@@ -11,6 +11,10 @@
     <modules>
         <module>qoj-question</module>
         <module>qoj-question/qoj-question-serv</module>
+        <module>qoj-gateway</module>
+        <module>qoj-common</module>
+        <module>qoj-user</module>
+        <module>qpj-test</module>
     </modules>
 
 

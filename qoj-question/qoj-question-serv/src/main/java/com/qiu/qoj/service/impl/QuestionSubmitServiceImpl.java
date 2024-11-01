@@ -26,7 +26,6 @@ import com.qiu.qoj.service.QuestionService;
 import com.qiu.qoj.service.QuestionSubmitService;
 import com.qiu.qoj.service.UserService;
 import com.qiu.qoj.utils.SqlUtils;
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -69,7 +68,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
 
     private static final ExecutorService QUESTION_SUBMIT_EXECUTOR = Executors.newSingleThreadExecutor();
 
-    @PostConstruct
+    //    @PostConstruct
     private void init() {
         QUESTION_SUBMIT_EXECUTOR.submit(new QUESTIONSUBMITHandler());
     }
