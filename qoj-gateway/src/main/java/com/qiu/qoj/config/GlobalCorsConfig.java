@@ -18,9 +18,12 @@ public class GlobalCorsConfig {
     public CorsWebFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         config.addAllowedMethod("*");
-        config.addAllowedOriginPattern("*");
+        config.addAllowedOrigin("http://localhost:8080");
         config.addAllowedHeader("*");
         config.setAllowCredentials(true);
+        config.addExposedHeader("*");
+        config.setMaxAge(3600L);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource(new PathPatternParser());
         source.registerCorsConfiguration("/**", config);
 

@@ -6,7 +6,6 @@ import cn.dev33.satoken.reactor.context.SaReactorSyncHolder;
 import cn.dev33.satoken.reactor.filter.SaReactorFilter;
 import cn.dev33.satoken.router.SaHttpMethod;
 import cn.dev33.satoken.router.SaRouter;
-import cn.dev33.satoken.stp.StpUtil;
 import com.qiu.qoj.common.BaseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -42,7 +41,7 @@ public class SaTokenConfig {
                     // 对于OPTIONS预检请求直接放行
                     SaRouter.match(SaHttpMethod.OPTIONS).stop();
                     // 登录认证
-                    SaRouter.match("/**", r -> StpUtil.checkLogin());
+//                    SaRouter.match("/**", r -> StpUtil.checkLogin());
 
                 })
                 // setAuth方法异常处理

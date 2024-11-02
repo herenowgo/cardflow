@@ -112,11 +112,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             log.info("user login failed, userAccount cannot match userPassword");
             Asserts.fail("用户不存在或密码错误");
         }
+        // 登录
         StpUtil.login(user.getId());
-        // 3. 记录用户的登录态
+        // 保存用户信息到 Session
         StpUtil.getSession().set(AuthConstant.STP_MEMBER_INFO, user);
 
-//        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
+        // 添加日志，查看token信息
+        log.info("Login token: {}", StpUtil.getTokenValue());
+
         return this.getLoginUserVO(user);
     }
 
