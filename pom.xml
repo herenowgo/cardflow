@@ -18,6 +18,7 @@
         <module>qoj-codeSandBox</module>
         <module>qoj-eventStream</module>
         <module>qoj-discussion</module>
+        <module>qoj-ai</module>
     </modules>
 
 
