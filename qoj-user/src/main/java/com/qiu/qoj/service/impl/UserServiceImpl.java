@@ -117,9 +117,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 保存用户信息到 Session
         StpUtil.getSession().set(AuthConstant.STP_MEMBER_INFO, user);
 
-        // 添加日志，查看token信息
-        log.info("Login token: {}", StpUtil.getTokenValue());
-
+//        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
         return this.getLoginUserVO(user);
     }
 

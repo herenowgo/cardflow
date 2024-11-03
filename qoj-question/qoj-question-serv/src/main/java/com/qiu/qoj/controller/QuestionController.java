@@ -4,12 +4,11 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.gson.Gson;
 import com.qiu.qoj.annotation.AuthCheck;
-import com.qiu.qoj.common.BaseResponse;
-import com.qiu.qoj.common.DeleteRequest;
-import com.qiu.qoj.common.ErrorCode;
-import com.qiu.qoj.common.ResultUtils;
 import com.qiu.qoj.constant.QuestionConstant;
 import com.qiu.qoj.constant.UserConstant;
+import com.qiu.qoj.domain.BaseResponse;
+import com.qiu.qoj.domain.DeleteRequest;
+import com.qiu.qoj.domain.ErrorCode;
 import com.qiu.qoj.exception.BusinessException;
 import com.qiu.qoj.exception.ThrowUtils;
 import com.qiu.qoj.model.dto.question.*;
@@ -80,7 +79,7 @@ public class QuestionController {
         boolean result = questionService.save(question);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         long newQuestionId = question.getId();
-        return ResultUtils.success(newQuestionId);
+        return BaseResponse.success(newQuestionId);
     }
 
     /**
@@ -106,7 +105,7 @@ public class QuestionController {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
         boolean b = questionService.removeById(id);
-        return ResultUtils.success(b);
+        return BaseResponse.success(b);
     }
 
     /**
@@ -143,7 +142,7 @@ public class QuestionController {
         Question oldQuestion = questionService.getById(id);
         ThrowUtils.throwIf(oldQuestion == null, ErrorCode.NOT_FOUND_ERROR);
         boolean result = questionService.updateById(question);
-        return ResultUtils.success(result);
+        return BaseResponse.success(result);
     }
 
     /**
@@ -167,7 +166,7 @@ public class QuestionController {
         if (!question.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
-        return ResultUtils.success(question);
+        return BaseResponse.success(question);
     }
 
     /**
@@ -185,7 +184,7 @@ public class QuestionController {
         if (question == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
-        return ResultUtils.success(questionService.getQuestionVO(question, request));
+        return BaseResponse.success(questionService.getQuestionVO(question, request));
     }
 
     /**
@@ -209,7 +208,7 @@ public class QuestionController {
             questionPage = questionService.page(new Page<>(current, size), questionService.getQueryWrapper(questionQueryRequest));
         }
 
-        return ResultUtils.success(questionService.getQuestionVOPage(questionPage, request));
+        return BaseResponse.success(questionService.getQuestionVOPage(questionPage, request));
     }
 
     /**
@@ -231,7 +230,7 @@ public class QuestionController {
         } else {
             questionPage = questionService.page(new Page<>(current, size), questionService.getQueryWrapper(questionQueryRequest));
         }
-        return ResultUtils.success(questionPage);
+        return BaseResponse.success(questionPage);
     }
 
     /**
@@ -255,7 +254,7 @@ public class QuestionController {
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         Page<Question> questionPage = questionService.page(new Page<>(current, size),
                 questionService.getQueryWrapper(questionQueryRequest));
-        return ResultUtils.success(questionService.getQuestionVOPage(questionPage, request));
+        return BaseResponse.success(questionService.getQuestionVOPage(questionPage, request));
     }
 
     // endregion
@@ -300,7 +299,7 @@ public class QuestionController {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
         boolean result = questionService.updateById(question);
-        return ResultUtils.success(result);
+        return BaseResponse.success(result);
     }
 
 
@@ -313,7 +312,7 @@ public class QuestionController {
     @GetMapping("/topFifty")
     public BaseResponse<List<QuestionVO>> getTopFifty(HttpServletRequest httpServletRequest) {
         List<QuestionVO> topFifty = questionService.getTopFifty(httpServletRequest);
-        return ResultUtils.success(topFifty);
+        return BaseResponse.success(topFifty);
     }
 
 

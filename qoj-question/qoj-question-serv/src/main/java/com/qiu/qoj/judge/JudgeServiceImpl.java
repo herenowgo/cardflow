@@ -1,9 +1,9 @@
 package com.qiu.qoj.judge;
 
 import cn.hutool.json.JSONUtil;
-import com.qiu.qoj.common.ErrorCode;
 import com.qiu.qoj.constant.QuestionConstant;
 import com.qiu.qoj.constant.QuestionSubmitConstant;
+import com.qiu.qoj.domain.ErrorCode;
 import com.qiu.qoj.exception.BusinessException;
 import com.qiu.qoj.judge.codesandbox.CodeSandbox;
 import com.qiu.qoj.judge.codesandbox.CodeSandboxFactory;

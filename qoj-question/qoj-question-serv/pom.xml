@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.qiu.qoj</groupId>
-        <artifactId>qoj</artifactId>
+        <artifactId>qoj-question</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
@@ -22,6 +22,10 @@
             <groupId>com.qiu.qoj</groupId>
             <artifactId>qoj-common</artifactId>
             <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
         </dependency>
         <dependency>
             <groupId>com.alibaba.cloud</groupId>

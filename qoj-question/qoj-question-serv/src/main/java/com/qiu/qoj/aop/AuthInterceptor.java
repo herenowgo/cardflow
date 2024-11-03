@@ -2,7 +2,7 @@ package com.qiu.qoj.aop;
 
 
 import com.qiu.qoj.annotation.AuthCheck;
-import com.qiu.qoj.common.ErrorCode;
+import com.qiu.qoj.domain.ErrorCode;
 import com.qiu.qoj.exception.BusinessException;
 import com.qiu.qoj.model.entity.User;
 import com.qiu.qoj.model.enums.UserRoleEnum;

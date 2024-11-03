@@ -1,12 +1,15 @@
 package com.qiu.qoj.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.qiu.qoj.common.ErrorCode;
 import com.qiu.qoj.constant.CommonConstant;
 import com.qiu.qoj.constant.QuestionConstant;
+import com.qiu.qoj.domain.ErrorCode;
+import com.qiu.qoj.domain.ResultCode;
+import com.qiu.qoj.exception.Asserts;
 import com.qiu.qoj.exception.BusinessException;
 import com.qiu.qoj.exception.ThrowUtils;
 import com.qiu.qoj.mapper.QuestionMapper;
@@ -60,10 +63,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
      */
     @Override
     public void validQuestion(Question question, boolean add) {
-        if (question == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-
+        Asserts.failIf(question == null, ResultCode.VALIDATE_FAILED);
 
         String title = question.getTitle();
         String content = question.getContent();
@@ -76,7 +76,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
 
         // 创建时，参数不能为空
         if (add) {
-            ThrowUtils.throwIf(StringUtils.isAnyBlank(title, content, tags), ErrorCode.PARAMS_ERROR);
+            ThrowUtils.throwIf(StrUtil.hasBlank(title, content, tags), ErrorCode.PARAMS_ERROR);
         }
         // 有参数则校验
         if (StringUtils.isNotBlank(title) && title.length() > 80) {
