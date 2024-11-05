@@ -42,4 +42,10 @@ public class AIController {
     public BaseResponse<QuestionRecommendation> recommendQuestion(String message, HttpServletRequest httpServletRequest) {
         return BaseResponse.success(aiService.generateQuestionRecommendation(message, httpServletRequest));
     }
+
+
+    @PostMapping("/suggest")
+    public BaseResponse<String> getStudySuggestion(String message, HttpServletRequest httpServletRequest) {
+        return BaseResponse.success(aiService.generateStudySuggestion(message));
+    }
 }

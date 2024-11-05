@@ -2,6 +2,7 @@ package com.qiu.qoj.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -12,9 +13,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.qiu.qoj.constant.*;
 import com.qiu.qoj.domain.ResultCode;
 import com.qiu.qoj.exception.Asserts;
+import com.qiu.qoj.feign.CodeSandBoxService;
 import com.qiu.qoj.judge.JudgeService;
+import com.qiu.qoj.judge.codesandbox.model.ExecuteCodeRequest;
+import com.qiu.qoj.judge.codesandbox.model.ExecuteCodeResponse;
 import com.qiu.qoj.judge.codesandbox.model.JudgeInfo;
 import com.qiu.qoj.mapper.QuestionSubmitMapper;
+import com.qiu.qoj.model.dto.question.JudgeCase;
+import com.qiu.qoj.model.dto.questionsubmint.DebugCodeRequest;
 import com.qiu.qoj.model.dto.questionsubmint.QuestionSubmitAddRequest;
 import com.qiu.qoj.model.dto.questionsubmint.QuestionSubmitQueryRequest;
 import com.qiu.qoj.model.entity.Question;
@@ -22,6 +28,7 @@ import com.qiu.qoj.model.entity.QuestionSubmit;
 import com.qiu.qoj.model.entity.User;
 import com.qiu.qoj.model.enums.QuestionSubmitLanguageEnum;
 import com.qiu.qoj.model.enums.QuestionSubmitStatusEnum;
+import com.qiu.qoj.model.vo.ExecuteCodeResponseVO;
 import com.qiu.qoj.model.vo.QuestionSubmitStateVO;
 import com.qiu.qoj.model.vo.QuestionSubmitVO;
 import com.qiu.qoj.model.vo.questionSubmit.QuestionSubmitPageVO;
@@ -37,6 +44,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -66,7 +74,8 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
-
+    @Resource
+    private CodeSandBoxService codeSandBoxService;
     /**
      * 提交题目
      *
@@ -224,8 +233,33 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
 
     }
 
+    @Override
+    public ExecuteCodeResponseVO debugCode(DebugCodeRequest debugCodeRequest) throws IOException, InterruptedException {
+        Long questionId = debugCodeRequest.getQuestionId();
+        String code = debugCodeRequest.getCode();
+        String language = debugCodeRequest.getLanguage();
+        String testCase = debugCodeRequest.getTestCase();
+        Boolean hasTestCase = StrUtil.isBlank(testCase);
+        if (hasTestCase) {
+            Question question = questionService.getById(questionId);
+            List<JudgeCase> judgeCaseList = JSONUtil.toList(question.getJudgeCase(), JudgeCase.class);
+            testCase = judgeCaseList.get(0).getInput();
+        }
+
+        ExecuteCodeRequest executeCodeRequest = new ExecuteCodeRequest();
+        executeCodeRequest.setLanguage(language);
+        executeCodeRequest.setCode(code);
+        executeCodeRequest.setInputList(List.of(testCase));
+        ExecuteCodeResponse executeCodeResponse = codeSandBoxService.executeCode(executeCodeRequest);
+
+        ExecuteCodeResponseVO executeCodeResponseVO = new ExecuteCodeResponseVO();
+        BeanUtil.copyProperties(executeCodeResponse, executeCodeResponseVO);
+
+        if (hasTestCase) {
+            executeCodeResponseVO.setTestCase(testCase);
+        }
+
+        return executeCodeResponseVO;
+    }
+
 }
-
-
-
-

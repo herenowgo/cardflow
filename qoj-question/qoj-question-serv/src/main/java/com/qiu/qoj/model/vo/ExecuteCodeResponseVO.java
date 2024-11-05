@@ -1,21 +1,12 @@
-package com.qiu.qoj.judge.codesandbox.model;
+package com.qiu.qoj.model.vo;
 
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class ExecuteCodeResponse {
-
-
+public class ExecuteCodeResponseVO {
     private String compileOutput;
 
     private String compileErrorOutput;
@@ -33,11 +24,6 @@ public class ExecuteCodeResponse {
      * 消耗时间（KB）
      */
     private List<Long> time = new ArrayList<>();
+
+    private String testCase;
 }
-
-
-
-
-
-
-

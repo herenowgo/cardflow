@@ -3,13 +3,17 @@ package com.qiu.qoj.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.qiu.qoj.model.dto.questionsubmint.DebugCodeRequest;
 import com.qiu.qoj.model.dto.questionsubmint.QuestionSubmitAddRequest;
 import com.qiu.qoj.model.dto.questionsubmint.QuestionSubmitQueryRequest;
 import com.qiu.qoj.model.entity.QuestionSubmit;
 import com.qiu.qoj.model.entity.User;
+import com.qiu.qoj.model.vo.ExecuteCodeResponseVO;
 import com.qiu.qoj.model.vo.QuestionSubmitStateVO;
 import com.qiu.qoj.model.vo.QuestionSubmitVO;
 import com.qiu.qoj.model.vo.questionSubmit.QuestionSubmitPageVO;
+
+import java.io.IOException;
 
 /**
  * @author 10692
@@ -67,4 +71,6 @@ public interface QuestionSubmitService extends IService<QuestionSubmit> {
     QuestionSubmitStateVO getJudgeInformation(Long questionSubmitId);
 
     Page<QuestionSubmitPageVO> listQuestionSubmitRecord(Long questionId, Integer current, Integer size);
+
+    ExecuteCodeResponseVO debugCode(DebugCodeRequest debugCodeRequest) throws IOException, InterruptedException;
 }

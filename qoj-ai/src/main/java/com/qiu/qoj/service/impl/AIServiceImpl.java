@@ -1,6 +1,8 @@
 package com.qiu.qoj.service.impl;
 
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.json.JSONUtil;
+import com.qiu.qoj.constant.AuthConstant;
 import com.qiu.qoj.judge.codesandbox.model.JudgeInfo;
 import com.qiu.qoj.manager.AIManage;
 import com.qiu.qoj.model.dto.question.JudgeCase;
@@ -95,12 +97,19 @@ public class AIServiceImpl implements AIService {
     public QuestionRecommendation generateQuestionRecommendation(String message, HttpServletRequest httpServletRequest) {
         User loginUser = userService.getLoginUser(httpServletRequest);
         String recommendation = aiManage.chatWithKnowledgeBase(message, "000000" + loginUser.getId().toString(), "1845342976004509696");
-        int index = recommendation.lastIndexOf("id::::");
-        String ids = recommendation.substring(index + 6);
-        String[] idArray = ids.split(",");
+        int firstIndex = recommendation.indexOf("ID:::");
+        int lastIndex = recommendation.lastIndexOf("ID:::");
+        String ids = recommendation.substring(firstIndex + 5, lastIndex);
+        String[] idArray = ids.split("，");
         List<QuestionVOForRecommend> questions = questionService.listByIds(Arrays.asList(idArray)).stream()
                 .map(QuestionVOForRecommend::objToVo)
                 .collect(Collectors.toList());
-        return new QuestionRecommendation(recommendation.substring(0, index), questions);
+        return new QuestionRecommendation("", questions);
+    }
+
+    @Override
+    public String generateStudySuggestion(String message) {
+        User user  = (User) StpUtil.getSession().get(AuthConstant.STP_MEMBER_INFO);
+        return aiManage.chatForSpeech(message, "666666000000" + user.getId().toString());
     }
 }

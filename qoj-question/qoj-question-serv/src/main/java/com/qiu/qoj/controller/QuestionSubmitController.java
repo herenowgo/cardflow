@@ -4,10 +4,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.qiu.qoj.domain.BaseResponse;
 import com.qiu.qoj.domain.ErrorCode;
 import com.qiu.qoj.exception.BusinessException;
+import com.qiu.qoj.model.dto.questionsubmint.DebugCodeRequest;
 import com.qiu.qoj.model.dto.questionsubmint.QuestionSubmitAddRequest;
 import com.qiu.qoj.model.dto.questionsubmint.QuestionSubmitQueryRequest;
 import com.qiu.qoj.model.entity.QuestionSubmit;
 import com.qiu.qoj.model.entity.User;
+import com.qiu.qoj.model.vo.ExecuteCodeResponseVO;
 import com.qiu.qoj.model.vo.QuestionSubmitStateVO;
 import com.qiu.qoj.model.vo.QuestionSubmitVO;
 import com.qiu.qoj.model.vo.questionSubmit.QuestionSubmitPageVO;
@@ -17,6 +19,8 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 
 /**
@@ -53,6 +57,14 @@ public class QuestionSubmitController {
 //        questionSubmitStateVO.setStatus(questionSubmit.getStatus());
 //        questionSubmitStateVO.setJudgeInfo(JSONUtil.parse(questionSubmit.getJudgeInfo()).toBean(JudgeInfo.class));
         return BaseResponse.success(questionSubmitId);
+    }
+
+
+
+    @PostMapping("/debug")
+    public BaseResponse<ExecuteCodeResponseVO> debugCode(@RequestBody DebugCodeRequest debugCodeRequest) throws IOException, InterruptedException {
+        ExecuteCodeResponseVO executeCodeResponseVO = questionSubmitService.debugCode(debugCodeRequest);
+        return BaseResponse.success(executeCodeResponseVO);
     }
 
     /**
@@ -116,6 +128,8 @@ public class QuestionSubmitController {
     public BaseResponse<QuestionSubmit> getQuestionSubmitInfo(@RequestParam Long questionSubmitId) {
         return BaseResponse.success(questionSubmitService.getById(questionSubmitId));
     }
+
+
 
 
 }

@@ -315,5 +315,4 @@ public class QuestionController {
         return BaseResponse.success(topFifty);
     }
 
-
 }
