@@ -1,14 +1,15 @@
 package com.qiu.qoj.service.impl;
 
+import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.qiu.qoj.constant.CommonConstant;
-import com.qiu.qoj.constant.EventConstant;
-import com.qiu.qoj.constant.QuestionConstant;
-import com.qiu.qoj.constant.QuestionSubmitConstant;
+import com.qiu.qoj.constant.*;
 import com.qiu.qoj.domain.ResultCode;
 import com.qiu.qoj.exception.Asserts;
 import com.qiu.qoj.judge.JudgeService;
@@ -23,6 +24,7 @@ import com.qiu.qoj.model.enums.QuestionSubmitLanguageEnum;
 import com.qiu.qoj.model.enums.QuestionSubmitStatusEnum;
 import com.qiu.qoj.model.vo.QuestionSubmitStateVO;
 import com.qiu.qoj.model.vo.QuestionSubmitVO;
+import com.qiu.qoj.model.vo.questionSubmit.QuestionSubmitPageVO;
 import com.qiu.qoj.service.QuestionService;
 import com.qiu.qoj.service.QuestionSubmitService;
 import com.qiu.qoj.service.UserService;
@@ -192,6 +194,33 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         questionSubmitStateVO.setStatus(questionSubmit.getStatus());
         questionSubmitStateVO.setJudgeInfo(JSONUtil.parse(questionSubmit.getJudgeInfo()).toBean(JudgeInfo.class));
         return questionSubmitStateVO;
+    }
+
+    @Override
+    public Page<QuestionSubmitPageVO> listQuestionSubmitRecord(Long questionId, Integer current, Integer size) {
+        User user = (User) StpUtil.getSession().get(AuthConstant.STP_MEMBER_INFO);
+        Long userId = user.getId();
+
+        LambdaQueryWrapper<QuestionSubmit> wrapper = Wrappers.lambdaQuery(QuestionSubmit.class)
+                .eq(QuestionSubmit::getUserId, userId)
+                .eq(QuestionSubmit::getQuestionId, questionId)
+                .select(QuestionSubmit::getStatus, QuestionSubmit::getId, QuestionSubmit::getLanguage, QuestionSubmit::getJudgeInfo, QuestionSubmit::getCreateTime);
+
+
+        // 从数据库中获取原始的分页数据
+        Page<QuestionSubmit> questionSubmitPage = page(new Page<>(current, size), wrapper);
+
+        List<QuestionSubmitPageVO> questionSubmitPageVOList = questionSubmitPage.getRecords().stream()
+                .map(QuestionSubmitPageVO::objToVo)
+                .collect(Collectors.toList());
+
+        Page<QuestionSubmitPageVO> questionSubmitPageVOPage = new Page<>();
+        BeanUtil.copyProperties(questionSubmitPage, questionSubmitPageVOPage);
+        questionSubmitPageVOPage.setRecords(questionSubmitPageVOList);
+        return questionSubmitPageVOPage;
+
+
+
     }
 
 }

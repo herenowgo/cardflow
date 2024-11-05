@@ -13,6 +13,8 @@ import com.qiu.qoj.model.entity.User;
 import com.qiu.qoj.model.vo.CommentVO;
 import com.qiu.qoj.service.CommentService;
 import com.qiu.qoj.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/comment")
 @Slf4j
+@Tag(name = "评论接口")
 public class CommentController {
 
     @Resource
@@ -45,6 +48,7 @@ public class CommentController {
      * @return
      */
     @PostMapping("/add")
+    @Operation()
     public BaseResponse<Long> addComment(@RequestBody CommentAddRequest commentAddRequest, HttpServletRequest request) {
         if (commentAddRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);

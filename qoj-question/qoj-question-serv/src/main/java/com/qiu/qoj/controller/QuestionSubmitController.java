@@ -10,6 +10,7 @@ import com.qiu.qoj.model.entity.QuestionSubmit;
 import com.qiu.qoj.model.entity.User;
 import com.qiu.qoj.model.vo.QuestionSubmitStateVO;
 import com.qiu.qoj.model.vo.QuestionSubmitVO;
+import com.qiu.qoj.model.vo.questionSubmit.QuestionSubmitPageVO;
 import com.qiu.qoj.service.QuestionSubmitService;
 import com.qiu.qoj.service.UserService;
 import jakarta.annotation.Resource;
@@ -97,6 +98,17 @@ public class QuestionSubmitController {
     public BaseResponse<QuestionSubmitStateVO> getJudgeInformation(@RequestParam Long questionSubmitId) {
         QuestionSubmitStateVO judgeInformation = questionSubmitService.getJudgeInformation(questionSubmitId);
         return BaseResponse.success(judgeInformation);
+    }
+
+
+    /**
+     * 获取题目提交记录
+     * @param questionId
+     * @return
+     */
+    @GetMapping("/records")
+    public BaseResponse<Page<QuestionSubmitPageVO>> listQuestionSubmitRecord(@RequestParam Long questionId, @RequestParam Integer current, @RequestParam Integer size) {
+        return BaseResponse.success(questionSubmitService.listQuestionSubmitRecord(questionId, current, size));
     }
 
 

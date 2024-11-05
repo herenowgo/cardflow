@@ -17,6 +17,8 @@ import com.qiu.qoj.model.entity.User;
 import com.qiu.qoj.model.vo.QuestionVO;
 import com.qiu.qoj.service.QuestionService;
 import com.qiu.qoj.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/question")
 @Slf4j
+@Tag(name = "body参数")
 public class QuestionController {
 
     @Resource
@@ -53,6 +56,7 @@ public class QuestionController {
      * @return
      */
     @PostMapping("/add")
+    @Operation(summary = "创建题目")
     public BaseResponse<Long> addQuestion(@RequestBody QuestionAddRequest questionAddRequest, HttpServletRequest request) {
         if (questionAddRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);

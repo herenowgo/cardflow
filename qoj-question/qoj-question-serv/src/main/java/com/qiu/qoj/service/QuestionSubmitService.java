@@ -9,6 +9,7 @@ import com.qiu.qoj.model.entity.QuestionSubmit;
 import com.qiu.qoj.model.entity.User;
 import com.qiu.qoj.model.vo.QuestionSubmitStateVO;
 import com.qiu.qoj.model.vo.QuestionSubmitVO;
+import com.qiu.qoj.model.vo.questionSubmit.QuestionSubmitPageVO;
 
 /**
  * @author 10692
@@ -64,4 +65,6 @@ public interface QuestionSubmitService extends IService<QuestionSubmit> {
     Integer getQuestionSubmitState(Long questionSubmitId);
 
     QuestionSubmitStateVO getJudgeInformation(Long questionSubmitId);
+
+    Page<QuestionSubmitPageVO> listQuestionSubmitRecord(Long questionId, Integer current, Integer size);
 }
