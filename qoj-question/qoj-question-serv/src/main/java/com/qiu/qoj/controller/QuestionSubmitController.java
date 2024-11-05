@@ -112,4 +112,10 @@ public class QuestionSubmitController {
     }
 
 
+    @GetMapping
+    public BaseResponse<QuestionSubmit> getQuestionSubmitInfo(@RequestParam Long questionSubmitId) {
+        return BaseResponse.success(questionSubmitService.getById(questionSubmitId));
+    }
+
+
 }

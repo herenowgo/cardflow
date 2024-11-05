@@ -204,7 +204,8 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         LambdaQueryWrapper<QuestionSubmit> wrapper = Wrappers.lambdaQuery(QuestionSubmit.class)
                 .eq(QuestionSubmit::getUserId, userId)
                 .eq(QuestionSubmit::getQuestionId, questionId)
-                .select(QuestionSubmit::getStatus, QuestionSubmit::getId, QuestionSubmit::getLanguage, QuestionSubmit::getJudgeInfo, QuestionSubmit::getCreateTime);
+                .select(QuestionSubmit::getStatus, QuestionSubmit::getId, QuestionSubmit::getLanguage, QuestionSubmit::getJudgeInfo, QuestionSubmit::getCreateTime)
+                .orderByDesc(QuestionSubmit::getCreateTime);
 
 
         // 从数据库中获取原始的分页数据
