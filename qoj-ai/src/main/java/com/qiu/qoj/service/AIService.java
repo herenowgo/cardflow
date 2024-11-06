@@ -12,4 +12,6 @@ public interface AIService {
     QuestionRecommendation generateQuestionRecommendation(String message, HttpServletRequest httpServletRequest);
 
     String generateStudySuggestion(String message);
+
+    String analyzeUserSubmitRecord();
 }

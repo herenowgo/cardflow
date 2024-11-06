@@ -12,6 +12,7 @@ import com.qiu.qoj.model.entity.User;
 import com.qiu.qoj.model.vo.ExecuteCodeResponseVO;
 import com.qiu.qoj.model.vo.QuestionSubmitStateVO;
 import com.qiu.qoj.model.vo.QuestionSubmitVO;
+import com.qiu.qoj.model.vo.QuestionSubmitWithTagVO;
 import com.qiu.qoj.model.vo.questionSubmit.QuestionSubmitPageVO;
 import com.qiu.qoj.service.QuestionSubmitService;
 import com.qiu.qoj.service.UserService;
@@ -19,6 +20,7 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import java.util.*;
 
 import java.io.IOException;
 
@@ -130,6 +132,12 @@ public class QuestionSubmitController {
     }
 
 
-
+    /**
+     * 获取提交记录
+     */
+    @GetMapping("/list")
+    public BaseResponse<List<QuestionSubmitWithTagVO>> listQuestionSubmit(Integer number) {
+        return BaseResponse.success(questionSubmitService.listQuestionSubmit(number));
+    }
 
 }

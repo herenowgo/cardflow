@@ -1,6 +1,7 @@
 package com.qiu.qoj.controller;
 
 import cn.dev33.satoken.annotation.SaCheckRole;
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.qiu.qoj.config.CosClientConfig;
@@ -188,6 +189,8 @@ public class UserController {
         if (deleteRequest == null || deleteRequest.getId() <= 0) {
             Asserts.fail("请求参数错误");
         }
+
+        StpUtil.logout(deleteRequest.getId());
         boolean b = userService.removeById(deleteRequest.getId());
         return BaseResponse.success(b);
     }
@@ -210,6 +213,7 @@ public class UserController {
         BeanUtils.copyProperties(userUpdateRequest, user);
         boolean result = userService.updateById(user);
         Asserts.failIf(!result, "更新用户失败");
+        StpUtil.logout(user.getId());
         return BaseResponse.success(true);
     }
 

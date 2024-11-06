@@ -48,4 +48,14 @@ public class AIController {
     public BaseResponse<String> getStudySuggestion(String message, HttpServletRequest httpServletRequest) {
         return BaseResponse.success(aiService.generateStudySuggestion(message));
     }
+
+    /**
+     * 分析用户提交记录
+     */
+    @PostMapping("/analyzeUserSubmitRecord")
+    public BaseResponse<String> analyzeUserSubmitRecord() {
+        return BaseResponse.success(aiService.analyzeUserSubmitRecord());
+    }
+
+
 }

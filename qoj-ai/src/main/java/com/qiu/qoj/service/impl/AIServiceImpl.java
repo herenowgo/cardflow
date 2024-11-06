@@ -2,7 +2,11 @@ package com.qiu.qoj.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.json.JSONUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.qiu.qoj.constant.AuthConstant;
+import com.qiu.qoj.domain.BaseResponse;
+import com.qiu.qoj.feign.QuestionSubmitServiceFeign;
+import com.qiu.qoj.feign.QuestionSubmitWithTagVO;
 import com.qiu.qoj.judge.codesandbox.model.JudgeInfo;
 import com.qiu.qoj.manager.AIManage;
 import com.qiu.qoj.model.dto.question.JudgeCase;
@@ -18,6 +22,8 @@ import com.qiu.qoj.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,6 +41,7 @@ public class AIServiceImpl implements AIService {
 
     private final UserService userService;
 
+    private final QuestionSubmitServiceFeign questionSubmitServiceFeign;
 
     /**
      * @param questionSubmitId
@@ -89,7 +96,7 @@ public class AIServiceImpl implements AIService {
         );
 
 //        User loginUser = userService.getLoginUser(httpServletRequest);
-        String result = aiManage.chatForSpeech(questionTemplate, "" + questionSubmitId.shortValue() + index);
+        String result = aiManage.chatForSpeech(questionTemplate, "4535243534543525" + questionSubmitId.shortValue() + index);
         return result;
     }
 
@@ -109,7 +116,27 @@ public class AIServiceImpl implements AIService {
 
     @Override
     public String generateStudySuggestion(String message) {
-        User user  = (User) StpUtil.getSession().get(AuthConstant.STP_MEMBER_INFO);
+        User user = (User) StpUtil.getSession().get(AuthConstant.STP_MEMBER_INFO);
         return aiManage.chatForSpeech(message, "666666000000" + user.getId().toString());
+    }
+
+    @Override
+    public String analyzeUserSubmitRecord() {
+        User user = (User) StpUtil.getSession().get(AuthConstant.STP_MEMBER_INFO);
+        BaseResponse<List<QuestionSubmitWithTagVO>> baseResponse = questionSubmitServiceFeign.listQuestionSubmit(100);
+        List<QuestionSubmitWithTagVO> data = baseResponse.getData();
+        // 使用jackson-dataformat-csv将List<QuestionSubmitWithTagVO>转换为csv格式字符串，头部为QuestionSubmitWithTagVO里的字段
+        CsvMapper csvMapper = new CsvMapper();
+        CsvSchema schema = csvMapper.schemaFor(QuestionSubmitWithTagVO.class).withHeader();
+        String csv = null;
+        try {
+            csv = csvMapper.writer(schema).writeValueAsString(data);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        String result = aiManage.chatForDataAnalysis(csv, "666666000000" + user.getId().toString());
+
+        return result;
     }
 }

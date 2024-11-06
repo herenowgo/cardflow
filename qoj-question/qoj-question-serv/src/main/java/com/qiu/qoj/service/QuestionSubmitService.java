@@ -11,9 +11,11 @@ import com.qiu.qoj.model.entity.User;
 import com.qiu.qoj.model.vo.ExecuteCodeResponseVO;
 import com.qiu.qoj.model.vo.QuestionSubmitStateVO;
 import com.qiu.qoj.model.vo.QuestionSubmitVO;
+import com.qiu.qoj.model.vo.QuestionSubmitWithTagVO;
 import com.qiu.qoj.model.vo.questionSubmit.QuestionSubmitPageVO;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author 10692
@@ -73,4 +75,6 @@ public interface QuestionSubmitService extends IService<QuestionSubmit> {
     Page<QuestionSubmitPageVO> listQuestionSubmitRecord(Long questionId, Integer current, Integer size);
 
     ExecuteCodeResponseVO debugCode(DebugCodeRequest debugCodeRequest) throws IOException, InterruptedException;
+
+    List<QuestionSubmitWithTagVO> listQuestionSubmit(Integer number);
 }

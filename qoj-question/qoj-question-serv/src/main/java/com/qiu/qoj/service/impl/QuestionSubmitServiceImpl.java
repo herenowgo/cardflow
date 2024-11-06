@@ -31,6 +31,7 @@ import com.qiu.qoj.model.enums.QuestionSubmitStatusEnum;
 import com.qiu.qoj.model.vo.ExecuteCodeResponseVO;
 import com.qiu.qoj.model.vo.QuestionSubmitStateVO;
 import com.qiu.qoj.model.vo.QuestionSubmitVO;
+import com.qiu.qoj.model.vo.QuestionSubmitWithTagVO;
 import com.qiu.qoj.model.vo.questionSubmit.QuestionSubmitPageVO;
 import com.qiu.qoj.service.QuestionService;
 import com.qiu.qoj.service.QuestionSubmitService;
@@ -46,6 +47,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -260,6 +262,42 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         }
 
         return executeCodeResponseVO;
+    }
+
+    @Override
+    public List<QuestionSubmitWithTagVO> listQuestionSubmit(Integer number) {
+
+        User user  = (User) StpUtil.getSession().get(AuthConstant.STP_MEMBER_INFO);
+        LambdaQueryWrapper<QuestionSubmit> lambdaQueryWrapper = Wrappers.lambdaQuery(QuestionSubmit.class)
+                .select(QuestionSubmit::getLanguage, QuestionSubmit::getCreateTime, QuestionSubmit::getJudgeInfo, QuestionSubmit::getStatus, QuestionSubmit::getQuestionId)
+                .eq(QuestionSubmit::getUserId, user.getId())
+                .orderByDesc(QuestionSubmit::getCreateTime)
+                .last("limit " + number);
+
+        List<QuestionSubmit> list = list(lambdaQueryWrapper);
+
+        List<Long> quesitonIDs = list.stream()
+                .map(QuestionSubmit::getQuestionId)
+                .distinct()
+                .toList();
+
+        List<Question> questions = questionService.listByIds(quesitonIDs);
+        Map<Long, String> idTagMap = questions.stream()
+                .collect(Collectors.toMap(Question::getId, Question::getTags));
+
+
+        List<QuestionSubmitWithTagVO> voList = list.stream()
+                .map(
+                        questionSubmit -> {
+                            QuestionSubmitWithTagVO questionSubmitWithTagVO = new QuestionSubmitWithTagVO();
+                            BeanUtil.copyProperties(questionSubmit, questionSubmitWithTagVO);
+                            questionSubmitWithTagVO.setTags(idTagMap.get(questionSubmit.getQuestionId()));
+                            return questionSubmitWithTagVO;
+                        }
+                )
+                .toList();
+
+        return voList;
     }
 
 }
