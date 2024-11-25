@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.qiu.qoj</groupId>
+        <artifactId>qoj</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>qoj-document</artifactId>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.qiu.qoj</groupId>
+            <artifactId>qoj-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-stream-rabbit</artifactId>-->
+<!--        </dependency>-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+        </dependency>
+        <!-- 读取bootstrap文件 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bootstrap</artifactId>
+        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.baomidou</groupId>-->
+<!--            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-web</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-data-redis</artifactId>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>org.apache.commons</groupId>-->
+<!--            <artifactId>commons-pool2</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.google.code.gson</groupId>-->
+<!--            <artifactId>gson</artifactId>-->
+<!--            <version>2.9.1</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.apache.commons</groupId>-->
+<!--            <artifactId>commons-lang3</artifactId>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; https://cloud.tencent.com/document/product/436/10199&ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>com.qcloud</groupId>-->
+<!--            <artifactId>cos_api</artifactId>-->
+<!--            <version>5.6.89</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>mysql</groupId>-->
+<!--            <artifactId>mysql-connector-java</artifactId>-->
+<!--            <scope>runtime</scope>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; https://github.com/briqt/xunfei-spark4j &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>io.github.briqt</groupId>-->
+<!--            <artifactId>xunfei-spark4j</artifactId>-->
+<!--            <version>1.2.0</version>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash;        https://github.com/MetaGLM/zhipuai-sdk-java-v4&ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>cn.bigmodel.openapi</groupId>-->
+<!--            <artifactId>oapi-java-sdk</artifactId>-->
+<!--            <version>release-V4-2.3.0</version>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; https://doc.xiaominfo.com/knife4j/documentation/get_start.html&ndash;&gt;-->
+<!--        &lt;!&ndash;        <dependency>&ndash;&gt;-->
+<!--        &lt;!&ndash;            <groupId>com.github.xiaoymin</groupId>&ndash;&gt;-->
+<!--        &lt;!&ndash;            <artifactId>knife4j-spring-boot-starter</artifactId>&ndash;&gt;-->
+<!--        &lt;!&ndash;            <version>3.0.3</version>&ndash;&gt;-->
+<!--        &lt;!&ndash;        </dependency>&ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-openfeign</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.baomidou</groupId>-->
+<!--            <artifactId>mybatis-plus-jsqlparser-4.9</artifactId>-->
+<!--        </dependency>-->
+        <!-- druid -->
+        <!--        <dependency>-->
+        <!--            <groupId>com.alibaba</groupId>-->
+        <!--            <artifactId>druid-spring-boot-starter</artifactId>-->
+        <!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.mchange</groupId>-->
+<!--            <artifactId>c3p0</artifactId>-->
+<!--            <version>0.9.5.2</version>-->
+<!--        </dependency>-->
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <!--            <plugin>-->
+            <!--                <groupId>io.fabric8</groupId>-->
+            <!--                <artifactId>docker-maven-plugin</artifactId>-->
+            <!--            </plugin>-->
+        </plugins>
+    </build>
+
+</project>

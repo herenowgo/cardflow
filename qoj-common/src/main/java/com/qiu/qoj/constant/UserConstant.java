@@ -37,5 +37,9 @@ public interface UserConstant {
     String USER_AVATAR_SET = "user:avatar";
     String USER_AVATAR_DB_SET = "user:avatar:db";
 
+    String USER_ROLE_ADMIN = "admin";
+
+    String USER_ROLE_USER = "user";
+
 
 }

@@ -2,10 +2,13 @@ package com.qiu.qoj.config;
 
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
+import cn.dev33.satoken.jwt.StpLogicJwtForMixin;
 import cn.dev33.satoken.reactor.context.SaReactorSyncHolder;
 import cn.dev33.satoken.reactor.filter.SaReactorFilter;
 import cn.dev33.satoken.router.SaHttpMethod;
 import cn.dev33.satoken.router.SaRouter;
+import cn.dev33.satoken.stp.StpLogic;
+import cn.dev33.satoken.stp.StpUtil;
 import com.qiu.qoj.common.BaseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -26,6 +29,12 @@ public class SaTokenConfig {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
+
+    @Bean
+    public StpLogic getStpLogicJwt() {
+        return new StpLogicJwtForMixin();
+    }
+
     /**
      * 注册Sa-Token全局过滤器
      */
@@ -41,7 +50,7 @@ public class SaTokenConfig {
                     // 对于OPTIONS预检请求直接放行
                     SaRouter.match(SaHttpMethod.OPTIONS).stop();
                     // 登录认证
-//                    SaRouter.match("/**", r -> StpUtil.checkLogin());
+                    SaRouter.match("/**", r -> StpUtil.checkLogin());
 
                 })
                 // setAuth方法异常处理

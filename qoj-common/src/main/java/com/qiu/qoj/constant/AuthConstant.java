@@ -61,4 +61,6 @@ public interface AuthConstant {
      */
     String STP_ADMIN_INFO = "adminInfo";
 
+    String ROLE = "role";
+
 }
