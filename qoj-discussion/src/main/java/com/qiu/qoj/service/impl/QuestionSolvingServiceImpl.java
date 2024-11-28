@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.qiu.qoj.constant.CommonConstant;
 import com.qiu.qoj.constant.QuestionSolvingConstant;
+import com.qiu.qoj.domain.UserContext;
 import com.qiu.qoj.mapper.QuestionSolvingMapper;
 import com.qiu.qoj.model.dto.questionsolving.QuestionSolvingQueryRequest;
 import com.qiu.qoj.model.entity.QuestionSolving;
@@ -143,9 +144,9 @@ public class QuestionSolvingServiceImpl extends ServiceImpl<QuestionSolvingMappe
 
     @Override
     public Boolean isSupported(Long questionSolvingId, HttpServletRequest httpServletRequest) {
-        User loginUser = userService.getLoginUser(httpServletRequest);
+
         String key = QuestionSolvingConstant.QUESTION_SOLVING_LIKED_KEY + questionSolvingId;
-        Long userId = loginUser.getId();
+        Long userId = UserContext.getUserId();
         // 用Redis判断用户是否已支持
         Boolean supported = stringRedisTemplate.opsForSet().isMember(key, userId.toString());
         return supported;

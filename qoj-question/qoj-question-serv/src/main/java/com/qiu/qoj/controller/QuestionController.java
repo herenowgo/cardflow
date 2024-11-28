@@ -9,6 +9,7 @@ import com.qiu.qoj.constant.UserConstant;
 import com.qiu.qoj.domain.BaseResponse;
 import com.qiu.qoj.domain.DeleteRequest;
 import com.qiu.qoj.domain.ErrorCode;
+import com.qiu.qoj.domain.UserContext;
 import com.qiu.qoj.exception.BusinessException;
 import com.qiu.qoj.exception.ThrowUtils;
 import com.qiu.qoj.model.dto.question.*;
@@ -72,8 +73,8 @@ public class QuestionController {
             question.setJudgeConfig(GSON.toJson(judgeConfig));
         }
         questionService.validQuestion(question, true);
-        User loginUser = userService.getLoginUser(request);
-        question.setUserId(loginUser.getId());
+
+        question.setUserId(UserContext.getUserId());
         question.setFavourNum(0);
         question.setThumbNum(0);
         boolean result = questionService.save(question);
@@ -95,13 +96,12 @@ public class QuestionController {
         if (deleteRequest == null || deleteRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        User user = userService.getLoginUser(request);
         long id = deleteRequest.getId();
         // 判断是否存在
         Question oldQuestion = questionService.getById(id);
         ThrowUtils.throwIf(oldQuestion == null, ErrorCode.NOT_FOUND_ERROR);
         // 仅本人或管理员可删除
-        if (!oldQuestion.getUserId().equals(user.getId()) && !userService.isAdmin(request)) {
+        if (!oldQuestion.getUserId().equals(UserContext.getUserId()) && !userService.isAdmin(request)) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
         boolean b = questionService.removeById(id);
@@ -246,8 +246,7 @@ public class QuestionController {
         if (questionQueryRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        User loginUser = userService.getLoginUser(request);
-        questionQueryRequest.setUserId(loginUser.getId());
+        questionQueryRequest.setUserId(UserContext.getUserId());
         long current = questionQueryRequest.getCurrent();
         long size = questionQueryRequest.getPageSize();
         // 限制爬虫

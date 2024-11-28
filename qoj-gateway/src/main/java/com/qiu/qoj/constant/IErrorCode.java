@@ -1,4 +1,4 @@
-package com.qiu.qoj.common;
+package com.qiu.qoj.constant;
 
 /**
  * 封装API的错误码

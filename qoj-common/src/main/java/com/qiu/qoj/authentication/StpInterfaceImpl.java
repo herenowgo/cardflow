@@ -1,8 +1,7 @@
 package com.qiu.qoj.authentication;
 
 import cn.dev33.satoken.stp.StpInterface;
-import cn.dev33.satoken.stp.StpUtil;
-import com.qiu.qoj.constant.AuthConstant;
+import com.qiu.qoj.domain.UserContext;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -16,8 +15,7 @@ public class StpInterfaceImpl implements StpInterface {
 
     @Override
     public List<String> getRoleList(Object loginId, String loginType) {
-        String role = StpUtil.getSession().get(AuthConstant.ROLE).toString();
-
+        String role = UserContext.getUserRole();
         return List.of(role);
     }
 }

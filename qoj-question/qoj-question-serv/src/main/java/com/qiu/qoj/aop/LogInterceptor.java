@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -21,14 +20,14 @@ import java.util.UUID;
  * @from <a href="https://yupi.icu">编程导航知识星球</a>
  **/
 @Aspect
-@Component
+//@Component
 @Slf4j
 public class LogInterceptor {
 
     /**
      * 执行拦截
      */
-    @Around("execution(* com.yupi.mianshiya.controller.*.*(..))")
+    @Around("execution(* com.qiu.qoj.controller.*.*(..))")
     public Object doInterceptor(ProceedingJoinPoint point) throws Throwable {
         // 计时
         StopWatch stopWatch = new StopWatch();

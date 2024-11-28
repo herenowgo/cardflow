@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.qiu.qoj.constant.CommonConstant;
+import com.qiu.qoj.domain.UserContext;
 import com.qiu.qoj.mapper.CommentMapper;
 import com.qiu.qoj.model.dto.comment.CommentQueryRequest;
 import com.qiu.qoj.model.entity.Comment;
@@ -78,8 +79,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment>
         if (CollUtil.isEmpty(commentList)) {
             return commentVOPage;
         }
-        User loginUser = userService.getLoginUser(request);
-        Long viewUserId = loginUser.getId();
+        Long viewUserId = UserContext.getUserId();
         // 1. 关联查询用户信息
         Set<Long> userIdSet = commentList.stream().map(Comment::getUserId).collect(Collectors.toSet());
         Map<Long, List<User>> userIdUserListMap = userService.listByIds(userIdSet).stream()

@@ -6,7 +6,7 @@ package com.qiu.qoj.constant;
  */
 public interface AuthConstant {
 
-    String AUTHORIZATION_Header = "Authorization";
+    String AUTHORIZATION_HEADER = "Authorization";
 
     String JWT_PAYLOAD_LOGIN_ID = "loginId";
 

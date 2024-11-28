@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.qiu.qoj.constant.*;
 import com.qiu.qoj.domain.ResultCode;
+import com.qiu.qoj.domain.UserContext;
 import com.qiu.qoj.exception.Asserts;
 import com.qiu.qoj.feign.CodeSandBoxService;
 import com.qiu.qoj.judge.JudgeService;
@@ -82,11 +83,10 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
      * 提交题目
      *
      * @param questionSubmitAddRequest
-     * @param loginUser
      * @return 提交记录的id
      */
     @Override
-    public Long doQuestionSubmit(QuestionSubmitAddRequest questionSubmitAddRequest, User loginUser) {
+    public Long doQuestionSubmit(QuestionSubmitAddRequest questionSubmitAddRequest, Long userId) {
         // 校验编程语言是否合法
         String language = questionSubmitAddRequest.getLanguage();
         QuestionSubmitLanguageEnum languageEnum = QuestionSubmitLanguageEnum.getEnumByValue(language);
@@ -98,7 +98,6 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         Asserts.failIf(question == null, ResultCode.FAILED);
 
         // 是否已提交题目
-        long userId = loginUser.getId();
         // 每个用户串行提交题目
         QuestionSubmit questionSubmit = new QuestionSubmit();
         questionSubmit.setUserId(userId);
@@ -209,8 +208,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
 
     @Override
     public Page<QuestionSubmitPageVO> listQuestionSubmitRecord(Long questionId, Integer current, Integer size) {
-        User user = (User) StpUtil.getSession().get(AuthConstant.STP_MEMBER_INFO);
-        Long userId = user.getId();
+        Long userId = UserContext.getUserId();
 
         LambdaQueryWrapper<QuestionSubmit> wrapper = Wrappers.lambdaQuery(QuestionSubmit.class)
                 .eq(QuestionSubmit::getUserId, userId)

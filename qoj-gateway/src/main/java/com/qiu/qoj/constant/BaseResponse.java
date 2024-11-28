@@ -1,4 +1,4 @@
-package com.qiu.qoj.common;
+package com.qiu.qoj.constant;
 
 import cn.hutool.json.JSONUtil;
 import lombok.Data;

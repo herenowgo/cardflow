@@ -1,4 +1,4 @@
-package com.qiu.qoj.config;
+package com.qiu.qoj.filter;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +12,7 @@ import org.springframework.web.util.pattern.PathPatternParser;
  * 注意：前端从网关进行调用时需要配置
  */
 @Configuration
-public class GlobalCorsConfig {
+public class GlobalCorsFilter {
 
     @Bean
     public CorsWebFilter corsFilter() {

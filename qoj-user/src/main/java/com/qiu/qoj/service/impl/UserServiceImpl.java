@@ -1,5 +1,6 @@
 package com.qiu.qoj.service.impl;
 
+import cn.dev33.satoken.stp.SaLoginConfig;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.ReUtil;
@@ -114,9 +115,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             Asserts.fail("用户不存在或密码错误");
         }
         // 登录
-        StpUtil.login(user.getId());
-        // 保存用户信息到 Session
-        StpUtil.getSession().set(AuthConstant.ROLE, user.getUserRole());
+        StpUtil.login(user.getId(), SaLoginConfig.setExtra(AuthConstant.ROLE, user.getUserRole()));
+
 
 //        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
         return this.getLoginUserVO(user);

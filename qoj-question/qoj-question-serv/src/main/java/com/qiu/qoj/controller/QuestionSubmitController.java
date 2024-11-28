@@ -3,6 +3,7 @@ package com.qiu.qoj.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.qiu.qoj.domain.BaseResponse;
 import com.qiu.qoj.domain.ErrorCode;
+import com.qiu.qoj.domain.UserContext;
 import com.qiu.qoj.exception.BusinessException;
 import com.qiu.qoj.model.dto.questionsubmint.DebugCodeRequest;
 import com.qiu.qoj.model.dto.questionsubmint.QuestionSubmitAddRequest;
@@ -20,9 +21,9 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import java.util.*;
 
 import java.io.IOException;
+import java.util.List;
 
 
 /**
@@ -53,8 +54,7 @@ public class QuestionSubmitController {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
 
-        final User loginUser = userService.getLoginUser(request);
-        Long questionSubmitId = questionSubmitService.doQuestionSubmit(questionSubmitAddRequest, loginUser);
+        Long questionSubmitId = questionSubmitService.doQuestionSubmit(questionSubmitAddRequest, UserContext.getUserId());
 //        QuestionSubmitStateVO questionSubmitStateVO = new QuestionSubmitStateVO();
 //        questionSubmitStateVO.setStatus(questionSubmit.getStatus());
 //        questionSubmitStateVO.setJudgeInfo(JSONUtil.parse(questionSubmit.getJudgeInfo()).toBean(JudgeInfo.class));
