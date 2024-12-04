@@ -1,7 +1,7 @@
 package com.qiu.qoj.controller;
 
 
-import com.qiu.qoj.domain.BaseResponse;
+import com.qiu.qoj.common.api.BaseResponse;
 import com.qiu.qoj.model.vo.QuestionRecommendation;
 import com.qiu.qoj.service.AIService;
 import jakarta.annotation.Resource;

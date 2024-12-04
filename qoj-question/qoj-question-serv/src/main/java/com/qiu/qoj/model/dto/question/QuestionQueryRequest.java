@@ -1,6 +1,6 @@
 package com.qiu.qoj.model.dto.question;
 
-import com.qiu.qoj.domain.PageRequest;
+import com.qiu.qoj.common.api.PageRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

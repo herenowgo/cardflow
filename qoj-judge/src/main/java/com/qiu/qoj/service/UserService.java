@@ -3,7 +3,7 @@ package com.qiu.qoj.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.qiu.qoj.model.dto.user.UserQueryRequest;
-import com.qiu.qoj.model.entity.User;
+import com.qiu.qoj.common.model.entity.User;
 import com.qiu.qoj.model.vo.LoginUserVO;
 import com.qiu.qoj.model.vo.UserVO;
 import jakarta.servlet.http.HttpServletRequest;

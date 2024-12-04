@@ -1,6 +1,6 @@
 package com.qiu.qoj.feign;
 
-import com.qiu.qoj.domain.BaseResponse;
+import com.qiu.qoj.common.api.BaseResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;

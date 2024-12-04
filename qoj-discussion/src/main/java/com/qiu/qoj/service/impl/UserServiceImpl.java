@@ -7,14 +7,14 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.qiu.qoj.config.CosClientConfig;
-import com.qiu.qoj.constant.CommonConstant;
-import com.qiu.qoj.constant.UserConstant;
-import com.qiu.qoj.domain.ErrorCode;
-import com.qiu.qoj.domain.UserContext;
+import com.qiu.qoj.common.constant.CommonConstant;
+import com.qiu.qoj.common.constant.UserConstant;
+import com.qiu.qoj.common.api.ErrorCode;
+import com.qiu.qoj.common.api.UserContext;
 import com.qiu.qoj.exception.BusinessException;
 import com.qiu.qoj.mapper.UserMapper;
 import com.qiu.qoj.model.dto.user.UserQueryRequest;
-import com.qiu.qoj.model.entity.User;
+import com.qiu.qoj.common.model.entity.User;
 import com.qiu.qoj.model.enums.UserRoleEnum;
 import com.qiu.qoj.model.vo.LoginUserVO;
 import com.qiu.qoj.model.vo.UserVO;
@@ -33,8 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import static com.qiu.qoj.constant.UserConstant.*;
 
 /**
  * 用户服务实现

@@ -1,9 +1,9 @@
 package com.qiu.qoj.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.qiu.qoj.domain.BaseResponse;
-import com.qiu.qoj.domain.ErrorCode;
-import com.qiu.qoj.domain.UserContext;
+import com.qiu.qoj.common.api.BaseResponse;
+import com.qiu.qoj.common.api.ErrorCode;
+import com.qiu.qoj.common.api.UserContext;
 import com.qiu.qoj.exception.BusinessException;
 import com.qiu.qoj.model.dto.questionsubmint.DebugCodeRequest;
 import com.qiu.qoj.model.dto.questionsubmint.QuestionSubmitAddRequest;

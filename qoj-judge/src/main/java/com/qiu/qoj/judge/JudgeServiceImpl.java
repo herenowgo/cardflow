@@ -2,9 +2,9 @@ package com.qiu.qoj.judge;
 
 import cn.hutool.json.JSONUtil;
 import com.qiu.qoj.CodeSandBoxService;
-import com.qiu.qoj.constant.QuestionConstant;
-import com.qiu.qoj.constant.QuestionSubmitConstant;
-import com.qiu.qoj.exception.Asserts;
+import com.qiu.qoj.common.constant.QuestionConstant;
+import com.qiu.qoj.common.constant.QuestionSubmitConstant;
+import com.qiu.qoj.common.exception.Asserts;
 import com.qiu.qoj.judge.codesandbox.model.ExecuteCodeRequest;
 import com.qiu.qoj.judge.codesandbox.model.ExecuteCodeResponse;
 import com.qiu.qoj.judge.codesandbox.model.JudgeInfo;

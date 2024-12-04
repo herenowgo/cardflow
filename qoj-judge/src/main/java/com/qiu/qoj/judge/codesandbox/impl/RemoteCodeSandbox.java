@@ -3,7 +3,7 @@ package com.qiu.qoj.judge.codesandbox.impl;
 
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
-import com.qiu.qoj.exception.Asserts;
+import com.qiu.qoj.common.exception.Asserts;
 import com.qiu.qoj.judge.codesandbox.CodeSandbox;
 import com.qiu.qoj.judge.codesandbox.model.ExecuteCodeRequest;
 import com.qiu.qoj.judge.codesandbox.model.ExecuteCodeResponse;

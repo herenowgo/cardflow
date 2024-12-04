@@ -13,7 +13,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-import static com.qiu.qoj.constant.RedisConstant.CACHE_NULL_TTL;
+import static com.qiu.qoj.common.constant.RedisConstant.CACHE_NULL_TTL;
 
 
 @Slf4j

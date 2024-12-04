@@ -1,7 +1,7 @@
 package com.qiu.qoj.model.dto.questionsubmint;
 
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.qiu.qoj.domain.PageRequest;
+import com.qiu.qoj.common.api.PageRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

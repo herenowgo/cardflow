@@ -4,17 +4,15 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.qiu.qoj.constant.CommonConstant;
-import com.qiu.qoj.constant.QuestionConstant;
-import com.qiu.qoj.domain.ErrorCode;
-import com.qiu.qoj.domain.ResultCode;
-import com.qiu.qoj.exception.Asserts;
+import com.qiu.qoj.common.constant.CommonConstant;
+import com.qiu.qoj.common.api.ErrorCode;
+import com.qiu.qoj.common.api.ResultCode;
+import com.qiu.qoj.common.exception.Asserts;
 import com.qiu.qoj.exception.BusinessException;
-import com.qiu.qoj.exception.ThrowUtils;
 import com.qiu.qoj.mapper.QuestionMapper;
 import com.qiu.qoj.model.dto.question.QuestionQueryRequest;
 import com.qiu.qoj.model.entity.Question;
-import com.qiu.qoj.model.entity.User;
+import com.qiu.qoj.common.model.entity.User;
 import com.qiu.qoj.model.vo.QuestionVO;
 import com.qiu.qoj.model.vo.UserVO;
 import com.qiu.qoj.service.QuestionService;
@@ -75,7 +73,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
 
         // 创建时，参数不能为空
         if (add) {
-            ThrowUtils.throwIf(StringUtils.isAnyBlank(title, content, tags), ErrorCode.PARAMS_ERROR);
+            Asserts.failIf(StringUtils.isAnyBlank(title, content, tags), ResultCode.VALIDATE_FAILED);
         }
         // 有参数则校验
         if (StringUtils.isNotBlank(title) && title.length() > 80) {

@@ -1,7 +1,7 @@
 package com.qiu.qoj.exception;
 
 
-import com.qiu.qoj.domain.ErrorCode;
+import com.qiu.qoj.common.api.ErrorCode;
 
 /**
  * 自定义异常类

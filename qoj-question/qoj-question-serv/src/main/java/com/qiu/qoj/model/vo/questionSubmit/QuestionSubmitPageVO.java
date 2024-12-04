@@ -2,7 +2,7 @@ package com.qiu.qoj.model.vo.questionSubmit;
 
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.qiu.qoj.domain.PageRequest;
+import com.qiu.qoj.common.api.PageRequest;
 import com.qiu.qoj.model.dto.questionsubmint.JudgeInfo;
 import com.qiu.qoj.model.entity.QuestionSubmit;
 import lombok.Data;

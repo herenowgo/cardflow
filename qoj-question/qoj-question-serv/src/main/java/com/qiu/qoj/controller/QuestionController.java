@@ -1,15 +1,15 @@
 package com.qiu.qoj.controller;
 
+import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.gson.Gson;
-import com.qiu.qoj.annotation.AuthCheck;
-import com.qiu.qoj.constant.QuestionConstant;
-import com.qiu.qoj.constant.UserConstant;
-import com.qiu.qoj.domain.BaseResponse;
-import com.qiu.qoj.domain.DeleteRequest;
-import com.qiu.qoj.domain.ErrorCode;
-import com.qiu.qoj.domain.UserContext;
+import com.qiu.qoj.common.constant.QuestionConstant;
+import com.qiu.qoj.common.constant.UserConstant;
+import com.qiu.qoj.common.api.BaseResponse;
+import com.qiu.qoj.common.api.DeleteRequest;
+import com.qiu.qoj.common.api.ErrorCode;
+import com.qiu.qoj.common.api.UserContext;
 import com.qiu.qoj.exception.BusinessException;
 import com.qiu.qoj.exception.ThrowUtils;
 import com.qiu.qoj.model.dto.question.*;
@@ -112,7 +112,7 @@ public class QuestionController {
      */
     @PostMapping("/update")
     @CacheEvict(value = QuestionConstant.CACHE_QUESTION_SIMPLE_PAGE, allEntries = true)
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> updateQuestion(@RequestBody QuestionUpdateRequest questionUpdateRequest) {
         if (questionUpdateRequest == null || questionUpdateRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -214,7 +214,7 @@ public class QuestionController {
      * @return
      */
     @PostMapping("/list/page")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
     public BaseResponse<Page<Question>> listQuestionByPage(@RequestBody QuestionQueryRequest questionQueryRequest,
                                                            HttpServletRequest request) {
         long current = questionQueryRequest.getCurrent();
