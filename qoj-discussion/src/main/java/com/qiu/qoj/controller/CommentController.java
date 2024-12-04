@@ -4,12 +4,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.qiu.qoj.domain.BaseResponse;
 import com.qiu.qoj.domain.DeleteRequest;
 import com.qiu.qoj.domain.ErrorCode;
+import com.qiu.qoj.domain.UserContext;
 import com.qiu.qoj.exception.BusinessException;
 import com.qiu.qoj.exception.ThrowUtils;
 import com.qiu.qoj.model.dto.comment.CommentAddRequest;
 import com.qiu.qoj.model.dto.comment.CommentQueryRequest;
 import com.qiu.qoj.model.entity.Comment;
-import com.qiu.qoj.model.entity.User;
 import com.qiu.qoj.model.vo.CommentVO;
 import com.qiu.qoj.service.CommentService;
 import com.qiu.qoj.service.UserService;
@@ -54,8 +54,7 @@ public class CommentController {
 
         // todo 无效参数校验
 
-        User loginUser = userService.getLoginUser(request);
-        comment.setUserId(loginUser.getId());
+        comment.setUserId(UserContext.getUserId());
 
 
         boolean result = commentService.save(comment);
@@ -76,13 +75,12 @@ public class CommentController {
         if (deleteRequest == null || deleteRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        User user = userService.getLoginUser(request);
         long id = deleteRequest.getId();
         // 判断是否存在
         Comment oldComment = commentService.getById(id);
         ThrowUtils.throwIf(oldComment == null, ErrorCode.NOT_FOUND_ERROR);
         // 仅本人或管理员可删除
-        if (!oldComment.getUserId().equals(user.getId()) && !userService.isAdmin(request)) {
+        if (!oldComment.getUserId().equals(UserContext.getUserId()) && !UserContext.isAdmin()) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
         boolean b = commentService.removeById(id);

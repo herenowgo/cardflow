@@ -14,10 +14,8 @@ import com.qiu.qoj.exception.BusinessException;
 import com.qiu.qoj.exception.ThrowUtils;
 import com.qiu.qoj.model.dto.question.*;
 import com.qiu.qoj.model.entity.Question;
-import com.qiu.qoj.model.entity.User;
 import com.qiu.qoj.model.vo.QuestionVO;
 import com.qiu.qoj.service.QuestionService;
-import com.qiu.qoj.service.UserService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -39,8 +37,6 @@ public class QuestionController {
     @Resource
     private QuestionService questionService;
 
-    @Resource
-    private UserService userService;
 
     private final static Gson GSON = new Gson();
 
@@ -101,7 +97,7 @@ public class QuestionController {
         Question oldQuestion = questionService.getById(id);
         ThrowUtils.throwIf(oldQuestion == null, ErrorCode.NOT_FOUND_ERROR);
         // 仅本人或管理员可删除
-        if (!oldQuestion.getUserId().equals(UserContext.getUserId()) && !userService.isAdmin(request)) {
+        if (!oldQuestion.getUserId().equals(UserContext.getUserId()) && !UserContext.isAdmin()) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
         boolean b = questionService.removeById(id);
@@ -162,8 +158,7 @@ public class QuestionController {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
         // 不是本人或管理员，就不能获取所有信息
-        User loginUser = userService.getLoginUser(request);
-        if (!question.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
+        if (!question.getUserId().equals(UserContext.getUserId()) && !UserContext.isAdmin()) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
         return BaseResponse.success(question);
@@ -288,13 +283,12 @@ public class QuestionController {
         }
         // 参数校验
         questionService.validQuestion(question, false);
-        User loginUser = userService.getLoginUser(request);
         long id = questionEditRequest.getId();
         // 判断是否存在
         Question oldQuestion = questionService.getById(id);
         ThrowUtils.throwIf(oldQuestion == null, ErrorCode.NOT_FOUND_ERROR);
         // 仅本人或管理员可编辑
-        if (!oldQuestion.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
+        if (!oldQuestion.getUserId().equals(UserContext.getUserId()) && !UserContext.isAdmin()) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
         boolean result = questionService.updateById(question);

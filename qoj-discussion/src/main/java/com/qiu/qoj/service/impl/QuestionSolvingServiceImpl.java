@@ -87,8 +87,7 @@ public class QuestionSolvingServiceImpl extends ServiceImpl<QuestionSolvingMappe
 
     @Override
     public QuestionSolving getUserQuestionSolving(Long questionId, HttpServletRequest request) {
-        User loginUser = userService.getLoginUser(request);
-        Long userId = loginUser.getId();
+        Long userId = UserContext.getUserId();
         LambdaQueryWrapper<QuestionSolving> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(QuestionSolving::getQuestionId, questionId);
         queryWrapper.eq(QuestionSolving::getUserId, userId);
@@ -122,9 +121,8 @@ public class QuestionSolvingServiceImpl extends ServiceImpl<QuestionSolvingMappe
 
     @Override
     public Boolean likeQuestionSolving(Long questionSolvingId, HttpServletRequest httpServletRequest) {
-        User loginUser = userService.getLoginUser(httpServletRequest);
         String key = QuestionSolvingConstant.QUESTION_SOLVING_LIKED_KEY + questionSolvingId;
-        Long userId = loginUser.getId();
+        Long userId = UserContext.getUserId();
         // 用Redis判断用户是否已支持
         Boolean existed = stringRedisTemplate.opsForSet().isMember(key, userId.toString());
         if (BooleanUtil.isFalse(existed)) {

@@ -10,6 +10,7 @@ import com.qiu.qoj.constant.EventConstant;
 import com.qiu.qoj.constant.QuestionConstant;
 import com.qiu.qoj.constant.QuestionSubmitConstant;
 import com.qiu.qoj.domain.ResultCode;
+import com.qiu.qoj.domain.UserContext;
 import com.qiu.qoj.exception.Asserts;
 import com.qiu.qoj.judge.JudgeService;
 import com.qiu.qoj.judge.codesandbox.model.JudgeInfo;
@@ -69,11 +70,10 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
      * 提交题目
      *
      * @param questionSubmitAddRequest
-     * @param loginUser
      * @return 提交记录的id
      */
     @Override
-    public Long doQuestionSubmit(QuestionSubmitAddRequest questionSubmitAddRequest, User loginUser) {
+    public Long doQuestionSubmit(QuestionSubmitAddRequest questionSubmitAddRequest) {
         // 校验编程语言是否合法
         String language = questionSubmitAddRequest.getLanguage();
         QuestionSubmitLanguageEnum languageEnum = QuestionSubmitLanguageEnum.getEnumByValue(language);
@@ -85,7 +85,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         Asserts.failIf(question == null, ResultCode.FAILED);
 
         // 是否已提交题目
-        long userId = loginUser.getId();
+        long userId = UserContext.getUserId();
         // 每个用户串行提交题目
         QuestionSubmit questionSubmit = new QuestionSubmit();
         questionSubmit.setUserId(userId);

@@ -7,7 +7,6 @@ import com.qiu.qoj.model.dto.questionsubmint.DebugCodeRequest;
 import com.qiu.qoj.model.dto.questionsubmint.QuestionSubmitAddRequest;
 import com.qiu.qoj.model.dto.questionsubmint.QuestionSubmitQueryRequest;
 import com.qiu.qoj.model.entity.QuestionSubmit;
-import com.qiu.qoj.model.entity.User;
 import com.qiu.qoj.model.vo.ExecuteCodeResponseVO;
 import com.qiu.qoj.model.vo.QuestionSubmitStateVO;
 import com.qiu.qoj.model.vo.QuestionSubmitVO;
@@ -49,14 +48,6 @@ public interface QuestionSubmitService extends IService<QuestionSubmit> {
     QueryWrapper<QuestionSubmit> getQueryWrapper(QuestionSubmitQueryRequest questionSubmitQueryRequest);
 
 
-    /**
-     * 获取题目封装
-     *
-     * @param questionSubmit
-     * @param loginUser
-     * @return
-     */
-    QuestionSubmitVO getQuestionSubmitVO(QuestionSubmit questionSubmit, User loginUser);
 
     /**
      * 分页获取题目封装
@@ -64,7 +55,9 @@ public interface QuestionSubmitService extends IService<QuestionSubmit> {
      * @param questionSubmitPage
      * @return
      */
-    Page<QuestionSubmitVO> getQuestionSubmitVOPage(Page<QuestionSubmit> questionSubmitPage, User loginUser);
+    Page<QuestionSubmitVO> getQuestionSubmitVOPage(Page<QuestionSubmit> questionSubmitPage);
+
+    QuestionSubmitVO getQuestionSubmitVO(QuestionSubmit questionSubmit);
 
     Integer getQuestionSubmitState(Long questionSubmitId);
 

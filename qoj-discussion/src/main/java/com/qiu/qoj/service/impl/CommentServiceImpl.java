@@ -134,9 +134,8 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment>
      */
     @Override
     public Boolean likeComment(Long commentId, HttpServletRequest httpServletRequest) {
-        User loginUser = userService.getLoginUser(httpServletRequest);
         String key = CommonConstant.COMMENT_LIKED_KEY + commentId;
-        Long userId = loginUser.getId();
+        Long userId = UserContext.getUserId();
         // 用Redis判断用户是否已点赞
         Boolean existed = stringRedisTemplate.opsForSet().isMember(key, userId.toString());
         if (BooleanUtil.isFalse(existed)) {

@@ -5,10 +5,10 @@ import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.COSObjectInputStream;
 import com.qcloud.cos.utils.IOUtils;
 import com.qiu.qoj.domain.ErrorCode;
+import com.qiu.qoj.domain.UserContext;
 import com.qiu.qoj.exception.BusinessException;
 import com.qiu.qoj.manager.CosManager;
 import com.qiu.qoj.model.dto.file.UploadFileRequest;
-import com.qiu.qoj.model.entity.User;
 import com.qiu.qoj.model.enums.FileUploadBizEnum;
 import com.qiu.qoj.service.FileService;
 import com.qiu.qoj.service.UserService;
@@ -73,11 +73,10 @@ public class FileServiceImpl implements FileService {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         validFile(multipartFile, fileUploadBizEnum);
-        User loginUser = userService.getLoginUser(request);
         // 文件目录：根据业务、用户来划分
         String uuid = RandomStringUtils.randomAlphanumeric(8);
         String filename = uuid + "-" + multipartFile.getOriginalFilename();
-        String filepath = String.format("/%s/%s/%s", fileUploadBizEnum.getValue(), loginUser.getId(), filename);
+        String filepath = String.format("/%s/%s/%s", fileUploadBizEnum.getValue(), UserContext.getUserId(), filename);
         File file = null;
         try {
             // 上传文件

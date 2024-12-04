@@ -9,14 +9,12 @@ import com.qiu.qoj.model.dto.questionsubmint.DebugCodeRequest;
 import com.qiu.qoj.model.dto.questionsubmint.QuestionSubmitAddRequest;
 import com.qiu.qoj.model.dto.questionsubmint.QuestionSubmitQueryRequest;
 import com.qiu.qoj.model.entity.QuestionSubmit;
-import com.qiu.qoj.model.entity.User;
 import com.qiu.qoj.model.vo.ExecuteCodeResponseVO;
 import com.qiu.qoj.model.vo.QuestionSubmitStateVO;
 import com.qiu.qoj.model.vo.QuestionSubmitVO;
 import com.qiu.qoj.model.vo.QuestionSubmitWithTagVO;
 import com.qiu.qoj.model.vo.questionSubmit.QuestionSubmitPageVO;
 import com.qiu.qoj.service.QuestionSubmitService;
-import com.qiu.qoj.service.UserService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -37,8 +35,6 @@ public class QuestionSubmitController {
     @Resource
     private QuestionSubmitService questionSubmitService;
 
-    @Resource
-    private UserService userService;
 
     /**
      * 提交题目
@@ -86,9 +82,8 @@ public class QuestionSubmitController {
         Page<QuestionSubmit> questionSubmitPage = questionSubmitService.page(new Page<>(current, size),
                 questionSubmitService.getQueryWrapper(questionSubmitQueryRequest));
 
-        final User loginUser = userService.getLoginUser(request);
         // 脱敏
-        return BaseResponse.success(questionSubmitService.getQuestionSubmitVOPage(questionSubmitPage, loginUser));
+        return BaseResponse.success(questionSubmitService.getQuestionSubmitVOPage(questionSubmitPage));
     }
 
     /**

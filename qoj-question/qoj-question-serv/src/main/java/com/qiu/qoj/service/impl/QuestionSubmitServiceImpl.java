@@ -1,6 +1,5 @@
 package com.qiu.qoj.service.impl;
 
-import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
@@ -10,15 +9,17 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.qiu.qoj.constant.*;
+import com.qiu.qoj.codesandbox.dto.ExecuteCodeRequest;
+import com.qiu.qoj.codesandbox.dto.ExecuteCodeResponse;
+import com.qiu.qoj.codesandbox.dto.JudgeInfo;
+import com.qiu.qoj.codesandbox.feign.CodeSandBoxService;
+import com.qiu.qoj.constant.CommonConstant;
+import com.qiu.qoj.constant.EventConstant;
+import com.qiu.qoj.constant.QuestionConstant;
+import com.qiu.qoj.constant.QuestionSubmitConstant;
 import com.qiu.qoj.domain.ResultCode;
 import com.qiu.qoj.domain.UserContext;
 import com.qiu.qoj.exception.Asserts;
-import com.qiu.qoj.feign.CodeSandBoxService;
-import com.qiu.qoj.judge.JudgeService;
-import com.qiu.qoj.judge.codesandbox.model.ExecuteCodeRequest;
-import com.qiu.qoj.judge.codesandbox.model.ExecuteCodeResponse;
-import com.qiu.qoj.judge.codesandbox.model.JudgeInfo;
 import com.qiu.qoj.mapper.QuestionSubmitMapper;
 import com.qiu.qoj.model.dto.question.JudgeCase;
 import com.qiu.qoj.model.dto.questionsubmint.DebugCodeRequest;
@@ -26,7 +27,6 @@ import com.qiu.qoj.model.dto.questionsubmint.QuestionSubmitAddRequest;
 import com.qiu.qoj.model.dto.questionsubmint.QuestionSubmitQueryRequest;
 import com.qiu.qoj.model.entity.Question;
 import com.qiu.qoj.model.entity.QuestionSubmit;
-import com.qiu.qoj.model.entity.User;
 import com.qiu.qoj.model.enums.QuestionSubmitLanguageEnum;
 import com.qiu.qoj.model.enums.QuestionSubmitStatusEnum;
 import com.qiu.qoj.model.vo.ExecuteCodeResponseVO;
@@ -36,13 +36,11 @@ import com.qiu.qoj.model.vo.QuestionSubmitWithTagVO;
 import com.qiu.qoj.model.vo.questionSubmit.QuestionSubmitPageVO;
 import com.qiu.qoj.service.QuestionService;
 import com.qiu.qoj.service.QuestionSubmitService;
-import com.qiu.qoj.service.UserService;
 import com.qiu.qoj.utils.SqlUtils;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.stream.function.StreamBridge;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -65,13 +63,6 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     private QuestionService questionService;
 
     @Resource
-    private UserService userService;
-
-    @Resource
-    @Lazy
-    private JudgeService judgeService;
-
-    @Resource
     private StreamBridge streamBridge;
 
     @Resource
@@ -79,6 +70,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
 
     @Resource
     private CodeSandBoxService codeSandBoxService;
+
     /**
      * 提交题目
      *
@@ -165,24 +157,23 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
 
 
     @Override
-    public QuestionSubmitVO getQuestionSubmitVO(QuestionSubmit questionSubmit, User loginUser) {
+    public QuestionSubmitVO getQuestionSubmitVO(QuestionSubmit questionSubmit) {
         QuestionSubmitVO questionSubmitVO = QuestionSubmitVO.objToVo(questionSubmit);
-        Long userId = loginUser.getId();
         // 仅本人和管理员能看见自己提交的代码
-        if (!userId.equals(questionSubmit.getUserId()) && !userService.isAdmin(loginUser)) {
+        if (!UserContext.getUserId().equals(questionSubmit.getUserId()) && !UserContext.isAdmin()) {
             questionSubmitVO.setCode(null);
         }
         return questionSubmitVO;
     }
 
     @Override
-    public Page<QuestionSubmitVO> getQuestionSubmitVOPage(Page<QuestionSubmit> questionSubmitPage, User loginUser) {
+    public Page<QuestionSubmitVO> getQuestionSubmitVOPage(Page<QuestionSubmit> questionSubmitPage) {
         List<QuestionSubmit> questionSubmitList = questionSubmitPage.getRecords();
         Page<QuestionSubmitVO> questionSubmitVOPage = new Page<>(questionSubmitPage.getCurrent(), questionSubmitPage.getSize(), questionSubmitPage.getTotal());
         if (CollectionUtils.isEmpty(questionSubmitList)) {
             return questionSubmitVOPage;
         }
-        List<QuestionSubmitVO> questionSubmitVOList = questionSubmitList.stream().map(questionSubmit -> getQuestionSubmitVO(questionSubmit, loginUser)).collect(Collectors.toList());
+        List<QuestionSubmitVO> questionSubmitVOList = questionSubmitList.stream().map(this::getQuestionSubmitVO).collect(Collectors.toList());
         questionSubmitVOPage.setRecords(questionSubmitVOList);
         return questionSubmitVOPage;
     }
@@ -230,7 +221,6 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         return questionSubmitPageVOPage;
 
 
-
     }
 
     @Override
@@ -265,10 +255,9 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     @Override
     public List<QuestionSubmitWithTagVO> listQuestionSubmit(Integer number) {
 
-        User user  = (User) StpUtil.getSession().get(AuthConstant.STP_MEMBER_INFO);
         LambdaQueryWrapper<QuestionSubmit> lambdaQueryWrapper = Wrappers.lambdaQuery(QuestionSubmit.class)
                 .select(QuestionSubmit::getLanguage, QuestionSubmit::getCreateTime, QuestionSubmit::getJudgeInfo, QuestionSubmit::getStatus, QuestionSubmit::getQuestionId)
-                .eq(QuestionSubmit::getUserId, user.getId())
+                .eq(QuestionSubmit::getUserId, UserContext.getUserId())
                 .orderByDesc(QuestionSubmit::getCreateTime)
                 .last("limit " + number);
 

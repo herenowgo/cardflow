@@ -7,6 +7,7 @@ import com.qiu.qoj.constant.QuestionSolvingConstant;
 import com.qiu.qoj.domain.BaseResponse;
 import com.qiu.qoj.domain.DeleteRequest;
 import com.qiu.qoj.domain.ErrorCode;
+import com.qiu.qoj.domain.UserContext;
 import com.qiu.qoj.exception.BusinessException;
 import com.qiu.qoj.exception.ThrowUtils;
 import com.qiu.qoj.model.dto.questionsolving.QuestionSolvingAddRequest;
@@ -64,8 +65,7 @@ public class QuestionSolvingController {
 
         // todo 无效参数校验
 
-        User loginUser = userService.getLoginUser(request);
-        questionSolving.setUserId(loginUser.getId());
+        questionSolving.setUserId(UserContext.getUserId());
 
 
         boolean result = questionSolvingService.save(questionSolving);
@@ -119,9 +119,8 @@ public class QuestionSolvingController {
         QuestionSolving oldQuestionSolving = questionSolvingService.getById(id);
         ThrowUtils.throwIf(oldQuestionSolving == null, ErrorCode.NOT_FOUND_ERROR);
         Long oldQuestionSolvingUserId = oldQuestionSolving.getUserId();
-        User loginUser = userService.getLoginUser(httpServletRequest);
-        Long newQuestionSolvingUserId = loginUser.getId();
-        if (!oldQuestionSolvingUserId.equals(newQuestionSolvingUserId) && !userService.isAdmin(httpServletRequest)) {
+        Long newQuestionSolvingUserId = UserContext.getUserId();
+        if (!oldQuestionSolvingUserId.equals(newQuestionSolvingUserId) && !UserContext.isAdmin()) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
         QuestionSolving questionSolving = new QuestionSolving();

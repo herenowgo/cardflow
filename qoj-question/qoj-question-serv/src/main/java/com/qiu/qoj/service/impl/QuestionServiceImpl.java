@@ -15,11 +15,8 @@ import com.qiu.qoj.exception.ThrowUtils;
 import com.qiu.qoj.mapper.QuestionMapper;
 import com.qiu.qoj.model.dto.question.QuestionQueryRequest;
 import com.qiu.qoj.model.entity.Question;
-import com.qiu.qoj.model.entity.User;
 import com.qiu.qoj.model.vo.QuestionVO;
-import com.qiu.qoj.model.vo.UserVO;
 import com.qiu.qoj.service.QuestionService;
-import com.qiu.qoj.service.UserService;
 import com.qiu.qoj.utils.CacheClient;
 import com.qiu.qoj.utils.SqlUtils;
 import jakarta.annotation.Resource;
@@ -44,9 +41,6 @@ import java.util.stream.Collectors;
 public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
         implements QuestionService {
 
-
-    @Resource
-    private UserService userService;
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -140,31 +134,6 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
     @Override
     public QuestionVO getQuestionVO(Question question, HttpServletRequest request) {
         QuestionVO questionVO = QuestionVO.objToVo(question);
-        long questionId = question.getId();
-        // 1. 关联查询用户信息
-        Long userId = question.getUserId();
-        User user = null;
-        if (userId != null && userId > 0) {
-            user = userService.getById(userId);
-        }
-        UserVO userVO = userService.getUserVO(user);
-        questionVO.setUserVO(userVO);
-        // 2. 已登录，获取用户点赞、收藏状态
-//        User loginUser = userService.getLoginUserPermitNull(request);
-//        if (loginUser != null) {
-//            // 获取点赞
-//            QueryWrapper<QuestionThumb> questionThumbQueryWrapper = new QueryWrapper<>();
-//            questionThumbQueryWrapper.in("questionId", questionId);
-//            questionThumbQueryWrapper.eq("userId", loginUser.getId());
-//            QuestionThumb questionThumb = questionThumbMapper.selectOne(questionThumbQueryWrapper);
-//            questionVO.setHasThumb(questionThumb != null);
-//            // 获取收藏
-//            QueryWrapper<QuestionFavour> questionFavourQueryWrapper = new QueryWrapper<>();
-//            questionFavourQueryWrapper.in("questionId", questionId);
-//            questionFavourQueryWrapper.eq("userId", loginUser.getId());
-//            QuestionFavour questionFavour = questionFavourMapper.selectOne(questionFavourQueryWrapper);
-//            questionVO.setHasFavour(questionFavour != null);
-//        }
         return questionVO;
     }
 

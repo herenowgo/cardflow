@@ -1,6 +1,5 @@
 package com.qiu.qoj.service.impl;
 
-import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
@@ -8,10 +7,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.qiu.qoj.config.CosClientConfig;
-import com.qiu.qoj.constant.AuthConstant;
 import com.qiu.qoj.constant.CommonConstant;
 import com.qiu.qoj.constant.UserConstant;
 import com.qiu.qoj.domain.ErrorCode;
+import com.qiu.qoj.domain.UserContext;
 import com.qiu.qoj.exception.BusinessException;
 import com.qiu.qoj.mapper.UserMapper;
 import com.qiu.qoj.model.dto.user.UserQueryRequest;
@@ -201,11 +200,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     public User getLoginUser(HttpServletRequest request) {
-        // 先判断是否已登录
-        StpUtil.checkLogin();
-        // 从数据库查询
 
-        return (User) StpUtil.getSession().get(AuthConstant.STP_MEMBER_INFO);
+        // 从数据库查询
+        User user = new User();
+        user.setId(UserContext.getUserId());
+        return user;
 
     }
 

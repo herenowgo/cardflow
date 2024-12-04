@@ -20,6 +20,7 @@
         <module>qoj-discussion</module>
         <module>qoj-ai</module>
         <module>qoj-document</module>
+        <module>qoj-common-api</module>
     </modules>
 
 
