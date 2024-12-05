@@ -16,7 +16,10 @@ import com.qiu.qoj.judge.model.enums.QuestionSubmitStatusEnum;
 import com.qiu.qoj.judge.service.QuestionService;
 import com.qiu.qoj.judge.service.QuestionSubmitService;
 import jakarta.annotation.Resource;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +45,9 @@ public class JudgeServiceImpl implements JudgeService {
 
     @Resource
     private CodeSandBoxService codeSandBoxService;
+
+    @Resource
+    private StreamBridge streamBridge;
 
     @Value("${codesandbox.type:example}")
     private String type;
@@ -136,6 +142,15 @@ public class JudgeServiceImpl implements JudgeService {
         questionSubmitUpdate.setJudgeInfo(JSONUtil.toJsonStr(judgeInfo));
         update = questionSubmitService.updateById(questionSubmitUpdate);
         Asserts.failIf(!update, "题目状态更新错误");
+        streamBridge.send("judgeResult-out-0", new EventMessage(questionSubmit.getUserId().toString(), "judgeResult", judgeInfo));
         return true;
     }
+    @Data
+    @AllArgsConstructor
+    class EventMessage {
+        private String userId;
+        private String eventType;
+        private Object data;
+    }
 }
+

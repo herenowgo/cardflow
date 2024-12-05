@@ -38,6 +38,8 @@ import com.qiu.qoj.question.service.QuestionService;
 import com.qiu.qoj.question.service.QuestionSubmitService;
 import com.qiu.qoj.question.utils.SqlUtils;
 import jakarta.annotation.Resource;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.stream.function.StreamBridge;
@@ -248,6 +250,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         if (hasTestCase) {
             executeCodeResponseVO.setTestCase(testCase);
         }
+        streamBridge.send("judgeResult-out-0", new EventMessage(UserContext.getUserId().toString(), "judgeResult", executeCodeResponseVO));
 
         return executeCodeResponseVO;
     }
@@ -287,4 +290,12 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         return voList;
     }
 
+}
+
+@Data
+@AllArgsConstructor
+class EventMessage {
+    private String userId;
+    private String eventType;
+    private Object data;
 }
