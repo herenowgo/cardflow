@@ -13,9 +13,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication(scanBasePackages = "com.qiu.qoj")
 @EnableDiscoveryClient
-@EnableScheduling
-@EnableAspectJAutoProxy(proxyTargetClass = true, exposeProxy = true)
-@EnableCaching
 public class DocumentApplication {
 
     public static void main(String[] args) {
