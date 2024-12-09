@@ -1,7 +1,6 @@
 package com.qiu.qoj.question.controller;
 
 import cn.dev33.satoken.annotation.SaCheckRole;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.gson.Gson;
 import com.qiu.qoj.common.api.BaseResponse;
@@ -17,7 +16,6 @@ import com.qiu.qoj.question.service.QuestionService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.web.bind.annotation.*;
@@ -196,21 +194,16 @@ public class QuestionController {
      * 分页获取题目列表（仅管理员）
      *
      * @param questionQueryRequest
-     * @param request
      * @return
      */
     @PostMapping("/list/page")
     @SaCheckRole(UserConstant.ADMIN_ROLE)
-    public BaseResponse<Page<Question>> listQuestionByPage(@RequestBody QuestionQueryRequest questionQueryRequest,
-                                                           HttpServletRequest request) {
+    public BaseResponse<Page<Question>> listQuestionByPage(@RequestBody QuestionQueryRequest questionQueryRequest) {
         long current = questionQueryRequest.getCurrent();
         long size = questionQueryRequest.getPageSize();
         Page<Question> questionPage;
-        if (StringUtils.isAllBlank(questionQueryRequest.getTitle(), questionQueryRequest.getAnswer(), questionQueryRequest.getContent()) && CollectionUtils.isEmpty(questionQueryRequest.getTags())) {
-            questionPage = questionService.simplePageUseCache(current, size);
-        } else {
-            questionPage = questionService.page(new Page<>(current, size), questionService.getQueryWrapper(questionQueryRequest));
-        }
+        questionPage = questionService.page(new Page<>(current, size), questionService.getQueryWrapper(questionQueryRequest));
+
         return BaseResponse.success(questionPage);
     }
 

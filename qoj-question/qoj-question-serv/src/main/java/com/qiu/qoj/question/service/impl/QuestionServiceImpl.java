@@ -20,7 +20,6 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -191,7 +190,6 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
     }
 
     @Override
-    @Cacheable(value = QuestionConstant.CACHE_QUESTION_SIMPLE_PAGE)
     public Page<Question> simplePageUseCache(long current, long size) {
         QuestionQueryRequest questionQueryRequest = new QuestionQueryRequest();
         questionQueryRequest.setSortField("title");

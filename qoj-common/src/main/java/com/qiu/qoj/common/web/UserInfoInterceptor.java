@@ -4,12 +4,13 @@ import com.qiu.qoj.common.constant.AuthConstant;
 import com.qiu.qoj.common.api.UserContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.core.Ordered;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 /**
  * 将用户的信息设置到线程上下文中
  */
-public class UserInfoInterceptor implements HandlerInterceptor {
+public class UserInfoInterceptor implements HandlerInterceptor, Ordered {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -32,5 +33,10 @@ public class UserInfoInterceptor implements HandlerInterceptor {
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         // 请求处理完后，清理 ThreadLocal
         UserContext.clear();
+    }
+
+    @Override
+    public int getOrder() {
+        return Ordered.HIGHEST_PRECEDENCE;
     }
 }
