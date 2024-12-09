@@ -2,7 +2,7 @@ package com.qiu.qoj.question.model.vo;
 
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.qiu.qoj.question.model.dto.questionsubmint.JudgeInfo;
+import com.qiu.qoj.codesandbox.dto.JudgeInfo;
 import com.qiu.qoj.question.model.entity.QuestionSubmit;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
