@@ -74,7 +74,7 @@ public class CardService {
         }
 
         List<String> userGroups = groupService.getUserGroups(UserContext.getUserId());
-        if(!userGroups.contains(card.getGroup())) {
+        if (!userGroups.contains(card.getGroup())) {
             groupService.addGroup(UserContext.getUserId(), card.getGroup());
         }
 
@@ -107,40 +107,43 @@ public class CardService {
      * 判断anki中的卡片是否更新了：anki笔记的mod > AnkiInfo的syncTime
      * 都判断之后，如果只有一边更新了，就同步给另一端
      * 否则都显示出来，让用户去选择
+     * 3. todo 删除的卡片的同步
+     * anki中的删了怎么办？ 那就是anki有cardID，而我们这边没有了，那就
+     * 我们这边删了，那就没有cardId， 而anki有。那建议把anki那边的删掉。
+     *      1. 最好先标记，删除的时候，如果ankiInfo不为空，就标记一个要删除。然后同步的时候，
      * 3. 后端接口设计
      * 所有卡片的同步时间、AnkiInfo的cardID、和modifiedTime
      * 以及没有cardID的卡片的数据
      */
-    public AnkiSyncResponse syncWithAnki() {
-        // 获取所有已经与Anki同步过的卡片
-        List<Card> cards = cardRepository.findCardSyncInfoByUserId(UserContext.getUserId());
+
+    /**
+     * 与 anki 进行特定分组的同步
+     */
+    public AnkiSyncResponse syncWithAnki(Long userId, String group) {
+        // 获取该分组下所有已经与Anki同步过的卡片
+        List<Card> cards = cardRepository.findCardSyncInfoByUserIdAndGroup(userId, group);
         List<AnkiSyncResponse.AnkiSyncedCard> ankiSyncedCards = cards.stream()
-                .map(card -> {
-                    return AnkiSyncResponse.AnkiSyncedCard.builder()
-                            .cardId(card.getAnkiInfo().getCardId())
-                            .syncTime(card.getAnkiInfo().getSyncTime())
-                            .modifiedTime(card.getModifiedTime())
-                            .build();
-                })
+                .map(card -> AnkiSyncResponse.AnkiSyncedCard.builder()
+                        .cardId(card.getAnkiInfo().getCardId())
+                        .syncTime(card.getAnkiInfo().getSyncTime())
+                        .modifiedTime(card.getModifiedTime())
+                        .build())
                 .collect(Collectors.toList());
 
         List<Long> cardIds = cards.stream()
-                .map(card -> {
-                    return card.getAnkiInfo().getCardId();
-                })
+                .map(card -> card.getAnkiInfo().getCardId())
                 .collect(Collectors.toList());
 
-        List<Card> unsynchronizedCards = cardRepository.findUnsynchronizedCardsByUserId(UserContext.getUserId());
+        // 获取该分组下未同步的卡片
+        List<Card> unsynchronizedCards = cardRepository.findUnsynchronizedCardsByUserIdAndGroup(userId, group);
         List<AnkiNoteAddRequest> ankiNoteAddRequests = unsynchronizedCards.stream()
-                .map(card -> {
-                    return AnkiNoteAddRequest.builder()
-                            .question(card.getQuestion())
-                            .answer(card.getAnswer())
-                            .deckName(card.getAnkiInfo().getDeckName())
-                            .modelName(card.getAnkiInfo().getModelName())
-                            .tags(card.getTags())
-                            .build();
-                })
+                .map(card -> AnkiNoteAddRequest.builder()
+                        .question(card.getQuestion())
+                        .answer(card.getAnswer())
+                        .deckName(group)  // 使用当前分组作为牌组名
+                        .modelName("Basic")
+                        .tags(card.getTags())
+                        .build())
                 .collect(Collectors.toList());
 
         return AnkiSyncResponse.builder()
@@ -149,6 +152,5 @@ public class CardService {
                 .cardIds(cardIds)
                 .build();
     }
-
 
 }

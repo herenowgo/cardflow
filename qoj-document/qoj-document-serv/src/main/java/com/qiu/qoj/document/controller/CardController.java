@@ -47,11 +47,12 @@ public class CardController {
      * 为了与anki进行双向同步，返回必须的信息
      * 包括系统新增的卡片以及已经同步过的卡片的一些用来双向比较的信息
      *
-     * @return
+     * @param group 要同步的分组名称
+     * @return 同步所需的信息
      */
-    @GetMapping("/syncWithAnki")
-    public BaseResponse<AnkiSyncResponse> syncWithAnki() {
-        return BaseResponse.success(cardService.syncWithAnki());
+    @GetMapping("/group/{group}/syncWithAnki")
+    public BaseResponse<AnkiSyncResponse> syncWithAnki(@PathVariable String group) {
+        return BaseResponse.success(cardService.syncWithAnki(UserContext.getUserId(), group));
     }
 
     // 获取用户的所有卡片

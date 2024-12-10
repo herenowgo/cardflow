@@ -12,9 +12,9 @@ public class AnkiNoteAddRequest {
 
     private String answer;
 
-    String deckName;
+    private String deckName;
 
-    String modelName;
+    private String modelName;
 
-    List<String> tags;
+    private List<String> tags;
 }
