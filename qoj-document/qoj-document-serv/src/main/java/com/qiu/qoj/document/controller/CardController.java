@@ -10,6 +10,7 @@ import com.qiu.qoj.document.service.CardService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -63,6 +64,22 @@ public class CardController {
     @GetMapping("/group/{group}")
     public BaseResponse<List<Card>> getUserGroupCards(@PathVariable String group) {
         return BaseResponse.success(cardService.getUserGroupCards(UserContext.getUserId(), group));
+    }
+
+    // 分页获取用户特定分组的卡片
+    @GetMapping("/group/{group}/page")
+    public BaseResponse<Page<Card>> getUserGroupCardsWithPagination(
+            @PathVariable String group,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return BaseResponse.success(
+            cardService.getUserGroupCardsWithPagination(
+                UserContext.getUserId(), 
+                group, 
+                page, 
+                size
+            )
+        );
     }
 
 

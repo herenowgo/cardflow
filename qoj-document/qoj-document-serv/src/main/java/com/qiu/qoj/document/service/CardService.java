@@ -10,8 +10,10 @@ import com.qiu.qoj.document.model.dto.card.CardAddRequest;
 import com.qiu.qoj.document.model.dto.card.CardUpdateRequest;
 import com.qiu.qoj.document.model.entity.Card;
 import com.qiu.qoj.document.repository.CardRepository;
-import com.qiu.qoj.document.repository.GroupRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -52,6 +54,12 @@ public class CardService {
     // 获取用户特定分组的卡片
     public List<Card> getUserGroupCards(Long userId, String group) {
         return cardRepository.findByUserIdAndGroupAndIsDeletedFalse(userId, group);
+    }
+
+    // 分页获取用户特定分组的卡片
+    public Page<Card> getUserGroupCardsWithPagination(Long userId, String group, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return cardRepository.findByUserIdAndGroupAndIsDeletedFalse(userId, group, pageable);
     }
 
     // 创建新卡片

@@ -1,6 +1,8 @@
 package com.qiu.qoj.document.repository;
 
 import com.qiu.qoj.document.model.entity.Card;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
@@ -48,5 +50,8 @@ public interface CardRepository extends MongoRepository<Card, String> {
     // 获取用户未同步到Anki的卡片（没有cardId的卡片）
     @Query(value = "{ 'userId': ?0, 'isDeleted': false, '$or': [{'ankiInfo.cardId': null}, {'ankiInfo.cardId': { $exists: false }}]}")
     List<Card> findUnsynchronizedCardsByUserId(Long userId);
+
+    // 分页获取用户特定分组的卡片
+    Page<Card> findByUserIdAndGroupAndIsDeletedFalse(Long userId, String group, Pageable pageable);
 
 }
