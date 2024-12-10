@@ -8,6 +8,8 @@ import java.util.List;
 @Data
 @Builder
 public class AnkiNoteAddRequest {
+    private String id;
+
     private String question;
 
     private String answer;

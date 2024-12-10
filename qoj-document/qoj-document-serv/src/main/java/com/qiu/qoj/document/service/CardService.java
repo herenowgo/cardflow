@@ -8,6 +8,7 @@ import com.qiu.qoj.document.model.dto.card.AnkiNoteAddRequest;
 import com.qiu.qoj.document.model.dto.card.AnkiSyncResponse;
 import com.qiu.qoj.document.model.dto.card.CardAddRequest;
 import com.qiu.qoj.document.model.dto.card.CardUpdateRequest;
+import com.qiu.qoj.document.model.entity.AnkiInfo;
 import com.qiu.qoj.document.model.entity.Card;
 import com.qiu.qoj.document.repository.CardRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,9 +38,15 @@ public class CardService {
                 .setIgnoreNullValue(true)
                 .setIgnoreProperties(CardUpdateRequest::getAnkiInfo);
         BeanUtil.copyProperties(cardUpdateRequest, card, copyOptions);
+        if(card.getAnkiInfo() == null) {
+            card.setAnkiInfo(new AnkiInfo());
+        }
         BeanUtil.copyProperties(cardUpdateRequest.getAnkiInfo(), card.getAnkiInfo(), CopyOptions.create().setIgnoreNullValue(true));
 
-        card.setModifiedTime(Card.getCurrentUnixTime());
+        if(card.getAnkiInfo() == null || card.getAnkiInfo().getSyncTime() == null ) {
+            card.setModifiedTime(Card.getCurrentUnixTime());
+        }
+
         cardRepository.save(card);
 
         return true;
@@ -69,9 +76,7 @@ public class CardService {
         card.setModifiedTime(Card.getCurrentUnixTime());
         card.setCreateTime(Card.getCurrentUnixTime());
         card.setUserId(UserContext.getUserId());
-        if (cardAddRequest.getAnkiInfo() != null && cardAddRequest.getAnkiInfo().getDeckName() != null) {
-            card.setGroup(cardAddRequest.getAnkiInfo().getDeckName());
-        }
+
 
         List<String> userGroups = groupService.getUserGroups(UserContext.getUserId());
         if (!userGroups.contains(card.getGroup())) {
@@ -138,6 +143,7 @@ public class CardService {
         List<Card> unsynchronizedCards = cardRepository.findUnsynchronizedCardsByUserIdAndGroup(userId, group);
         List<AnkiNoteAddRequest> ankiNoteAddRequests = unsynchronizedCards.stream()
                 .map(card -> AnkiNoteAddRequest.builder()
+                        .id(card.getId())
                         .question(card.getQuestion())
                         .answer(card.getAnswer())
                         .deckName(group)  // 使用当前分组作为牌组名

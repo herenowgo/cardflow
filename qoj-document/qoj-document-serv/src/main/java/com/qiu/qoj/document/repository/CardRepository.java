@@ -22,17 +22,6 @@ public interface CardRepository extends MongoRepository<Card, String> {
     // 根据ID和用户ID查找
     Card findByIdAndUserIdAndIsDeletedFalse(String id, Long userId);
 
-    // 根据牌组名称查找
-    List<Card> findByAnkiInfoDeckName(String deckName);
-
-    // 根据标签查找
-    List<Card> findByTagsContaining(String tag);
-
-    // 根据分组查找
-    List<Card> findByGroup(String group);
-
-    // 根据最后修改时间查找
-    List<Card> findByModifiedTimeAfter(Long timestamp);
 
     // 根据用户ID和分组查找
     List<Card> findByUserIdAndGroup(Long userId, String group);
