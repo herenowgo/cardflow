@@ -37,6 +37,7 @@ public class AnkiSyncResponse {
     @Data
     @Builder
     public static class AnkiSyncedCard {
+        String id;
         Long cardId;
         Long syncTime;
         Long modifiedTime;

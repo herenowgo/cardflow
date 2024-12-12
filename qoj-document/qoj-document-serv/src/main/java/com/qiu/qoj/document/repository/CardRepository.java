@@ -47,4 +47,10 @@ public interface CardRepository extends MongoRepository<Card, String> {
     @Query(value = "{ 'userId': ?0, 'group': ?1, 'isDeleted': false, '$or': [{'ankiInfo.cardId': null}, {'ankiInfo.cardId': { $exists: false }}]}")
     List<Card> findUnsynchronizedCardsByUserIdAndGroup(Long userId, String group);
 
+    // 根据ID查找未删除的卡片
+    Card findByIdAndIsDeletedFalse(String id);
+
+    // 批量查询未删除的卡片
+    List<Card> findByIdInAndIsDeletedFalse(List<String> ids);
+
 }

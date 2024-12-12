@@ -38,17 +38,22 @@ public class CardService {
                 .setIgnoreNullValue(true)
                 .setIgnoreProperties(CardUpdateRequest::getAnkiInfo);
         BeanUtil.copyProperties(cardUpdateRequest, card, copyOptions);
-        if(card.getAnkiInfo() == null) {
-            card.setAnkiInfo(new AnkiInfo());
-        }
-        BeanUtil.copyProperties(cardUpdateRequest.getAnkiInfo(), card.getAnkiInfo(), CopyOptions.create().setIgnoreNullValue(true));
 
-        if(card.getAnkiInfo() == null || card.getAnkiInfo().getSyncTime() == null ) {
+        // Anki中对应的卡片发生了更新，要同步到系统
+        if (cardUpdateRequest.getAnkiInfo() != null) {
+            if (card.getAnkiInfo() == null) {
+                card.setAnkiInfo(new AnkiInfo());
+            }
+            BeanUtil.copyProperties(cardUpdateRequest.getAnkiInfo(), card.getAnkiInfo(), CopyOptions.create().setIgnoreNullValue(true));
+            if(cardUpdateRequest.getAnswer() != null || cardUpdateRequest.getQuestion() != null) {
+                card.setModifiedTime(cardUpdateRequest.getAnkiInfo().getSyncTime());
+            }
+        } else {
+            // 只是系统中的卡片发生了更新
             card.setModifiedTime(Card.getCurrentUnixTime());
         }
 
         cardRepository.save(card);
-
         return true;
     }
 
@@ -73,11 +78,19 @@ public class CardService {
     public Boolean createCard(CardAddRequest cardAddRequest) {
         Card card = new Card();
         BeanUtil.copyProperties(cardAddRequest, card);
-        card.setModifiedTime(Card.getCurrentUnixTime());
-        card.setCreateTime(Card.getCurrentUnixTime());
+        // 判断是系统的新卡还是anki的新卡
+        if (cardAddRequest.getAnkiInfo() != null && cardAddRequest.getAnkiInfo().getSyncTime() != null) {
+            card.setCreateTime(cardAddRequest.getAnkiInfo().getSyncTime());
+            card.setModifiedTime(cardAddRequest.getAnkiInfo().getSyncTime());
+        } else {
+            Long currentUnixTime = Card.getCurrentUnixTime();
+            card.setModifiedTime(currentUnixTime);
+            card.setCreateTime(currentUnixTime);
+        }
+
         card.setUserId(UserContext.getUserId());
 
-
+        // 检查牌组是否存在，不存在则创建
         List<String> userGroups = groupService.getUserGroups(UserContext.getUserId());
         if (!userGroups.contains(card.getGroup())) {
             groupService.addGroup(UserContext.getUserId(), card.getGroup());
@@ -129,6 +142,7 @@ public class CardService {
         List<Card> cards = cardRepository.findCardSyncInfoByUserIdAndGroup(userId, group);
         List<AnkiSyncResponse.AnkiSyncedCard> ankiSyncedCards = cards.stream()
                 .map(card -> AnkiSyncResponse.AnkiSyncedCard.builder()
+                        .id(card.getId())
                         .cardId(card.getAnkiInfo().getCardId())
                         .syncTime(card.getAnkiInfo().getSyncTime())
                         .modifiedTime(card.getModifiedTime())
@@ -157,6 +171,32 @@ public class CardService {
                 .ankiSyncedCards(ankiSyncedCards)
                 .cardIds(cardIds)
                 .build();
+    }
+
+    // 获取指定ID的卡片
+    public Card getCardById(String cardId) {
+        Card card = cardRepository.findByIdAndIsDeletedFalse(cardId);
+        Asserts.failIf(card == null, "卡片不存在");
+        
+        // 检查权限：普通用户只能查看自己的卡片，管理员可���查看所有卡片
+        Asserts.failIf(!UserContext.getUserId().equals(card.getUserId()) && !UserContext.isAdmin(),
+            "没有权限查看此卡片");
+            
+        return card;
+    }
+
+    // 批量获取指定ID的卡片
+    public List<Card> getCardsByIds(List<String> cardIds) {
+        List<Card> cards = cardRepository.findByIdInAndIsDeletedFalse(cardIds);
+        
+        // 检查权限：普通用户只能查看自己的卡片，管理员可以查看所有卡片
+        if (!UserContext.isAdmin()) {
+            cards = cards.stream()
+                    .filter(card -> card.getUserId().equals(UserContext.getUserId()))
+                    .collect(Collectors.toList());
+        }
+        
+        return cards;
     }
 
 }

@@ -4,6 +4,7 @@ import com.qiu.qoj.common.api.BaseResponse;
 import com.qiu.qoj.common.api.UserContext;
 import com.qiu.qoj.document.model.dto.card.AnkiSyncResponse;
 import com.qiu.qoj.document.model.dto.card.CardAddRequest;
+import com.qiu.qoj.document.model.dto.card.CardIdsRequest;
 import com.qiu.qoj.document.model.dto.card.CardUpdateRequest;
 import com.qiu.qoj.document.model.entity.Card;
 import com.qiu.qoj.document.service.CardService;
@@ -74,14 +75,25 @@ public class CardController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return BaseResponse.success(
-            cardService.getUserGroupCardsWithPagination(
-                UserContext.getUserId(), 
-                group, 
-                page, 
-                size
-            )
+                cardService.getUserGroupCardsWithPagination(
+                        UserContext.getUserId(),
+                        group,
+                        page,
+                        size
+                )
         );
     }
 
+    // 获取指定ID的卡片
+    @GetMapping("/{cardId}")
+    public BaseResponse<Card> getCardById(@PathVariable String cardId) {
+        return BaseResponse.success(cardService.getCardById(cardId));
+    }
+
+    // 批量获取指定ID的卡片
+    @PostMapping("/batch")
+    public BaseResponse<List<Card>> getCardsByIds(@RequestBody @Valid CardIdsRequest request) {
+        return BaseResponse.success(cardService.getCardsByIds(request.getCardIds()));
+    }
 
 }
