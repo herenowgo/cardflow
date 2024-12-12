@@ -2,11 +2,7 @@ package com.qiu.qoj.document.model.dto.card;
 
 import com.qiu.qoj.document.model.entity.AnkiInfo;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 

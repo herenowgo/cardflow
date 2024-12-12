@@ -45,7 +45,7 @@ public class CardService {
                 card.setAnkiInfo(new AnkiInfo());
             }
             BeanUtil.copyProperties(cardUpdateRequest.getAnkiInfo(), card.getAnkiInfo(), CopyOptions.create().setIgnoreNullValue(true));
-            if(cardUpdateRequest.getAnswer() != null || cardUpdateRequest.getQuestion() != null) {
+            if (cardUpdateRequest.getAnswer() != null || cardUpdateRequest.getQuestion() != null) {
                 card.setModifiedTime(cardUpdateRequest.getAnkiInfo().getSyncTime());
             }
         } else {
@@ -177,25 +177,25 @@ public class CardService {
     public Card getCardById(String cardId) {
         Card card = cardRepository.findByIdAndIsDeletedFalse(cardId);
         Asserts.failIf(card == null, "卡片不存在");
-        
+
         // 检查权限：普通用户只能查看自己的卡片，管理员可���查看所有卡片
         Asserts.failIf(!UserContext.getUserId().equals(card.getUserId()) && !UserContext.isAdmin(),
-            "没有权限查看此卡片");
-            
+                "没有权限查看此卡片");
+
         return card;
     }
 
     // 批量获取指定ID的卡片
     public List<Card> getCardsByIds(List<String> cardIds) {
         List<Card> cards = cardRepository.findByIdInAndIsDeletedFalse(cardIds);
-        
+
         // 检查权限：普通用户只能查看自己的卡片，管理员可以查看所有卡片
         if (!UserContext.isAdmin()) {
             cards = cards.stream()
                     .filter(card -> card.getUserId().equals(UserContext.getUserId()))
                     .collect(Collectors.toList());
         }
-        
+
         return cards;
     }
 

@@ -30,10 +30,10 @@ public class GroupService {
             group.setUserId(userId);
             group.setName(new ArrayList<>());
         }
-        
+
         // 检查分组名是否已存在
         Asserts.failIf(group.getName().contains(groupName), "分组名已存在");
-        
+
         group.getName().add(groupName);
         groupRepository.save(group);
         return true;
@@ -46,7 +46,7 @@ public class GroupService {
             group = new Group();
             group.setUserId(userId);
         }
-        
+
         group.setName(groups);
         groupRepository.save(group);
         return true;
