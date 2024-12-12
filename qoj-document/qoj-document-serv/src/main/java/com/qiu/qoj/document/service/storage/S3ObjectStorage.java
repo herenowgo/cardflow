@@ -1,5 +1,6 @@
 package com.qiu.qoj.document.service.storage;
 
+import com.qiu.qoj.common.exception.ApiException;
 import com.qiu.qoj.document.config.ObjectStorageConfig;
 import io.minio.*;
 import io.minio.http.Method;
@@ -37,7 +38,24 @@ public class S3ObjectStorage implements ObjectStorage {
             return getFileUrl(objectName);
         } catch (Exception e) {
             log.error("Failed to upload file", e);
-            throw new RuntimeException("Failed to upload file", e);
+            throw new ApiException("Failed to upload file", e);
+        }
+    }
+
+    @Override
+    public String uploadFile(MultipartFile file, String objectName, Map<String, String> userMetadata) {
+        try {
+            minioClient.putObject(PutObjectArgs.builder()
+                    .bucket(config.getBucket())
+                    .object(objectName)
+                    .userMetadata(userMetadata)
+                    .stream(file.getInputStream(), file.getSize(), -1)
+                    .contentType(file.getContentType())
+                    .build());
+            return getFileUrl(objectName);
+        } catch (Exception e) {
+            log.error("Failed to upload file", e);
+            throw new ApiException("Failed to upload file", e);
         }
     }
 
@@ -55,7 +73,26 @@ public class S3ObjectStorage implements ObjectStorage {
             return getFileUrl(objectName);
         } catch (Exception e) {
             log.error("Failed to upload string content", e);
-            throw new RuntimeException("Failed to upload string content", e);
+            throw new ApiException("Failed to upload string content", e);
+        }
+    }
+
+    @Override
+    public String uploadString(String content, String objectName, Map<String, String> userMetadata) {
+        try {
+            byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
+            ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+            minioClient.putObject(PutObjectArgs.builder()
+                    .bucket(config.getBucket())
+                    .object(objectName)
+                    .userMetadata(userMetadata)
+                    .stream(bais, bytes.length, -1)
+                    .contentType("text/plain")
+                    .build());
+            return getFileUrl(objectName);
+        } catch (Exception e) {
+            log.error("Failed to upload string content", e);
+            throw new ApiException("Failed to upload string content", e);
         }
     }
 
@@ -68,7 +105,7 @@ public class S3ObjectStorage implements ObjectStorage {
                     .build());
         } catch (Exception e) {
             log.error("Failed to download file", e);
-            throw new RuntimeException("Failed to download file", e);
+            throw new ApiException("Failed to download file", e);
         }
     }
 
@@ -81,7 +118,7 @@ public class S3ObjectStorage implements ObjectStorage {
                     .build());
         } catch (Exception e) {
             log.error("Failed to delete file", e);
-            throw new RuntimeException("Failed to delete file", e);
+            throw new ApiException("Failed to delete file", e);
         }
     }
 
@@ -104,7 +141,7 @@ public class S3ObjectStorage implements ObjectStorage {
             }
         } catch (Exception e) {
             log.error("Failed to delete files", e);
-            throw new RuntimeException("Failed to delete files", e);
+            throw new ApiException("Failed to delete files", e);
         }
         return failedDeletes;
     }
@@ -120,7 +157,7 @@ public class S3ObjectStorage implements ObjectStorage {
                     .build());
         } catch (Exception e) {
             log.error("Failed to get file URL", e);
-            throw new RuntimeException("Failed to get file URL", e);
+            throw new ApiException("Failed to get file URL", e);
         }
     }
 
@@ -139,7 +176,7 @@ public class S3ObjectStorage implements ObjectStorage {
             }
         } catch (Exception e) {
             log.error("Failed to list files", e);
-            throw new RuntimeException("Failed to list files", e);
+            throw new ApiException("Failed to list files", e);
         }
         return items;
     }
@@ -156,7 +193,7 @@ public class S3ObjectStorage implements ObjectStorage {
             return stat.userMetadata();
         } catch (Exception e) {
             log.error("Failed to get file metadata", e);
-            throw new RuntimeException("Failed to get file metadata", e);
+            throw new ApiException("Failed to get file metadata", e);
         }
     }
 
@@ -173,7 +210,7 @@ public class S3ObjectStorage implements ObjectStorage {
                     .build());
         } catch (Exception e) {
             log.error("Failed to copy file", e);
-            throw new RuntimeException("Failed to copy file", e);
+            throw new ApiException("Failed to copy file", e);
         }
     }
 
@@ -184,7 +221,7 @@ public class S3ObjectStorage implements ObjectStorage {
             deleteFile(sourceObjectName);
         } catch (Exception e) {
             log.error("Failed to move file", e);
-            throw new RuntimeException("Failed to move file", e);
+            throw new ApiException("Failed to move file", e);
         }
     }
 
@@ -212,7 +249,7 @@ public class S3ObjectStorage implements ObjectStorage {
             return stat.size();
         } catch (Exception e) {
             log.error("Failed to get file size", e);
-            throw new RuntimeException("Failed to get file size", e);
+            throw new ApiException("Failed to get file size", e);
         }
     }
 
@@ -231,6 +268,20 @@ public class S3ObjectStorage implements ObjectStorage {
     }
 
     @Override
+    public Map<String, String> uploadFiles(List<MultipartFile> files, List<String> objectNames, Map<String, String> userMetadata) {
+        if (files.size() != objectNames.size()) {
+            throw new IllegalArgumentException("Files and object names lists must have the same size");
+        }
+
+        Map<String, String> results = new HashMap<>();
+        for (int i = 0; i < files.size(); i++) {
+            String url = uploadFile(files.get(i), objectNames.get(i), userMetadata);
+            results.put(objectNames.get(i), url);
+        }
+        return results;
+    }
+
+    @Override
     public Date getLastModified(String objectName) {
         try {
             StatObjectResponse stat = minioClient.statObject(
@@ -241,7 +292,7 @@ public class S3ObjectStorage implements ObjectStorage {
             return Date.from(stat.lastModified().toInstant());
         } catch (Exception e) {
             log.error("Failed to get last modified time", e);
-            throw new RuntimeException("Failed to get last modified time", e);
+            throw new ApiException("Failed to get last modified time", e);
         }
     }
 
@@ -261,7 +312,7 @@ public class S3ObjectStorage implements ObjectStorage {
             minioClient.copyObject(args);
         } catch (Exception e) {
             log.error("Failed to set file metadata", e);
-            throw new RuntimeException("Failed to set file metadata", e);
+            throw new ApiException("Failed to set file metadata", e);
         }
     }
 
@@ -275,7 +326,7 @@ public class S3ObjectStorage implements ObjectStorage {
             return tags.get();
         } catch (Exception e) {
             log.error("Failed to get file tags", e);
-            throw new RuntimeException("Failed to get file tags", e);
+            throw new ApiException("Failed to get file tags", e);
         }
     }
 
@@ -289,7 +340,7 @@ public class S3ObjectStorage implements ObjectStorage {
                     .build());
         } catch (Exception e) {
             log.error("Failed to set file tags", e);
-            throw new RuntimeException("Failed to set file tags", e);
+            throw new ApiException("Failed to set file tags", e);
         }
     }
 }
