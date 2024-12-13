@@ -4,27 +4,36 @@ import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import com.qiu.qoj.common.api.BaseResponse;
-import com.qiu.qoj.common.api.UserContext;
+import com.qiu.qoj.ai.client.AIClientFactory;
 import com.qiu.qoj.ai.feign.QuestionSubmitServiceFeign;
 import com.qiu.qoj.ai.feign.QuestionSubmitWithTagVO;
 import com.qiu.qoj.ai.judge.codesandbox.model.JudgeInfo;
 import com.qiu.qoj.ai.manager.AIManage;
+import com.qiu.qoj.ai.model.dto.ai.AIChatRequest;
 import com.qiu.qoj.ai.model.dto.question.JudgeCase;
+import com.qiu.qoj.ai.model.entity.Cards;
 import com.qiu.qoj.ai.model.entity.Question;
 import com.qiu.qoj.ai.model.entity.QuestionSubmit;
+import com.qiu.qoj.ai.model.entity.Tags;
+import com.qiu.qoj.ai.model.enums.AIModel;
 import com.qiu.qoj.ai.model.vo.QuestionRecommendation;
 import com.qiu.qoj.ai.model.vo.QuestionVOForRecommend;
 import com.qiu.qoj.ai.service.AIService;
 import com.qiu.qoj.ai.service.QuestionService;
 import com.qiu.qoj.ai.service.QuestionSubmitService;
+import com.qiu.qoj.common.api.BaseResponse;
+import com.qiu.qoj.common.api.UserContext;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.prompt.ChatOptionsBuilder;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.qiu.qoj.ai.constant.AIConstant.GENERATE_TAGS_SYSTEM_PROMPT;
 
 @Component
 @RequiredArgsConstructor
@@ -39,13 +48,50 @@ public class AIServiceImpl implements AIService {
 
     private final QuestionSubmitServiceFeign questionSubmitServiceFeign;
 
+    private final AIClientFactory aiClientFactory;
+
+
+    /**
+     * 强制使用flash模型
+     *
+     * @param request
+     * @return
+     */
+    @Override
+    public Tags generateTags(AIChatRequest request) {
+        ChatClient client = aiClientFactory.getClient(AIModel.GLM_4_Flash);
+
+        return client.prompt()
+                .options(ChatOptionsBuilder.builder().withModel(AIModel.GLM_4_Flash.getName()).build())
+                .system(GENERATE_TAGS_SYSTEM_PROMPT)
+                .user(request.getContent())
+                .call()
+                .entity(Tags.class);
+    }
+
+    @Override
+    public Cards generateCards(AIChatRequest request) {
+        AIModel aiModel = AIModel.getByVO(request.getModel());
+        ChatClient client = aiClientFactory.getClient(aiModel);
+
+        return client.prompt()
+                .options(ChatOptionsBuilder.builder().withModel(aiModel.getName()).build())
+                .system("")
+                .user(request.getContent())
+                .call()
+                .entity(Cards.class);
+    }
+
+
+    public
+
     /**
      * @param questionSubmitId
      * @param index            从0开始
      * @return
      */
     @Override
-    public String generateAlgorithmProblemModificationSuggestion(Long questionSubmitId, Integer index) {
+    String generateAlgorithmProblemModificationSuggestion(Long questionSubmitId, Integer index) {
         QuestionSubmit questionSubmit = questionSubmitService.getById(questionSubmitId);
         Long questionId = questionSubmit.getQuestionId();
         Question question = questionService.getById(questionId);
