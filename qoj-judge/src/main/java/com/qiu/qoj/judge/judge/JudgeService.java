@@ -8,8 +8,8 @@ public interface JudgeService {
     /**
      * 判题
      *
-     * @param questionSubmitId
+     * @param questionSubmitIdAndRequestId 使用','分隔的questionSubmitId和requestId
      * @return
      */
-    Boolean doJudge(long questionSubmitId);
+    Boolean doJudge(String questionSubmitIdAndRequestId);
 }

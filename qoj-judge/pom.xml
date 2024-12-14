@@ -20,6 +20,11 @@
     <dependencies>
         <dependency>
             <groupId>com.qiu.qoj</groupId>
+            <artifactId>codeflow-eventStream-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.qiu.qoj</groupId>
             <artifactId>qoj-common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>

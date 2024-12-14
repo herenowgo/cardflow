@@ -3,7 +3,6 @@ package com.qiu.qoj.question.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.qiu.qoj.common.api.BaseResponse;
 import com.qiu.qoj.common.api.UserContext;
-import com.qiu.qoj.common.exception.Asserts;
 import com.qiu.qoj.question.model.dto.questionsubmint.DebugCodeRequest;
 import com.qiu.qoj.question.model.dto.questionsubmint.QuestionSubmitAddRequest;
 import com.qiu.qoj.question.model.dto.questionsubmint.QuestionSubmitQueryRequest;
@@ -15,6 +14,7 @@ import com.qiu.qoj.question.model.vo.questionSubmit.QuestionSubmitPageVO;
 import com.qiu.qoj.question.service.QuestionSubmitService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,17 +41,9 @@ public class QuestionSubmitController {
      * @return resultNum
      */
     @PostMapping("/")
-    public BaseResponse<Long> doQuestionSubmit(@RequestBody QuestionSubmitAddRequest questionSubmitAddRequest) {
-
-        // 校验参数
-        Asserts.failIf(questionSubmitAddRequest == null || questionSubmitAddRequest.getQuestionId() <= 0, "请求参数错误");
-
-
-        Long questionSubmitId = questionSubmitService.doQuestionSubmit(questionSubmitAddRequest, UserContext.getUserId());
-//        QuestionSubmitStateVO questionSubmitStateVO = new QuestionSubmitStateVO();
-//        questionSubmitStateVO.setStatus(questionSubmit.getStatus());
-//        questionSubmitStateVO.setJudgeInfo(JSONUtil.parse(questionSubmit.getJudgeInfo()).toBean(JudgeInfo.class));
-        return BaseResponse.success(questionSubmitId);
+    public BaseResponse<String> doQuestionSubmit(@RequestBody @Valid QuestionSubmitAddRequest questionSubmitAddRequest) {
+        String requestId = questionSubmitService.doQuestionSubmit(questionSubmitAddRequest, UserContext.getUserId());
+        return BaseResponse.success(requestId);
     }
 
 

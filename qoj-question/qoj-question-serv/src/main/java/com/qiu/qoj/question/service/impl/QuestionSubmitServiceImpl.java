@@ -52,7 +52,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -87,49 +86,39 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
      * @return 提交记录的id
      */
     @Override
-    public Long doQuestionSubmit(QuestionSubmitAddRequest questionSubmitAddRequest, Long userId) {
+    public String doQuestionSubmit(QuestionSubmitAddRequest questionSubmitAddRequest, Long userId) {
+        String requestId = EventMessageUtil.generateRequestId();
         // 校验编程语言是否合法
         String language = questionSubmitAddRequest.getLanguage();
         QuestionSubmitLanguageEnum languageEnum = QuestionSubmitLanguageEnum.getEnumByValue(language);
         Asserts.failIf(languageEnum == null, "编程语言错误");
 
         long questionId = questionSubmitAddRequest.getQuestionId();
-        // 判断实体是否存在，根据类别获取实体
+        // 获取题目相关信息
         Question question = questionService.getById(questionId);
         Asserts.failIf(question == null, ResultCode.FAILED);
 
-        // 是否已提交题目
-        // 每个用户串行提交题目
-        QuestionSubmit questionSubmit = new QuestionSubmit();
-        questionSubmit.setUserId(userId);
-        questionSubmit.setQuestionId(questionId);
-        questionSubmit.setCode(questionSubmitAddRequest.getCode());
-        questionSubmit.setLanguage(language);
-        // 设置初始状态
-        questionSubmit.setStatus(QuestionSubmitStatusEnum.WAITING.getValue());
-        questionSubmit.setJudgeInfo("{}");
+
+        QuestionSubmit questionSubmit = QuestionSubmit.builder()
+                .userId(userId)
+                .questionId(questionId)
+                .code(questionSubmitAddRequest.getCode())
+                .language(language)
+                .status(QuestionSubmitStatusEnum.WAITING.getValue())
+                .judgeInfo("{}")
+                .build();
+
         boolean save = this.save(questionSubmit);
         Asserts.failIf(!save, "数据插入失败");
 
-        // Redis中提交数加1
+        // 题目提交数加1
         String key = QuestionConstant.QUESTION_SUBMIT_NUMBER;
         stringRedisTemplate.opsForZSet().incrementScore(key, String.valueOf(questionId), 1);
-        // 设置状态
-        String submitStateKey = QuestionSubmitConstant.QUESTION_SUBMIT_STATE_KEY + questionSubmit.getId();
-        stringRedisTemplate.opsForValue().set(submitStateKey, QuestionSubmitStatusEnum.WAITING.getValue().toString(), 5, TimeUnit.MINUTES);
         Long questionSubmitId = questionSubmit.getId();
         // 异步执行判题服务
-        streamBridge.send(EventConstant.QUESTION_SUBMIT, questionSubmitId);
-//        CompletableFuture.runAsync(() -> {
-//            judgeService.doJudge(questionSubmitId);
-//        });
-//        HashMap<Object, Object> objectObjectHashMap = new HashMap<>(1);
-//        objectObjectHashMap.put("questionSubmitId", questionSubmitId.toString());
-////        stringRedisTemplate.opsForStream().add("stream.questionSubmit", objectObjectHashMap);
-        // 同步执行判题服务
-//        QuestionSubmit questionSubmitResult = judgeService.doJudge(questionSubmitId);
+        streamBridge.send(EventConstant.QUESTION_SUBMIT, questionSubmitId + "," + requestId);
 
-        return questionSubmitId;
+        return requestId;
     }
 
 

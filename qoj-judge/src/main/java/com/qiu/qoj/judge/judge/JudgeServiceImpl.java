@@ -15,12 +15,12 @@ import com.qiu.qoj.judge.model.enums.QuestionSubmitStatusEnum;
 import com.qiu.qoj.judge.service.QuestionService;
 import com.qiu.qoj.judge.service.QuestionSubmitService;
 import jakarta.annotation.Resource;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import work.codeflow.eventStream.dto.EventMessage;
+import work.codeflow.eventStream.dto.EventType;
 
 import java.io.IOException;
 import java.util.List;
@@ -52,7 +52,10 @@ public class JudgeServiceImpl implements JudgeService {
 
 
     @Override
-    public Boolean doJudge(long questionSubmitId) {
+    public Boolean doJudge(String questionSubmitIdAndRequestId) {
+        String[] split = questionSubmitIdAndRequestId.split(",");
+        Long questionSubmitId = Long.parseLong(split[0]);
+        String requestId = split[1];
         // 获取提交记录和对应题目的测试用例
         QuestionSubmit questionSubmit = questionSubmitService.getById(questionSubmitId);
         Asserts.failIf(questionSubmit == null, "提交信息不存在");
@@ -99,6 +102,7 @@ public class JudgeServiceImpl implements JudgeService {
         JudgeInfo judgeInfo = judgeManager.doJudge(judgeContext, executeCodeResponse);
         judgeInfo.setInputList(inputList.stream().limit(3).collect(Collectors.toList()));
 
+        // todo 把错误的测试用例放在前面
         if (!executeCodeResponse.getRunOutput().isEmpty()) {
             judgeInfo.setRunOutput(executeCodeResponse.getRunOutput().stream().limit(3).collect(Collectors.toList()));
         }
@@ -124,16 +128,15 @@ public class JudgeServiceImpl implements JudgeService {
         questionSubmitUpdate.setJudgeInfo(JSONUtil.toJsonStr(judgeInfo));
         questionSubmitService.updateById(questionSubmitUpdate);
 
-        streamBridge.send("judgeResult-out-0", new EventMessage(questionSubmit.getUserId().toString(), "judgeResult", judgeInfo));
+        EventMessage eventMessage = EventMessage.builder()
+                .userId(questionSubmit.getUserId().toString())
+                .eventType(EventType.JUDGE_RESULT)
+                .requestId(requestId)
+                .data(judgeInfo)
+                .build();
+        streamBridge.send("judgeResult-out-0", eventMessage);
         return true;
     }
 
-    @Data
-    @AllArgsConstructor
-    class EventMessage {
-        private String userId;
-        private String eventType;
-        private Object data;
-    }
 }
 

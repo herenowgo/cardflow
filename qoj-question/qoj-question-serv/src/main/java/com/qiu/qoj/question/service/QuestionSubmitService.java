@@ -27,7 +27,7 @@ public interface QuestionSubmitService extends IService<QuestionSubmit> {
      * @param questionSubmitAddRequest
      * @return
      */
-    Long doQuestionSubmit(QuestionSubmitAddRequest questionSubmitAddRequest, Long userId);
+    String doQuestionSubmit(QuestionSubmitAddRequest questionSubmitAddRequest, Long userId);
 
     /**
      * 题目提交（内部服务）

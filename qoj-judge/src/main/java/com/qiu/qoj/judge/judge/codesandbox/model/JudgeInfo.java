@@ -24,6 +24,7 @@ public class JudgeInfo {
 
     private String compileErrorOutput;
 
+    // todo 封装为对象列表
     private List<String> runOutput;
 
     private List<String> inputList;

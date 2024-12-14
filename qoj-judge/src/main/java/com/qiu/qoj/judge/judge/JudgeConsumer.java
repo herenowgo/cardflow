@@ -2,7 +2,6 @@ package com.qiu.qoj.judge.judge;
 
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +15,7 @@ public class JudgeConsumer {
     private final JudgeService judgeService;
 
     @Bean
-    public Consumer<Long> questionSubmit() {
+    public Consumer<String> questionSubmit() {
         return judgeService::doJudge;
     }
 }
