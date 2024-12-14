@@ -25,7 +25,7 @@ public class ChatController {
 
     @PostMapping("/code")
     public BaseResponse<String> analysisAlgorithmicProblem(AIChatRequest aiChatRequest) {
-        return BaseResponse.success(aiService.generateAlgorithmProblemModificationSuggestion());
+        return BaseResponse.success("");
     }
 
 

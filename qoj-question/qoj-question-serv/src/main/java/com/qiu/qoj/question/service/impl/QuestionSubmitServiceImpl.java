@@ -38,17 +38,20 @@ import com.qiu.qoj.question.service.QuestionService;
 import com.qiu.qoj.question.service.QuestionSubmitService;
 import com.qiu.qoj.question.utils.SqlUtils;
 import jakarta.annotation.Resource;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import work.codeflow.eventStream.dto.EventMessage;
+import work.codeflow.eventStream.dto.EventType;
+import work.codeflow.eventStream.util.EventMessageUtil;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -72,6 +75,10 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
 
     @Resource
     private CodeSandBoxService codeSandBoxService;
+
+    // 自定义线程池
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
+
 
     /**
      * 提交题目
@@ -221,38 +228,51 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         BeanUtil.copyProperties(questionSubmitPage, questionSubmitPageVOPage);
         questionSubmitPageVOPage.setRecords(questionSubmitPageVOList);
         return questionSubmitPageVOPage;
-
-
     }
 
     @Override
-    public ExecuteCodeResponseVO debugCode(DebugCodeRequest debugCodeRequest) throws IOException, InterruptedException {
-        Long questionId = debugCodeRequest.getQuestionId();
-        String code = debugCodeRequest.getCode();
-        String language = debugCodeRequest.getLanguage();
-        String testCase = debugCodeRequest.getTestCase();
+    public String debugCode(DebugCodeRequest debugCodeRequest) throws IOException, InterruptedException {
+        String requestId = EventMessageUtil.generateRequestId();
+        String userId = UserContext.getUserId().toString();
+        executorService.submit(() -> {
+            Long questionId = debugCodeRequest.getQuestionId();
+            String code = debugCodeRequest.getCode();
+            String language = debugCodeRequest.getLanguage();
+            String testCase = debugCodeRequest.getTestCase();
+            // 如果用户没输入测试用例，获取默认的测试用例
+            if (StrUtil.isBlank(testCase)) {
+                Question question = questionService.getById(questionId);
+                List<JudgeCase> judgeCaseList = JSONUtil.toList(question.getJudgeCase(), JudgeCase.class);
+                testCase = judgeCaseList.get(0).getInput();
+            }
 
-        // 如果用户没输入测试用例，获取默认的测试用例
-        if (StrUtil.isBlank(testCase)) {
-            Question question = questionService.getById(questionId);
-            List<JudgeCase> judgeCaseList = JSONUtil.toList(question.getJudgeCase(), JudgeCase.class);
-            testCase = judgeCaseList.get(0).getInput();
-        }
+            ExecuteCodeRequest executeCodeRequest = new ExecuteCodeRequest();
+            executeCodeRequest.setLanguage(language);
+            executeCodeRequest.setCode(code);
+            executeCodeRequest.setInputList(List.of(testCase));
+            ExecuteCodeResponse executeCodeResponse = null;
+            try {
+                executeCodeResponse = codeSandBoxService.executeCode(executeCodeRequest);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
 
-        ExecuteCodeRequest executeCodeRequest = new ExecuteCodeRequest();
-        executeCodeRequest.setLanguage(language);
-        executeCodeRequest.setCode(code);
-        executeCodeRequest.setInputList(List.of(testCase));
-        ExecuteCodeResponse executeCodeResponse = codeSandBoxService.executeCode(executeCodeRequest);
+            ExecuteCodeResponseVO executeCodeResponseVO = new ExecuteCodeResponseVO();
+            BeanUtil.copyProperties(executeCodeResponse, executeCodeResponseVO);
 
-        ExecuteCodeResponseVO executeCodeResponseVO = new ExecuteCodeResponseVO();
-        BeanUtil.copyProperties(executeCodeResponse, executeCodeResponseVO);
+            executeCodeResponseVO.setTestCase(testCase);
 
-        executeCodeResponseVO.setTestCase(testCase);
+            EventMessage eventMessage = EventMessage.builder()
+                    .data(executeCodeResponseVO)
+                    .userId(userId)
+                    .eventType(EventType.JUDGE_RESULT)
+                    .requestId(requestId)
+                    .build();
+            streamBridge.send("judgeResult-out-0", eventMessage);
+        });
 
-        streamBridge.send("judgeResult-out-0", new EventMessage(UserContext.getUserId().toString(), "judgeResult", executeCodeResponseVO));
 
-        return executeCodeResponseVO;
+        return requestId;
     }
 
     @Override
@@ -290,12 +310,4 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         return voList;
     }
 
-}
-
-@Data
-@AllArgsConstructor
-class EventMessage {
-    private String userId;
-    private String eventType;
-    private Object data;
 }

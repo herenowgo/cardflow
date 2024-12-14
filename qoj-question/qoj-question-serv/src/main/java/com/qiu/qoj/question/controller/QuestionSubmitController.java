@@ -8,7 +8,6 @@ import com.qiu.qoj.question.model.dto.questionsubmint.DebugCodeRequest;
 import com.qiu.qoj.question.model.dto.questionsubmint.QuestionSubmitAddRequest;
 import com.qiu.qoj.question.model.dto.questionsubmint.QuestionSubmitQueryRequest;
 import com.qiu.qoj.question.model.entity.QuestionSubmit;
-import com.qiu.qoj.question.model.vo.ExecuteCodeResponseVO;
 import com.qiu.qoj.question.model.vo.QuestionSubmitStateVO;
 import com.qiu.qoj.question.model.vo.QuestionSubmitVO;
 import com.qiu.qoj.question.model.vo.QuestionSubmitWithTagVO;
@@ -57,9 +56,9 @@ public class QuestionSubmitController {
 
 
     @PostMapping("/debug")
-    public BaseResponse<ExecuteCodeResponseVO> debugCode(@RequestBody DebugCodeRequest debugCodeRequest) throws IOException, InterruptedException {
-        ExecuteCodeResponseVO executeCodeResponseVO = questionSubmitService.debugCode(debugCodeRequest);
-        return BaseResponse.success(executeCodeResponseVO);
+    public BaseResponse<String> debugCode(@RequestBody DebugCodeRequest debugCodeRequest) throws IOException, InterruptedException {
+        String requestId = questionSubmitService.debugCode(debugCodeRequest);
+        return BaseResponse.success(requestId);
     }
 
     /**

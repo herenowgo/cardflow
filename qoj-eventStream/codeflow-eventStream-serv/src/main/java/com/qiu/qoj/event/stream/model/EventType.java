@@ -5,5 +5,6 @@ public enum EventType {
     CODE_SUGGEST,
     CARD_SUGGEST,
     CARDS_GENERATE,
-    ANSWER;
+    ANSWER,
+    JUDGE_RESULT;
 }

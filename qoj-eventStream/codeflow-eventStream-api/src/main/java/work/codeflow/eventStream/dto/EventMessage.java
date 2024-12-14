@@ -1,12 +1,14 @@
-package com.qiu.qoj.ai.model.entity;
+package work.codeflow.eventStream.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 @Builder
 public class EventMessage {
-    private String groupId;
+    private String requestId;
     private String userId;
     private EventType eventType;
     private Integer sequence;

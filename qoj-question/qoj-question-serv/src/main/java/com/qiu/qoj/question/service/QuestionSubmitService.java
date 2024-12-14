@@ -7,7 +7,6 @@ import com.qiu.qoj.question.model.dto.questionsubmint.DebugCodeRequest;
 import com.qiu.qoj.question.model.dto.questionsubmint.QuestionSubmitAddRequest;
 import com.qiu.qoj.question.model.dto.questionsubmint.QuestionSubmitQueryRequest;
 import com.qiu.qoj.question.model.entity.QuestionSubmit;
-import com.qiu.qoj.question.model.vo.ExecuteCodeResponseVO;
 import com.qiu.qoj.question.model.vo.QuestionSubmitStateVO;
 import com.qiu.qoj.question.model.vo.QuestionSubmitVO;
 import com.qiu.qoj.question.model.vo.QuestionSubmitWithTagVO;
@@ -65,7 +64,7 @@ public interface QuestionSubmitService extends IService<QuestionSubmit> {
 
     Page<QuestionSubmitPageVO> listQuestionSubmitRecord(Long questionId, Integer current, Integer size);
 
-    ExecuteCodeResponseVO debugCode(DebugCodeRequest debugCodeRequest) throws IOException, InterruptedException;
+    String debugCode(DebugCodeRequest debugCodeRequest) throws IOException, InterruptedException;
 
     List<QuestionSubmitWithTagVO> listQuestionSubmit(Integer number);
 }

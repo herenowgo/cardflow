@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class EventMessage {
-    private String groupId;
+    private String requestId;
     private String userId;
     private EventType eventType;
     private Integer sequence;

@@ -1,9 +1,10 @@
-package com.qiu.codeflow.dto;
+package work.codeflow.eventStream.dto;
 
 public enum EventType {
     TAGS,
     CODE_SUGGEST,
     CARD_SUGGEST,
     CARDS_GENERATE,
-    ANSWER;
+    ANSWER,
+    JUDGE_RESULT;
 }

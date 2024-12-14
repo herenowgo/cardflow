@@ -12,23 +12,28 @@ import com.qiu.qoj.ai.judge.codesandbox.model.JudgeInfo;
 import com.qiu.qoj.ai.manager.AIManage;
 import com.qiu.qoj.ai.model.dto.ai.AIChatRequest;
 import com.qiu.qoj.ai.model.dto.question.JudgeCase;
-import com.qiu.qoj.ai.model.entity.*;
+import com.qiu.qoj.ai.model.entity.Cards;
+import com.qiu.qoj.ai.model.entity.Question;
+import com.qiu.qoj.ai.model.entity.QuestionSubmit;
+import com.qiu.qoj.ai.model.entity.Tags;
 import com.qiu.qoj.ai.model.enums.AIModel;
 import com.qiu.qoj.ai.model.vo.QuestionRecommendation;
 import com.qiu.qoj.ai.model.vo.QuestionVOForRecommend;
 import com.qiu.qoj.ai.service.AIService;
 import com.qiu.qoj.ai.service.QuestionService;
 import com.qiu.qoj.ai.service.QuestionSubmitService;
-import com.qiu.qoj.ai.utils.AIUtils;
 import com.qiu.qoj.common.api.BaseResponse;
 import com.qiu.qoj.common.api.UserContext;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.prompt.ChatOptionsBuilder;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import work.codeflow.eventStream.dto.EventMessage;
+import work.codeflow.eventStream.dto.EventType;
+import work.codeflow.eventStream.util.EventMessageUtil;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -69,44 +74,44 @@ public class AIServiceImpl implements AIService {
     @Override
     public String generateTags(AIChatRequest request) {
         ChatClient client = aiClientFactory.getClient(AIModel.GLM_4_Flash);
-        String groupId = AIUtils.generateGroupId();
+        String requestId = EventMessageUtil.generateRequestId();
         String userId = UserContext.getUserId().toString();
         // 异步执行 AI 生成内容和发送消息的操作
         executorService.submit(() -> {
             try {
                 Tags tags = client.prompt()
-                        .options(ChatOptionsBuilder.builder().withModel(AIModel.GLM_4_Flash.getName()).build())
+                        .options(ChatOptions.builder().model(AIModel.GLM_4_Flash.getName()).build())
                         .system(AIConstant.GENERATE_TAGS_SYSTEM_PROMPT)
                         .user(request.getContent())
                         .call()
                         .entity(Tags.class);
 
-                sendToQueue(tags.getTags(), groupId, EventType.TAGS, userId);
+                sendToQueue(tags.getTags(), requestId, EventType.TAGS, userId);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
 
-        return groupId;
+        return requestId;
     }
 
     @Override
     public String generateCards(AIChatRequest request) {
         AIModel aiModel = AIModel.getByVO(request.getModel());
         ChatClient client = aiClientFactory.getClient(aiModel);
-        String groupId = AIUtils.generateGroupId();
+        String requestId = EventMessageUtil.generateRequestId();
         String userId = UserContext.getUserId().toString();
 
         executorService.submit(() -> {
             try {
                 Cards cards = client.prompt()
-                        .options(ChatOptionsBuilder.builder().withModel(aiModel.getName()).build())
+                        .options(ChatOptions.builder().model(aiModel.getName()).build())
                         .system(AIConstant.GENERATE_CARDS_SYSTEM_PROMPT)
                         .user(request.getContent())
                         .call()
                         .entity(Cards.class);
 
-                sendToQueue(cards, groupId, EventType.CARDS_GENERATE, userId);
+                sendToQueue(cards, requestId, EventType.CARDS_GENERATE, userId);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -114,15 +119,15 @@ public class AIServiceImpl implements AIService {
 
         });
 
-        return groupId;
+        return requestId;
     }
 
 
-    private void sendToQueue(Object data, String groupId, EventType eventType, String userId) {
+    private void sendToQueue(Object data, String requestId, EventType eventType, String userId) {
         EventMessage eventMessage = EventMessage.builder()
                 .userId(userId)
                 .eventType(eventType)
-                .groupId(groupId)
+                .requestId(requestId)
                 .data(data)
                 .build();
 
@@ -138,7 +143,7 @@ public class AIServiceImpl implements AIService {
     public String generateAlgorithmProblemModificationSuggestion(AIChatRequest aiChatRequest, Long questionSubmitId, Integer index) {
         AIModel aiModel = AIModel.getByVO(aiChatRequest.getModel());
         ChatClient client = aiClientFactory.getClient(aiModel);
-        String groupId = AIUtils.generateGroupId();
+        String requestId = EventMessageUtil.generateRequestId();
         String userId = UserContext.getUserId().toString();
 
         executorService.submit(() -> {
@@ -172,7 +177,7 @@ public class AIServiceImpl implements AIService {
                 result
                         .bufferTimeout(10, Duration.ofSeconds(1))
                         .doOnNext(message -> {
-                            sendToQueue(message, groupId, EventType.ANSWER, userId);
+                            sendToQueue(message, requestId, EventType.ANSWER, userId);
                         }) // 对每个接收到的元素调用sendToQueue方法
                         .subscribe(); // 启动流的消费
             } catch (Exception e) {
@@ -181,7 +186,7 @@ public class AIServiceImpl implements AIService {
         });
 
 
-        return groupId;
+        return requestId;
     }
 
 
