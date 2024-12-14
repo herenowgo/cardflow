@@ -23,7 +23,7 @@ public class DebugCodeRequest implements Serializable {
     private String language;
 
     /**
-     * 测试用例
+     * 测试用例（输入）
      */
     private String testCase;
 }

@@ -1,6 +1,6 @@
 package com.qiu.qoj.event.stream.controller;
 
-import com.qiu.qoj.event.stream.model.EventMessage;
+import com.qiu.qoj.event.stream.model.EventMessageVO;
 import com.qiu.qoj.event.stream.service.EventStreamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -18,7 +18,7 @@ public class EventStreamController {
     private final EventStreamService eventStreamService;
 
     @GetMapping(value = "/subscribe/{userId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<EventMessage> subscribe(@PathVariable String userId) {
+    public Flux<EventMessageVO> subscribe(@PathVariable String userId) {
         return eventStreamService.subscribe(userId);
     }
 } 

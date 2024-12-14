@@ -1,35 +1,32 @@
 package com.qiu.qoj.ai.controller;
 
-import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
-
-import java.util.Map;
+import com.qiu.qoj.ai.model.dto.ai.AIChatRequest;
+import com.qiu.qoj.ai.service.AIService;
+import com.qiu.qoj.common.api.BaseResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequiredArgsConstructor
+@RequestMapping("/ai")
 public class ChatController {
 
-    private final ZhiPuAiChatModel chatModel;
+    private final AIService aiService;
 
-    @Autowired
-    public ChatController(ZhiPuAiChatModel chatModel) {
-        this.chatModel = chatModel;
+    @PostMapping("/tags")
+    public BaseResponse<String> getTags(@RequestBody AIChatRequest aiChatRequest) {
+        return BaseResponse.success(aiService.generateTags(aiChatRequest));
     }
 
-    @GetMapping("/ai/generate")
-    public Map generate(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        return Map.of("generation", this.chatModel.call(message));
+    @PostMapping("/cards")
+    public BaseResponse<String> getCards(@RequestBody AIChatRequest aiChatRequest) {
+        return BaseResponse.success(aiService.generateCards(aiChatRequest));
     }
 
-    @GetMapping("/ai/generateStream")
-    public Flux<ChatResponse> generateStream(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        var prompt = new Prompt(new UserMessage(message));
-        return this.chatModel.stream(prompt);
+    @PostMapping("/code")
+    public BaseResponse<String> analysisAlgorithmicProblem(AIChatRequest aiChatRequest) {
+        return BaseResponse.success(aiService.generateAlgorithmProblemModificationSuggestion());
     }
+
+
 }

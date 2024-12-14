@@ -231,8 +231,9 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         String code = debugCodeRequest.getCode();
         String language = debugCodeRequest.getLanguage();
         String testCase = debugCodeRequest.getTestCase();
-        Boolean hasTestCase = StrUtil.isBlank(testCase);
-        if (hasTestCase) {
+
+        // 如果用户没输入测试用例，获取默认的测试用例
+        if (StrUtil.isBlank(testCase)) {
             Question question = questionService.getById(questionId);
             List<JudgeCase> judgeCaseList = JSONUtil.toList(question.getJudgeCase(), JudgeCase.class);
             testCase = judgeCaseList.get(0).getInput();
@@ -247,9 +248,8 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         ExecuteCodeResponseVO executeCodeResponseVO = new ExecuteCodeResponseVO();
         BeanUtil.copyProperties(executeCodeResponse, executeCodeResponseVO);
 
-        if (hasTestCase) {
-            executeCodeResponseVO.setTestCase(testCase);
-        }
+        executeCodeResponseVO.setTestCase(testCase);
+
         streamBridge.send("judgeResult-out-0", new EventMessage(UserContext.getUserId().toString(), "judgeResult", executeCodeResponseVO));
 
         return executeCodeResponseVO;

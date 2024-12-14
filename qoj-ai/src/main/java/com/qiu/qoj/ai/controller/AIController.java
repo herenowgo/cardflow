@@ -31,10 +31,8 @@ public class AIController {
      */
     @PostMapping("/analyzeError")
     public BaseResponse<String> analyzeError(@RequestParam Long questionSubmitId, @RequestParam Integer index) {
-
-
-        String s = aiService.generateAlgorithmProblemModificationSuggestion(questionSubmitId, index);
-        return BaseResponse.success(s);
+//        String s = aiService.generateAlgorithmProblemModificationSuggestion(questionSubmitId, index);
+        return BaseResponse.success("");
     }
 
 
