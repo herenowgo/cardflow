@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.qiu.qoj.question.model.dto.questionsubmint.DebugCodeRequest;
 import com.qiu.qoj.question.model.dto.questionsubmint.QuestionSubmitAddRequest;
 import com.qiu.qoj.question.model.dto.questionsubmint.QuestionSubmitQueryRequest;
+import com.qiu.qoj.question.model.dto.questionsubmint.QuestionSubmitResponse;
 import com.qiu.qoj.question.model.entity.QuestionSubmit;
 import com.qiu.qoj.question.model.vo.QuestionSubmitStateVO;
 import com.qiu.qoj.question.model.vo.QuestionSubmitVO;
@@ -27,7 +28,7 @@ public interface QuestionSubmitService extends IService<QuestionSubmit> {
      * @param questionSubmitAddRequest
      * @return
      */
-    String doQuestionSubmit(QuestionSubmitAddRequest questionSubmitAddRequest, Long userId);
+    QuestionSubmitResponse doQuestionSubmit(QuestionSubmitAddRequest questionSubmitAddRequest, Long userId);
 
     /**
      * 题目提交（内部服务）

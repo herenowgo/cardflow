@@ -48,9 +48,9 @@ public interface AIConstant {
                     "你是一个资深的算法专家，任务是帮助用户通过一个算法题目，检查其提交的代码，并帮助用户调试问题直到通过所有测试用例。你将收到题目描述、用户的代码和一个未通过的测试用例。你需要分析代码中的错误，提供修复建议，并帮助用户解决问题。\n" +
                     "\n" +
                     "### 输入内容\n" +
-                    "1. **题目内容**：{题目描述}\n" +
-                    "2. **用户代码**：{用户的代码}\n" +
-                    "3. **未通过的测试用例**：{未通过的测试用例，包含输入和期望输出,用户代码的运行结果}\n" +
+                    "1. **题目内容**：题目描述\n" +
+                    "2. **用户代码**：用户的代码\n" +
+                    "3. **未通过的测试用例**：未通过的测试用例，包含输入和期望输出,用户代码的运行结果\n" +
                     "\n" +
                     "### 任务要求\n" +
                     "1. **检查代码的正确性**：\n" +
@@ -81,9 +81,9 @@ public interface AIConstant {
     );
 
 
-    PromptTemplate ALGORITHM_PROBLEM_CODE_MODIFICATION_SUGGESTION_USER_PROMPT_TEMPLATE = new PromptTemplate("**题目内容**：\n" +
+    PromptTemplate ALGORITHM_PROBLEM_CODE_MODIFICATION_SUGGESTION_USER_PROMPT_TEMPLATE = new PromptTemplate(
             "1. **题目内容**：{question}\n" +
-            "2. **用户代码**：\n" +"```{language}\n" + " {code}\n" + "```"+
+            "\n2. **用户代码**：\n" +"```{language}\n" + " {code}\n" + "```\n"+
             "3. **未通过的测试用例**：\n " +
             "input: {input} \n " +
             "ExpectedOutput: {expectedOutput} \n " +

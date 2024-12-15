@@ -14,8 +14,8 @@ public class StreamConfig {
 
     private final EventStreamService eventStreamService;
 
-    @Bean("judgeResult")
-    public Consumer<EventMessage> processJudgeResult() {
+    @Bean("eventMessage")
+    public Consumer<EventMessage> processEventMessage() {
         return eventStreamService::pushEvent;
     }
 } 

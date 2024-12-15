@@ -6,6 +6,7 @@ import com.qiu.qoj.common.api.UserContext;
 import com.qiu.qoj.question.model.dto.questionsubmint.DebugCodeRequest;
 import com.qiu.qoj.question.model.dto.questionsubmint.QuestionSubmitAddRequest;
 import com.qiu.qoj.question.model.dto.questionsubmint.QuestionSubmitQueryRequest;
+import com.qiu.qoj.question.model.dto.questionsubmint.QuestionSubmitResponse;
 import com.qiu.qoj.question.model.entity.QuestionSubmit;
 import com.qiu.qoj.question.model.vo.QuestionSubmitStateVO;
 import com.qiu.qoj.question.model.vo.QuestionSubmitVO;
@@ -41,9 +42,9 @@ public class QuestionSubmitController {
      * @return resultNum
      */
     @PostMapping("/")
-    public BaseResponse<String> doQuestionSubmit(@RequestBody @Valid QuestionSubmitAddRequest questionSubmitAddRequest) {
-        String requestId = questionSubmitService.doQuestionSubmit(questionSubmitAddRequest, UserContext.getUserId());
-        return BaseResponse.success(requestId);
+    public BaseResponse<QuestionSubmitResponse> doQuestionSubmit(@RequestBody @Valid QuestionSubmitAddRequest questionSubmitAddRequest) {
+        QuestionSubmitResponse questionSubmitResponse = questionSubmitService.doQuestionSubmit(questionSubmitAddRequest, UserContext.getUserId());
+        return BaseResponse.success(questionSubmitResponse);
     }
 
 

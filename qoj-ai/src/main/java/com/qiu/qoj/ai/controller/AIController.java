@@ -1,21 +1,18 @@
 package com.qiu.qoj.ai.controller;
 
 
-import com.qiu.qoj.common.api.BaseResponse;
 import com.qiu.qoj.ai.model.vo.QuestionRecommendation;
 import com.qiu.qoj.ai.service.AIService;
+import com.qiu.qoj.common.api.BaseResponse;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 
-@RestController
-@RequestMapping("/ai")
-@Slf4j
+//@RestController
+//@RequestMapping("/ai")
+//@Slf4j
 public class AIController {
 
     @Resource

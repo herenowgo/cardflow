@@ -1,6 +1,5 @@
 package com.qiu.qoj.ai.model.enums;
 
-import com.qiu.qoj.common.exception.ApiException;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -26,7 +25,7 @@ public enum AIModel {
         return Arrays.stream(values())
                 .filter(aiModel -> aiModel.voName.equals(aiModelVO.getName()))
                 .findFirst()
-                .orElseThrow(() -> new ApiException("AI模型不存在"));
+                .orElse(GLM_4_Flash);
     }
 }
 

@@ -127,14 +127,13 @@ public class JudgeServiceImpl implements JudgeService {
         }
         questionSubmitUpdate.setJudgeInfo(JSONUtil.toJsonStr(judgeInfo));
         questionSubmitService.updateById(questionSubmitUpdate);
-
         EventMessage eventMessage = EventMessage.builder()
                 .userId(questionSubmit.getUserId().toString())
                 .eventType(EventType.JUDGE_RESULT)
                 .requestId(requestId)
                 .data(judgeInfo)
                 .build();
-        streamBridge.send("judgeResult-out-0", eventMessage);
+        streamBridge.send("eventStream-out-0", eventMessage);
         return true;
     }
 

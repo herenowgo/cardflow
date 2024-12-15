@@ -25,6 +25,7 @@ import com.qiu.qoj.question.model.dto.question.JudgeCase;
 import com.qiu.qoj.question.model.dto.questionsubmint.DebugCodeRequest;
 import com.qiu.qoj.question.model.dto.questionsubmint.QuestionSubmitAddRequest;
 import com.qiu.qoj.question.model.dto.questionsubmint.QuestionSubmitQueryRequest;
+import com.qiu.qoj.question.model.dto.questionsubmint.QuestionSubmitResponse;
 import com.qiu.qoj.question.model.entity.Question;
 import com.qiu.qoj.question.model.entity.QuestionSubmit;
 import com.qiu.qoj.question.model.enums.QuestionSubmitLanguageEnum;
@@ -86,7 +87,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
      * @return 提交记录的id
      */
     @Override
-    public String doQuestionSubmit(QuestionSubmitAddRequest questionSubmitAddRequest, Long userId) {
+    public QuestionSubmitResponse doQuestionSubmit(QuestionSubmitAddRequest questionSubmitAddRequest, Long userId) {
         String requestId = EventMessageUtil.generateRequestId();
         // 校验编程语言是否合法
         String language = questionSubmitAddRequest.getLanguage();
@@ -118,7 +119,8 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         // 异步执行判题服务
         streamBridge.send(EventConstant.QUESTION_SUBMIT, questionSubmitId + "," + requestId);
 
-        return requestId;
+
+        return new QuestionSubmitResponse(requestId, questionSubmitId);
     }
 
 
@@ -257,7 +259,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
                     .eventType(EventType.JUDGE_RESULT)
                     .requestId(requestId)
                     .build();
-            streamBridge.send("judgeResult-out-0", eventMessage);
+            streamBridge.send("eventMessage-out-0", eventMessage);
         });
 
 

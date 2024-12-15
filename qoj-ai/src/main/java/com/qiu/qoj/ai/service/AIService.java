@@ -12,7 +12,7 @@ public interface AIService {
 
     String generateCards(AIChatRequest request);
 
-    String generateAlgorithmProblemModificationSuggestion(AIChatRequest aiChatRequest, Long questionSubmitId, Integer index);
+    String generateCodeModificationSuggestion(AIChatRequest aiChatRequest, Long questionSubmitId, Integer index);
 
     QuestionRecommendation generateQuestionRecommendation(String message, HttpServletRequest httpServletRequest);
 

@@ -134,13 +134,42 @@ public class AIServiceImpl implements AIService {
         streamBridge.send("aiResult-out-0", eventMessage);
     }
 
+    private void sendToQueue(List<String> data, String requestId, EventType eventType, String userId, Integer sequence) {
+        StringBuilder sb = new StringBuilder();
+        for (String str : data) {
+            sb.append(str);
+        }
+        String result = sb.toString();
+        EventMessage eventMessage = EventMessage.builder()
+                .userId(userId)
+                .eventType(eventType)
+                .requestId(requestId)
+                .data(result)
+                .sequence(sequence)
+                .build();
+        streamBridge.send("eventMessage-out-0", eventMessage);
+    }
+
+    private void sendEndMessageToQueue(String requestId, EventType eventType, String userId) {
+        EventMessage eventMessage = EventMessage.builder()
+                .userId(userId)
+                .eventType(eventType)
+                .requestId(requestId)
+                .sequence(-1)
+                .build();
+        streamBridge.send("eventMessage-out-0", eventMessage);
+    }
+
     /**
      * @param questionSubmitId
      * @param index            从0开始
      * @return
      */
     @Override
-    public String generateAlgorithmProblemModificationSuggestion(AIChatRequest aiChatRequest, Long questionSubmitId, Integer index) {
+    public String generateCodeModificationSuggestion(AIChatRequest aiChatRequest, Long questionSubmitId, Integer index) {
+        if (aiChatRequest == null) {
+            aiChatRequest = new AIChatRequest();
+        }
         AIModel aiModel = AIModel.getByVO(aiChatRequest.getModel());
         ChatClient client = aiClientFactory.getClient(aiModel);
         String requestId = EventMessageUtil.generateRequestId();
@@ -161,12 +190,15 @@ public class AIServiceImpl implements AIService {
                 List<JudgeCase> judgeCaseList = JSONUtil.toList(judgeCase, JudgeCase.class);
 
                 Map<String, Object> userPromptMap = new HashMap<>();
-                userPromptMap.put("question", title);
+                userPromptMap.put("question", title + "\n" + question.getContent());
                 userPromptMap.put("input", judgeCaseList.get(index).getInput());
                 userPromptMap.put("expectedOutput", judgeCaseList.get(index).getOutput());
                 userPromptMap.put("code", code);
                 userPromptMap.put("language", language);
-                userPromptMap.put("actualRunOutput", judgeInfoBean.getAnswers().get(index) + judgeInfoBean.getCompileErrorOutput());
+                userPromptMap.put("actualRunOutput", judgeInfoBean.getRunOutput().get(index) + judgeInfoBean.getCompileErrorOutput());
+
+//                String render = AIConstant.ALGORITHM_PROBLEM_CODE_MODIFICATION_SUGGESTION_SYSTEM_PROMPT_TEMPLATE.render();
+//                String render1 = AIConstant.ALGORITHM_PROBLEM_CODE_MODIFICATION_SUGGESTION_USER_PROMPT_TEMPLATE.render(userPromptMap);
 
                 Flux<String> result = client.prompt()
                         .system(AIConstant.ALGORITHM_PROBLEM_CODE_MODIFICATION_SUGGESTION_SYSTEM_PROMPT_TEMPLATE.render())
@@ -175,11 +207,13 @@ public class AIServiceImpl implements AIService {
                         .content();
 
                 result
-                        .bufferTimeout(10, Duration.ofSeconds(1))
+                        .bufferTimeout(15, Duration.ofSeconds(1))
+                        .index()
                         .doOnNext(message -> {
-                            sendToQueue(message, requestId, EventType.ANSWER, userId);
+                            sendToQueue(message.getT2(), requestId, EventType.CODE_SUGGEST, userId, Math.toIntExact(message.getT1()) + 1);
                         }) // 对每个接收到的元素调用sendToQueue方法
-                        .subscribe(); // 启动流的消费
+                        .doOnComplete(() -> sendEndMessageToQueue(requestId, EventType.CODE_SUGGEST, userId))
+                        .blockLast(); // 启动流的消费
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -241,11 +275,11 @@ public class AIServiceImpl implements AIService {
 //                judgeInfoBean.getAnswers().get(index) + judgeInfoBean.getCompileErrorOutput()
 //        );
 //
-////        User loginUser = userService.getLoginUser(httpServletRequest);
+
+    /// /        User loginUser = userService.getLoginUser(httpServletRequest);
 //        String result = aiManage.chatForSpeech(questionTemplate, "4535243534543525" + questionSubmitId.shortValue() + index);
 //        return result;
 //    }
-
     @Override
     public QuestionRecommendation generateQuestionRecommendation(String message, HttpServletRequest httpServletRequest) {
         String recommendation = aiManage.chatWithKnowledgeBase(message, "000000" + UserContext.getUserId().toString(), "1845342976004509696");
