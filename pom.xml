@@ -22,6 +22,7 @@
         <module>qoj-document</module>
         <module>qoj-common-api</module>
         <module>qoj-question/qoj-question-api</module>
+        <module>codeflow-graph</module>
     </modules>
 
 
