@@ -5,6 +5,9 @@ import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @Node("Card")
 public class Card {
@@ -18,6 +21,10 @@ public class Card {
 
     @Relationship(type = "BASED_ON_CARD", direction = Relationship.Direction.OUTGOING)
     private Card basedOnCard;
+
+    // 添加与知识点的多对多关系
+    @Relationship(type = "HAS_TAG", direction = Relationship.Direction.OUTGOING)
+    private List<KnowledgeTag> knowledgeTags = new ArrayList<>();
 
     // 构造函数
     public Card(String id, String question) {
