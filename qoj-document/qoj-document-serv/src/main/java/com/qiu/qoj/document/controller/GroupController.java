@@ -2,7 +2,7 @@ package com.qiu.qoj.document.controller;
 
 import com.qiu.qoj.common.api.BaseResponse;
 import com.qiu.qoj.common.api.UserContext;
-import com.qiu.qoj.document.service.GroupService;
+import com.qiu.qoj.document.service.impl.GroupService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;

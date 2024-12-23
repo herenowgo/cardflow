@@ -1,4 +1,4 @@
-package com.qiu.qoj.document.service;
+package com.qiu.qoj.document.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;

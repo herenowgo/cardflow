@@ -7,7 +7,7 @@ import com.qiu.qoj.document.model.dto.card.CardAddRequest;
 import com.qiu.qoj.document.model.dto.card.CardIdsRequest;
 import com.qiu.qoj.document.model.dto.card.CardUpdateRequest;
 import com.qiu.qoj.document.model.entity.Card;
-import com.qiu.qoj.document.service.CardService;
+import com.qiu.qoj.document.service.impl.CardService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package com.qiu.qoj.document.service;
+package com.qiu.qoj.document.service.impl;
 
 import com.qiu.qoj.common.exception.Asserts;
 import com.qiu.qoj.document.model.entity.Group;
