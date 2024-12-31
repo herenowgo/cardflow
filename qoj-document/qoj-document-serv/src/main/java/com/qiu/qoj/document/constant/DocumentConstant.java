@@ -32,10 +32,10 @@ public interface DocumentConstant {
     Set<String> ALLOW_FILE_TYPE = FILE_TYPE_SIZE_LIMIT.keySet();
 
     // 文件名最大长度
-    int MAX_FILENAME_LENGTH = 255;
+    int MAX_FILENAME_LENGTH = 40;
 
     // 路径最大深度
-    int MAX_PATH_DEPTH = 5;
+    int MAX_PATH_DEPTH = 3;
 
     // 单个文件夹下最大文件数
     int MAX_FILES_PER_FOLDER = 1000;

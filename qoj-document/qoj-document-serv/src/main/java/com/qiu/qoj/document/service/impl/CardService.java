@@ -44,7 +44,8 @@ public class CardService {
             if (card.getAnkiInfo() == null) {
                 card.setAnkiInfo(new AnkiInfo());
             }
-            BeanUtil.copyProperties(cardUpdateRequest.getAnkiInfo(), card.getAnkiInfo(), CopyOptions.create().setIgnoreNullValue(true));
+            BeanUtil.copyProperties(cardUpdateRequest.getAnkiInfo(), card.getAnkiInfo(),
+                    CopyOptions.create().setIgnoreNullValue(true));
             if (cardUpdateRequest.getAnswer() != null || cardUpdateRequest.getQuestion() != null) {
                 card.setModifiedTime(cardUpdateRequest.getAnkiInfo().getSyncTime());
             }
@@ -56,7 +57,6 @@ public class CardService {
         cardRepository.save(card);
         return true;
     }
-
 
     // 获取用户的所有卡片
     public List<Card> getUserCards(Long userId) {
@@ -128,7 +128,7 @@ public class CardService {
      * 3. todo 删除的卡片的同步
      * anki中的删了怎么办？ 那就是anki有cardID，而我们这边没有了，那就
      * 我们这边删了，那就没有cardId， 而anki有。那建议把anki那边的删掉。
-     *      1. 最好先标记，删除的时候，如果ankiInfo不为空，就标记一个要删除。然后同步的时候，
+     * 1. 最好先标记，删除的时候，如果ankiInfo不为空，就标记一个要删除。然后同步的时候，
      * 3. 后端接口设计
      * 所有卡片的同步时间、AnkiInfo的cardID、和modifiedTime
      * 以及没有cardID的卡片的数据
@@ -160,7 +160,7 @@ public class CardService {
                         .id(card.getId())
                         .question(card.getQuestion())
                         .answer(card.getAnswer())
-                        .deckName(group)  // 使用当前分组作为牌组名
+                        .deckName(group) // 使用当前分组作为牌组名
                         .modelName("Basic")
                         .tags(card.getTags())
                         .build())
@@ -178,7 +178,7 @@ public class CardService {
         Card card = cardRepository.findByIdAndIsDeletedFalse(cardId);
         Asserts.failIf(card == null, "卡片不存在");
 
-        // 检查权限：普通用户只能查看自己的卡片，管理员可���查看所有卡片
+        // 检查权限：普通用户只能查看自己的卡片，管理员可以查看所有卡片
         Asserts.failIf(!UserContext.getUserId().equals(card.getUserId()) && !UserContext.isAdmin(),
                 "没有权限查看此卡片");
 
@@ -197,6 +197,22 @@ public class CardService {
         }
 
         return cards;
+    }
+
+    /**
+     * 检查一组Anki卡片ID是否存在
+     * 
+     * @param ankiCardIds Anki卡片ID列表
+     * @return 布尔数组，表示对应位置的Anki卡片ID是否存在
+     */
+    public List<Boolean> checkAnkiCardsExist(List<Long> ankiCardIds) {
+        // 获取所有存在的Anki卡片ID
+        List<Long> existingCardIds = cardRepository.findAnkiCardIdsByCardIdIn(ankiCardIds);
+
+        // 将结果转换为布尔数组
+        return ankiCardIds.stream()
+                .map(existingCardIds::contains)
+                .collect(Collectors.toList());
     }
 
 }

@@ -22,7 +22,6 @@ public interface CardRepository extends MongoRepository<Card, String> {
     // 根据ID和用户ID查找
     Card findByIdAndUserIdAndIsDeletedFalse(String id, Long userId);
 
-
     // 根据用户ID和分组查找
     List<Card> findByUserIdAndGroup(Long userId, String group);
 
@@ -39,8 +38,7 @@ public interface CardRepository extends MongoRepository<Card, String> {
     Page<Card> findByUserIdAndGroupAndIsDeletedFalse(Long userId, String group, Pageable pageable);
 
     // 获取特定分组的卡片同步信息
-    @Query(value = "{ 'userId': ?0, 'group': ?1, 'isDeleted': false, 'ankiInfo.cardId': { $exists: true } }",
-            fields = "{ 'ankiInfo.cardId': 1, 'ankiInfo.syncTime': 1, 'modifiedTime': 1 }")
+    @Query(value = "{ 'userId': ?0, 'group': ?1, 'isDeleted': false, 'ankiInfo.cardId': { $exists: true } }", fields = "{ 'ankiInfo.cardId': 1, 'ankiInfo.syncTime': 1, 'modifiedTime': 1 }")
     List<Card> findCardSyncInfoByUserIdAndGroup(Long userId, String group);
 
     // 获取特定分组未同步到Anki的卡片
@@ -52,5 +50,14 @@ public interface CardRepository extends MongoRepository<Card, String> {
 
     // 批量查询未删除的卡片
     List<Card> findByIdInAndIsDeletedFalse(List<String> ids);
+
+    /**
+     * 查找一组Anki卡片ID中存在的ID列表
+     * 
+     * @param cardIds Anki卡片ID列表
+     * @return 存在的Anki卡片ID列表
+     */
+    @Query(value = "{ 'ankiInfo.cardId': { $in: ?0 } }", fields = "{ 'ankiInfo.cardId': 1 }")
+    List<Long> findAnkiCardIdsByCardIdIn(List<Long> cardIds);
 
 }

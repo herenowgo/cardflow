@@ -1,20 +1,37 @@
 package com.qiu.qoj.document.controller;
 
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.qiu.qoj.common.api.BaseResponse;
 import com.qiu.qoj.common.api.UserContext;
+import com.qiu.qoj.document.model.dto.card.AnkiCardIdsRequest;
 import com.qiu.qoj.document.model.dto.card.AnkiSyncResponse;
 import com.qiu.qoj.document.model.dto.card.CardAddRequest;
 import com.qiu.qoj.document.model.dto.card.CardIdsRequest;
 import com.qiu.qoj.document.model.dto.card.CardUpdateRequest;
 import com.qiu.qoj.document.model.entity.Card;
 import com.qiu.qoj.document.service.impl.CardService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/cards")
@@ -23,7 +40,6 @@ import java.util.List;
 public class CardController {
 
     private final CardService cardService;
-
 
     // 创建新卡片
     @PostMapping
@@ -42,7 +58,6 @@ public class CardController {
     public BaseResponse<Boolean> updateCard(@RequestBody @Valid CardUpdateRequest cardUpdateRequest) {
         return BaseResponse.success(cardService.updateCardContent(cardUpdateRequest));
     }
-
 
     /**
      * 为了与anki进行双向同步，返回必须的信息
@@ -79,9 +94,7 @@ public class CardController {
                         UserContext.getUserId(),
                         group,
                         page,
-                        size
-                )
-        );
+                        size));
     }
 
     // 获取指定ID的卡片
@@ -94,6 +107,19 @@ public class CardController {
     @PostMapping("/batch")
     public BaseResponse<List<Card>> getCardsByIds(@RequestBody @Valid CardIdsRequest request) {
         return BaseResponse.success(cardService.getCardsByIds(request.getCardIds()));
+    }
+
+    /**
+     * 检查一组Anki卡片ID是否存在
+     * 
+     * @param cardIds Anki卡片ID列表
+     * @return 布尔数组，表示对应位置的Anki卡片ID是否存在
+     */
+    @Operation(summary = "检查Anki卡片是否存在", description = "传入一组Anki卡片ID，返回每个ID是否存在的布尔数组")
+    @PostMapping("/anki/exists")
+    public BaseResponse<List<Boolean>> checkAnkiCardsExist(
+            @Parameter(description = "Anki卡片ID列表", required = true) @RequestBody @Valid AnkiCardIdsRequest request) {
+        return BaseResponse.success(cardService.checkAnkiCardsExist(request.getCardIds()));
     }
 
 }

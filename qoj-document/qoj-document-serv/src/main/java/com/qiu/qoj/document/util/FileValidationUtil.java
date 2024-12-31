@@ -16,8 +16,11 @@ public class FileValidationUtil {
                 "File name too long, max length is " + DocumentConstant.MAX_FILENAME_LENGTH);
 
         // 检查文件名是否包含非法字符
-        Asserts.failIf(!fileName.matches("^[a-zA-Z0-9._-]+$"),
-                "File name contains invalid characters");
+        String invalidChars = "<>:\"/\\|?*";
+        for (char c : invalidChars.toCharArray()) {
+            Asserts.failIf(fileName.indexOf(c) != -1,
+                    "File name contains invalid character: " + c);
+        }
     }
 
     /**

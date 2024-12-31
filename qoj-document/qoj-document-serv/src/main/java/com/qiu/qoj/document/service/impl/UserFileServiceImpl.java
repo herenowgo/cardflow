@@ -36,10 +36,10 @@ public class UserFileServiceImpl implements UserFileService {
         FileValidationUtil.validatePath(parentPath);
 
         // 2. 检查存储空间配额
-        checkStorageQuota(file.getSize());
+//        checkStorageQuota(file.getSize());
 
         // 3. 检查文件夹下的文件数量限制
-        checkFolderFileLimit(parentPath);
+//        checkFolderFileLimit(parentPath);
 
         // 1. 构建文件路径
         String fileName = file.getOriginalFilename();
@@ -199,7 +199,7 @@ public class UserFileServiceImpl implements UserFileService {
 
         if (isImageType(type)) {
             // 图片类型 - 返回临时访问URL
-            previewUrl = objectStorage.getPresignedUrl(path, 30);
+            previewUrl = objectStorage.getPresignedUrl(path, 99999);
         } else if (isTextType(type)) {
             // 文本类型 - 读取文件内容
             content = getTextContent(path);

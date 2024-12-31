@@ -2,6 +2,8 @@
 .idea
 *.iml
 src/main/resources/application.yml
+.cursorrules
+.vscode/**
 ### Java template
 # Compiled class file
 *.class
@@ -29,6 +31,12 @@ hs_err_pid*
 replay_pid*
 
 ### Maven template
+*.yml
+*.yaml
+*.properties
+*.xml
+*.json
+pom.xml
 target/
 pom.xml.tag
 pom.xml.releaseBackup

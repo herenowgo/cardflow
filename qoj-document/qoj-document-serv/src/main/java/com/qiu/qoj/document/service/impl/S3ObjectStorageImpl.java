@@ -1,5 +1,6 @@
 package com.qiu.qoj.document.service.impl;
 
+import com.qiu.qoj.common.exception.ApiException;
 import com.qiu.qoj.common.exception.Asserts;
 import com.qiu.qoj.document.config.ObjectStorageConfig;
 import com.qiu.qoj.document.constant.DocumentConstant;
@@ -37,7 +38,7 @@ public class S3ObjectStorageImpl implements ObjectStorage {
 
         // 检查文件是否已存在(如果不允许覆盖)
         if (!overwrite && doesObjectExist(path)) {
-            throw new RuntimeException("File already exists: " + path);
+            throw new ApiException("File already exists: " + path);
         }
 
         // 执行上传

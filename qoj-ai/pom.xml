@@ -157,7 +157,7 @@
                 <scope>import</scope>
             </dependency>
         </dependencies>
-    </dependencyManagement>00000000000000000000000000000000000000000000
+    </dependencyManagement>
 
     <repositories>
         <repository>
