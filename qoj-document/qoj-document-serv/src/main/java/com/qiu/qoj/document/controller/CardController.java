@@ -25,10 +25,6 @@ import com.qiu.qoj.document.service.impl.CardService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -109,17 +105,30 @@ public class CardController {
         return BaseResponse.success(cardService.getCardsByIds(request.getCardIds()));
     }
 
+    // /**
+    //  * 检查一组Anki卡片ID是否存在
+    //  * 
+    //  * @param cardIds Anki卡片ID列表
+    //  * @return 布尔数组，表示对应位置的Anki卡片ID是否存在
+    //  */
+    // @Operation(summary = "检查Anki卡片是否存在", description = "传入一组Anki卡片ID，返回每个ID是否存在的布尔数组")
+    // @PostMapping("/anki/exists")
+    // public BaseResponse<List<Boolean>> checkAnkiCardsExist(
+    //         @Parameter(description = "Anki卡片ID列表", required = true) @RequestBody @Valid AnkiCardIdsRequest request) {
+    //     return BaseResponse.success(cardService.checkAnkiCardsExist(request.getCardIds()));
+    // }
+
     /**
-     * 检查一组Anki卡片ID是否存在
+     * 根据Anki卡片ID列表获取对应的卡片
      * 
-     * @param cardIds Anki卡片ID列表
-     * @return 布尔数组，表示对应位置的Anki卡片ID是否存在
+     * @param request Anki卡片ID列表
+     * @return 包含这些Anki卡片ID的Card列表
      */
-    @Operation(summary = "检查Anki卡片是否存在", description = "传入一组Anki卡片ID，返回每个ID是否存在的布尔数组")
-    @PostMapping("/anki/exists")
-    public BaseResponse<List<Boolean>> checkAnkiCardsExist(
+    @Operation(summary = "根据Anki卡片ID获取卡片", description = "传入一组Anki卡片ID，返回对应的卡片列表")
+    @PostMapping("/anki/cards")
+    public BaseResponse<List<Card>> getCardsByAnkiCardIds(
             @Parameter(description = "Anki卡片ID列表", required = true) @RequestBody @Valid AnkiCardIdsRequest request) {
-        return BaseResponse.success(cardService.checkAnkiCardsExist(request.getCardIds()));
+        return BaseResponse.success(cardService.getCardsByAnkiCardIds(request.getCardIds()));
     }
 
 }

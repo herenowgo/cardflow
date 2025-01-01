@@ -60,4 +60,13 @@ public interface CardRepository extends MongoRepository<Card, String> {
     @Query(value = "{ 'ankiInfo.cardId': { $in: ?0 } }", fields = "{ 'ankiInfo.cardId': 1 }")
     List<Long> findAnkiCardIdsByCardIdIn(List<Long> cardIds);
 
+    /**
+     * 根据Anki卡片ID列表查找卡片
+     * 
+     * @param cardIds Anki卡片ID列表
+     * @return 包含这些Anki卡片ID的Card列表
+     */
+    @Query(value = "{ 'ankiInfo.cardId': { $in: ?0 }, 'isDeleted': false }")
+    List<Card> findByAnkiInfoCardIdIn(List<Long> cardIds);
+
 }

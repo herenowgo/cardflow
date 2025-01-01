@@ -215,4 +215,23 @@ public class CardService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 根据Anki卡片ID列表获取对应的卡片
+     * 
+     * @param ankiCardIds Anki卡片ID列表
+     * @return 包含这些Anki卡片ID的Card列表
+     */
+    public List<Card> getCardsByAnkiCardIds(List<Long> ankiCardIds) {
+        List<Card> cards = cardRepository.findByAnkiInfoCardIdIn(ankiCardIds);
+
+        // 检查权限：普通用户只能查看自己的卡片，管理员可以查看所有卡片
+        if (!UserContext.isAdmin()) {
+            cards = cards.stream()
+                    .filter(card -> card.getUserId().equals(UserContext.getUserId()))
+                    .collect(Collectors.toList());
+        }
+
+        return cards;
+    }
+
 }
