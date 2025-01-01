@@ -1,13 +1,15 @@
 package com.qiu.qoj.ai.client;
 
-import com.qiu.qoj.ai.model.enums.AIModel;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.qiu.qoj.ai.model.enums.AIModel;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 
 @Component
 public class AIClientFactory {

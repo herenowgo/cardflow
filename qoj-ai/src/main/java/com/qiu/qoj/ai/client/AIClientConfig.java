@@ -15,18 +15,14 @@ public class AIClientConfig {
     @Value("${spring.ai.zhipuai.api-key}")
     private String zhiPuAiApiToken;
 
-
     @Bean
     ChatClient glm_4() {
         ZhiPuAiApi zhiPuAiApi = new ZhiPuAiApi(zhiPuAiApiToken);
 
         ChatModel chatModel = new ZhiPuAiChatModel(zhiPuAiApi, ZhiPuAiChatOptions.builder()
-                .withModel(ZhiPuAiApi.ChatModel.GLM_4_Flash.getValue())
+                .model(ZhiPuAiApi.ChatModel.GLM_4_Flash.getValue())
                 .build());
 
         return ChatClient.builder(chatModel).build();
     }
 }
-
-
-
