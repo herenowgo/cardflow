@@ -198,6 +198,7 @@ public class AIServiceImpl implements AIService {
                                 .model(aiModel.getName())
                                 .build())
                         .advisors(memoryAdvisor)
+                        .system(AIConstant.CARD_CHECK_SYSTEM_PROMPT_TEMPLATE.render())
                         .user(request.getContent())
                         .stream()
                         .content();
