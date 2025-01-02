@@ -9,4 +9,6 @@ public interface AIService {
     String generateCards(AIChatRequest request);
 
     String generateCodeModificationSuggestion(AIChatRequest aiChatRequest, Long questionSubmitId, Integer index);
+
+    String chat(AIChatRequest request);
 }

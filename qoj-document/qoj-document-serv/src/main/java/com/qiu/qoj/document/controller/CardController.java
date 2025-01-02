@@ -105,8 +105,6 @@ public class CardController {
         return BaseResponse.success(cardService.getCardsByIds(request.getCardIds()));
     }
 
-
-
     /**
      * 根据Anki卡片ID列表获取对应的卡片
      * 

@@ -13,6 +13,6 @@ public class AIChatRequest {
     private String content;
     private AIModelVO model = AIModelVO.BASIC;
     private String prompt;
-    // 会话id，用于实现多轮对话
+    // 会话id，用于实现多轮对话（在多轮对话中，要传递相同的sessionId）
     private String sessionId;
 }

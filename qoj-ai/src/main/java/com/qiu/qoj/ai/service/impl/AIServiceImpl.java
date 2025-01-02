@@ -8,8 +8,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.prompt.ChatOptions;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +51,10 @@ public class AIServiceImpl implements AIService {
     // 自定义线程池
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
+    // 用于存储会话记录
+    private final InMemoryChatMemory chatMemory = new InMemoryChatMemory();
+
+    private static final int DEFAULT_WINDOW_SIZE = 10;
 
     /**
      * 强制使用flash模型
@@ -164,6 +169,48 @@ public class AIServiceImpl implements AIService {
                         }) // 对每个接收到的元素调用sendToQueue方法
                         .doOnComplete(() -> sendEndMessageToQueue(requestId, EventType.CODE_SUGGEST, userId))
                         .blockLast(); // 启动流的消费
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        return requestId;
+    }
+
+    @Override
+    public String chat(AIChatRequest request) {
+        AIModel aiModel = AIModel.getByVO(request.getModel());
+        ChatClient client = aiClientFactory.getClient(aiModel);
+        String requestId = EventMessageUtil.generateRequestId();
+        String userId = UserContext.getUserId().toString();
+        String sessionId = UserContext.getUserId() + request.getSessionId().substring(0, 10);
+
+        executorService.submit(() -> {
+            try {
+                // 创建记忆顾问，设置窗口大小
+                MessageChatMemoryAdvisor memoryAdvisor = new MessageChatMemoryAdvisor(
+                        chatMemory,
+                        sessionId,
+                        DEFAULT_WINDOW_SIZE);
+                // 使用流式响应
+                Flux<String> result = client.prompt()
+                        .options(ChatOptions.builder()
+                                .model(aiModel.getName())
+                                .build())
+                        .advisors(memoryAdvisor)
+                        .user(request.getContent())
+                        .stream()
+                        .content();
+
+                result
+                        .bufferTimeout(15, Duration.ofSeconds(1))
+                        .index()
+                        .doOnNext(message -> {
+                            sendToQueue(message.getT2(), requestId, EventType.ANSWER, userId,
+                                    Math.toIntExact(message.getT1()) + 1);
+                        })
+                        .doOnComplete(() -> sendEndMessageToQueue(requestId, EventType.ANSWER, userId))
+                        .blockLast();
             } catch (Exception e) {
                 e.printStackTrace();
             }

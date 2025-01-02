@@ -10,6 +10,8 @@ import com.qiu.qoj.ai.model.dto.ai.UserCodeAnalysisRequest;
 import com.qiu.qoj.ai.service.AIService;
 import com.qiu.qoj.common.api.BaseResponse;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -37,6 +39,17 @@ public class ChatController {
         return BaseResponse.success(requestId);
     }
 
-    
+    /**
+     * 与AI进行对话
+     * 
+     * @param aiChatRequest AI对话请求参数
+     * @return 请求ID，用于获取流式响应
+     */
+    @Operation(summary = "AI对话", description = "与AI进行对话，返回请求ID用于从流式响应中获取消息")
+    @PostMapping("/chat")
+    public BaseResponse<String> chat(
+            @Parameter(description = "AI对话请求参数", required = true) @RequestBody AIChatRequest aiChatRequest) {
+        return BaseResponse.success(aiService.chat(aiChatRequest));
+    }
 
 }
