@@ -27,7 +27,7 @@ public class ChatClientFactory {
         map.put(AIModel.GLM_4_Air, zhiPu);
         map.put(AIModel.GLM_4_AirX, zhiPu);
         map.put(AIModel.GLM_4_PLUS, zhiPu);
-        map.put(AIModel.GEMINI_EXP_1206, gemini);
+        map.put(AIModel.GEMINI_1_5_PRO_EXP, gemini);
         map.put(AIModel.GEMINI_2_0_FLASH_EXP, gemini);
     }
 

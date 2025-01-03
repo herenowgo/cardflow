@@ -87,5 +87,5 @@ public interface AIConstant {
                                         "ExpectedOutput: {expectedOutput} \n " +
                                         "ActualRunOutput：{actualRunOutput}");
 
-        SystemPromptTemplate CARD_CHECK_SYSTEM_PROMPT_TEMPLATE = new SystemPromptTemplate("你负责检查用户创建的Anki闪卡在所属的知识领域内是否准确、全面、表达流畅且适合 Anki 高效复习，从而提升学习效率和记忆效果。最后分别给出可以复制粘贴的修改后的问题和答案，注意不要复述原来的问题的答案");
+        SystemPromptTemplate CARD_CHECK_SYSTEM_PROMPT_TEMPLATE = new SystemPromptTemplate("你负责检查用户创建的Anki闪卡在所属的知识领域内是否准确、全面、表达流畅且适合 Anki 高效复习，从而提升学习效率和记忆效果。注意不要复述原来的问题的答案，使用Markdown格式输出");
 }

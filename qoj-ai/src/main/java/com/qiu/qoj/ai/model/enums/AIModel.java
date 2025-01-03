@@ -11,11 +11,10 @@ public enum AIModel {
     GLM_4_AirX("glm-4-airx", "fast"),
     GLM_4_PLUS("glm-4-plus", "plus"),
     // gemini-exp-1206
-    GEMINI_EXP_1206("gemini-exp-1206", "gemini-exp-1206"),
+    GEMINI_1_5_PRO_EXP("gemini-1.5-pro-exp", "gemini-1.5-pro-exp"),
     // gemini-2.0-flash-exp
     GEMINI_2_0_FLASH_EXP("gemini-2.0-flash-exp", "gemini-2.0-flash-exp"),
     ;
-
 
     private final String name;
     private final String voName;
@@ -32,4 +31,3 @@ public enum AIModel {
                 .orElse(GLM_4_Flash);
     }
 }
-
