@@ -14,7 +14,7 @@ import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 
-import com.qiu.qoj.ai.client.AIClientFactory;
+import com.qiu.qoj.ai.client.ChatClientFactory;
 import com.qiu.qoj.ai.constant.AIConstant;
 import com.qiu.qoj.ai.judge.codesandbox.model.JudgeInfo;
 import com.qiu.qoj.ai.model.dto.ai.AIChatRequest;
@@ -29,6 +29,7 @@ import com.qiu.qoj.ai.service.QuestionService;
 import com.qiu.qoj.ai.service.QuestionSubmitService;
 import com.qiu.qoj.common.api.UserContext;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
@@ -44,7 +45,7 @@ public class AIServiceImpl implements AIService {
 
     private final QuestionService questionService;
 
-    private final AIClientFactory aiClientFactory;
+    private final ChatClientFactory chatClientFactory;
 
     private final StreamBridge streamBridge;
 
@@ -64,7 +65,7 @@ public class AIServiceImpl implements AIService {
      */
     @Override
     public String generateTags(AIChatRequest request) {
-        ChatClient client = aiClientFactory.getClient(AIModel.GLM_4_Flash);
+        ChatClient client = chatClientFactory.getClient(AIModel.GLM_4_Flash);
         String requestId = EventMessageUtil.generateRequestId();
         String userId = UserContext.getUserId().toString();
         // 异步执行 AI 生成内容和发送消息的操作
@@ -89,7 +90,7 @@ public class AIServiceImpl implements AIService {
     @Override
     public String generateCards(AIChatRequest request) {
         AIModel aiModel = AIModel.getByVO(request.getModel());
-        ChatClient client = aiClientFactory.getClient(aiModel);
+        ChatClient client = chatClientFactory.getClient(aiModel);
         String requestId = EventMessageUtil.generateRequestId();
         String userId = UserContext.getUserId().toString();
 
@@ -125,7 +126,7 @@ public class AIServiceImpl implements AIService {
             aiChatRequest = new AIChatRequest();
         }
         AIModel aiModel = AIModel.getByVO(aiChatRequest.getModel());
-        ChatClient client = aiClientFactory.getClient(aiModel);
+        ChatClient client = chatClientFactory.getClient(aiModel);
         String requestId = EventMessageUtil.generateRequestId();
         String userId = UserContext.getUserId().toString();
 
@@ -180,10 +181,13 @@ public class AIServiceImpl implements AIService {
     @Override
     public String chat(AIChatRequest request) {
         AIModel aiModel = AIModel.getByVO(request.getModel());
-        ChatClient client = aiClientFactory.getClient(aiModel);
+        ChatClient client = chatClientFactory.getClient(aiModel);
         String requestId = EventMessageUtil.generateRequestId();
         String userId = UserContext.getUserId().toString();
         String sessionId = UserContext.getUserId() + request.getSessionId().substring(0, 10);
+        String systemPrompt = StrUtil.isBlank(request.getPrompt())
+                ? AIConstant.CARD_CHECK_SYSTEM_PROMPT_TEMPLATE.render()
+                : request.getPrompt();
 
         executorService.submit(() -> {
             try {
@@ -197,8 +201,9 @@ public class AIServiceImpl implements AIService {
                         .options(ChatOptions.builder()
                                 .model(aiModel.getName())
                                 .build())
+
                         .advisors(memoryAdvisor)
-                        .system(AIConstant.CARD_CHECK_SYSTEM_PROMPT_TEMPLATE.render())
+                        .system(systemPrompt)
                         .user(request.getContent())
                         .stream()
                         .content();

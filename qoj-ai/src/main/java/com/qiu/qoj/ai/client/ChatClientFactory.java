@@ -12,18 +12,23 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 
 @Component
-public class AIClientFactory {
+public class ChatClientFactory {
     @Resource
-    ChatClient glm_4;
+    ChatClient zhiPu;
+
+    @Resource
+    ChatClient gemini;
 
     Map<AIModel, ChatClient> map = new HashMap<>();
 
     @PostConstruct
     public void init() {
-        map.put(AIModel.GLM_4_Flash, glm_4);
-        map.put(AIModel.GLM_4_Air, glm_4);
-        map.put(AIModel.GLM_4_AirX, glm_4);
-        map.put(AIModel.GLM_4_PLUS, glm_4);
+        map.put(AIModel.GLM_4_Flash, zhiPu);
+        map.put(AIModel.GLM_4_Air, zhiPu);
+        map.put(AIModel.GLM_4_AirX, zhiPu);
+        map.put(AIModel.GLM_4_PLUS, zhiPu);
+        map.put(AIModel.GEMINI_EXP_1206, gemini);
+        map.put(AIModel.GEMINI_2_0_FLASH_EXP, gemini);
     }
 
     public ChatClient getClient(AIModel model) {

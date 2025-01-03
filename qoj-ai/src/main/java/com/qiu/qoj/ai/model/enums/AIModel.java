@@ -10,6 +10,10 @@ public enum AIModel {
     GLM_4_Air("glm-4-air", "better"),
     GLM_4_AirX("glm-4-airx", "fast"),
     GLM_4_PLUS("glm-4-plus", "plus"),
+    // gemini-exp-1206
+    GEMINI_EXP_1206("gemini-exp-1206", "gemini-exp-1206"),
+    // gemini-2.0-flash-exp
+    GEMINI_2_0_FLASH_EXP("gemini-2.0-flash-exp", "gemini-2.0-flash-exp"),
     ;
 
 
