@@ -233,7 +233,7 @@ public class AIServiceImpl implements AIService {
                 .data(data)
                 .build();
 
-        streamBridge.send("aiResult-out-0", eventMessage);
+        streamBridge.send("eventMessage-out-0", eventMessage);
     }
 
     private void sendToQueue(List<String> data, String requestId, EventType eventType, String userId,
