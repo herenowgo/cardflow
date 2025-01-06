@@ -5,11 +5,12 @@ import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 
 public interface AIConstant {
 
-        String GENERATE_TAGS_SYSTEM_PROMPT = "你是一个专业的知识标签生成器。你的任务是为输入的内容生成准确、一致的标签。\n" +
-                        "请遵循以下规则:\n" +
-                        "1. 标签应该简洁、准确,使用中文\n" +
-                        "2. 标签应该反映内容的核心主题、领域、技术栈等关键信息\n" +
-                        "3. 对相似内容要生成一致的标签";
+        SystemPromptTemplate GENERATE_TAGS_SYSTEM_PROMPT = new SystemPromptTemplate(
+                        "你是一个专业的知识标签生成器。你的任务是为输入的内容生成准确、一致的标签。\n" +
+                                        "请遵循以下规则:\n" +
+                                        "1. 标签应该简洁、准确,使用中文\n" +
+                                        "2. 标签应该反映内容的核心主题、领域、技术栈等关键信息\n" +
+                                        "3. 对相似内容要生成一致的标签");
 
         String GENERATE_CARDS_SYSTEM_PROMPT = "# 角色：  \n" +
                         "您是一位资深的教育专家，擅长从文本中提炼关键知识点，并设计成高效的学习卡片。\n" +
@@ -87,5 +88,6 @@ public interface AIConstant {
                                         "ExpectedOutput: {expectedOutput} \n " +
                                         "ActualRunOutput：{actualRunOutput}");
 
-        SystemPromptTemplate CARD_CHECK_SYSTEM_PROMPT_TEMPLATE = new SystemPromptTemplate("你负责检查用户创建的Anki闪卡在所属的知识领域内是否准确、全面、表达流畅且适合 Anki 高效复习，从而提升学习效率和记忆效果。注意不要复述原来的问题的答案，使用Markdown格式输出");
+        SystemPromptTemplate CARD_CHECK_SYSTEM_PROMPT_TEMPLATE = new SystemPromptTemplate(
+                        "你负责检查用户创建的Anki闪卡在所属的知识领域内是否准确、全面、表达流畅且适合 Anki 高效复习，从而提升学习效率和记忆效果。注意不要复述原来的问题的答案，使用Markdown格式输出");
 }

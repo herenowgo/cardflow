@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.qiu.qoj.ai.model.dto.ai.AIChatRequest;
 import com.qiu.qoj.ai.model.dto.ai.UserCodeAnalysisRequest;
 import com.qiu.qoj.ai.service.AIService;
+import com.qiu.qoj.ai.utils.ContentCleaner;
 import com.qiu.qoj.common.api.BaseResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,11 +24,13 @@ public class ChatController {
 
     @PostMapping("/tags")
     public BaseResponse<String> getTags(@RequestBody AIChatRequest aiChatRequest) {
+        aiChatRequest.setContent(ContentCleaner.cleanHtmlContent(aiChatRequest.getContent()));
         return BaseResponse.success(aiService.generateTags(aiChatRequest));
     }
 
     @PostMapping("/cards")
     public BaseResponse<String> getCards(@RequestBody AIChatRequest aiChatRequest) {
+        aiChatRequest.setContent(ContentCleaner.cleanHtmlContent(aiChatRequest.getContent()));
         return BaseResponse.success(aiService.generateCards(aiChatRequest));
     }
 
@@ -49,6 +52,7 @@ public class ChatController {
     @PostMapping("/chat")
     public BaseResponse<String> chat(
             @Parameter(description = "AI对话请求参数", required = true) @RequestBody AIChatRequest aiChatRequest) {
+        aiChatRequest.setContent(ContentCleaner.cleanHtmlContent(aiChatRequest.getContent()));
         return BaseResponse.success(aiService.chat(aiChatRequest));
     }
 

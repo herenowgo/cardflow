@@ -68,15 +68,22 @@ public class AIServiceImpl implements AIService {
         ChatClient client = chatClientFactory.getClient(AIModel.GLM_4_Flash);
         String requestId = EventMessageUtil.generateRequestId();
         String userId = UserContext.getUserId().toString();
+
+        String sanitizedContent = sanitizeUserPrompt(request.getContent());
+
         // 异步执行 AI 生成内容和发送消息的操作
         executorService.submit(() -> {
             try {
                 Tags tags = client.prompt()
                         .options(ChatOptions.builder().model(AIModel.GLM_4_Flash.getName()).build())
-                        .system(AIConstant.GENERATE_TAGS_SYSTEM_PROMPT)
-                        .user(request.getContent())
+                        .system(AIConstant.GENERATE_TAGS_SYSTEM_PROMPT.render())
+                        .user(sanitizedContent)
                         .call()
                         .entity(Tags.class);
+
+                if (tags == null) {
+                    tags = new Tags();
+                }
 
                 sendToQueue(tags.getTags(), requestId, EventType.TAGS, userId);
             } catch (Exception e) {
@@ -85,6 +92,31 @@ public class AIServiceImpl implements AIService {
         });
 
         return requestId;
+    }
+
+    /**
+     * 处理用户输入内容，使其可以安全地用于 PromptTemplate
+     */
+    private String sanitizeUserPrompt(String content) {
+        if (content == null) {
+            return "";
+        }
+
+        return content
+                // 1. 处理HTML实体
+                .replace("&lt;", "<")
+                .replace("&gt;", ">")
+                .replace("&amp;", "&")
+                .replace("&quot;", "\"")
+                // 2. 转义 PromptTemplate 特殊字符
+                .replace("\\", "\\\\") // 必须先处理反斜杠
+                .replace("{", "\\{")
+                .replace("}", "\\}")
+                .replace("$", "\\$")
+                .replace("#", "\\#")
+                // 3. 保持换行符
+                .replace("\r\n", "\n")
+                .replace("\r", "\n");
     }
 
     @Override
