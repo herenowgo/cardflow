@@ -65,7 +65,8 @@ public class AIServiceImpl implements AIService {
      */
     @Override
     public String generateTags(AIChatRequest request) {
-        ChatClient client = chatClientFactory.getClient(AIModel.GLM_4_Flash);
+        AIModel aiModel = AIModel.getByVO(request.getModel());
+        ChatClient client = chatClientFactory.getClient(aiModel);
         String requestId = EventMessageUtil.generateRequestId();
         String userId = UserContext.getUserId().toString();
 
@@ -75,7 +76,8 @@ public class AIServiceImpl implements AIService {
         executorService.submit(() -> {
             try {
                 Tags tags = client.prompt()
-                        .options(ChatOptions.builder().model(AIModel.GLM_4_Flash.getName()).build())
+                        .options(ChatOptions.builder().model(
+                                aiModel.getName()).build())
                         .system(AIConstant.GENERATE_TAGS_SYSTEM_PROMPT.render())
                         .user(sanitizedContent)
                         .call()
@@ -92,31 +94,6 @@ public class AIServiceImpl implements AIService {
         });
 
         return requestId;
-    }
-
-    /**
-     * 处理用户输入内容，使其可以安全地用于 PromptTemplate
-     */
-    private String sanitizeUserPrompt(String content) {
-        if (content == null) {
-            return "";
-        }
-
-        return content
-                // 1. 处理HTML实体
-                .replace("&lt;", "<")
-                .replace("&gt;", ">")
-                .replace("&amp;", "&")
-                .replace("&quot;", "\"")
-                // 2. 转义 PromptTemplate 特殊字符
-                .replace("\\", "\\\\") // 必须先处理反斜杠
-                .replace("{", "\\{")
-                .replace("}", "\\}")
-                .replace("$", "\\$")
-                .replace("#", "\\#")
-                // 3. 保持换行符
-                .replace("\r\n", "\n")
-                .replace("\r", "\n");
     }
 
     @Override
@@ -295,4 +272,28 @@ public class AIServiceImpl implements AIService {
         streamBridge.send("eventMessage-out-0", eventMessage);
     }
 
+    /**
+     * 处理用户输入内容，使其可以安全地用于 PromptTemplate
+     */
+    private String sanitizeUserPrompt(String content) {
+        if (content == null) {
+            return "";
+        }
+
+        return content
+                // 1. 处理HTML实体
+                .replace("&lt;", "<")
+                .replace("&gt;", ">")
+                .replace("&amp;", "&")
+                .replace("&quot;", "\"")
+                // 2. 转义 PromptTemplate 特殊字符
+                .replace("\\", "\\\\") // 必须先处理反斜杠
+                .replace("{", "\\{")
+                .replace("}", "\\}")
+                .replace("$", "\\$")
+                .replace("#", "\\#")
+                // 3. 保持换行符
+                .replace("\r\n", "\n")
+                .replace("\r", "\n");
+    }
 }
