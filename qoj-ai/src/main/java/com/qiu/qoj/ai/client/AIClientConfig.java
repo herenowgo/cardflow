@@ -25,6 +25,12 @@ public class AIClientConfig {
     @Value("${spring.ai.gemini.api-url}")
     private String geminiAiApiUrl;
 
+    @Value("${spring.ai.deepseek.api-key}")
+    private String deepSeekAiApiToken;
+
+    @Value("${spring.ai.deepseek.api-url}")
+    private String deepSeekAiApiUrl;
+
     @Bean
     ChatClient zhiPu() {
         ZhiPuAiApi zhiPuAiApi = new ZhiPuAiApi(zhiPuAiApiToken);
@@ -41,6 +47,18 @@ public class AIClientConfig {
         OpenAiApi openAiApi = new OpenAiApi(geminiAiApiUrl, geminiAiApiToken);
         OpenAiChatOptions options = OpenAiChatOptions.builder()
                 .model("gemini-exp-1206")
+                .build();
+        ChatModel chatModel = new OpenAiChatModel(openAiApi, options);
+
+        return ChatClient.builder(chatModel).build();
+    }
+
+    @Bean
+    ChatClient deepSeek() {
+        OpenAiApi openAiApi = new OpenAiApi(deepSeekAiApiUrl, deepSeekAiApiToken);
+        OpenAiChatOptions options = OpenAiChatOptions.builder()
+                .model("deepseek-chat")
+                .temperature(1.3)
                 .build();
         ChatModel chatModel = new OpenAiChatModel(openAiApi, options);
 

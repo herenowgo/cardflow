@@ -102,13 +102,14 @@ public class AIServiceImpl implements AIService {
         ChatClient client = chatClientFactory.getClient(aiModel);
         String requestId = EventMessageUtil.generateRequestId();
         String userId = UserContext.getUserId().toString();
+        String sanitizedContent = sanitizeUserPrompt(request.getContent());
 
         executorService.submit(() -> {
             try {
                 Cards cards = client.prompt()
                         .options(ChatOptions.builder().model(aiModel.getName()).build())
                         .system(AIConstant.GENERATE_CARDS_SYSTEM_PROMPT)
-                        .user(request.getContent())
+                        .user(sanitizedContent)
                         .call()
                         .entity(Cards.class);
 
@@ -198,6 +199,8 @@ public class AIServiceImpl implements AIService {
                 ? AIConstant.CARD_CHECK_SYSTEM_PROMPT_TEMPLATE.render()
                 : request.getPrompt();
 
+        String sanitizedContent = sanitizeUserPrompt(request.getContent());
+                
         executorService.submit(() -> {
             try {
                 // 创建记忆顾问，设置窗口大小
@@ -212,8 +215,9 @@ public class AIServiceImpl implements AIService {
                                 .build())
 
                         .advisors(memoryAdvisor)
+                        
                         .system(systemPrompt)
-                        .user(request.getContent())
+                        .user(sanitizedContent)
                         .stream()
                         .content();
 

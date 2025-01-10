@@ -14,6 +14,7 @@ public enum AIModel {
     GEMINI_1_5_PRO_EXP("gemini-1.5-pro-exp", "gemini-1.5-pro-exp"),
     // gemini-2.0-flash-exp
     GEMINI_2_0_FLASH_EXP("gemini-2.0-flash-exp", "gemini-2.0-flash-exp"),
+    DEEP_SEEK("deepseek-chat", "DeepSeek-V3"),
     ;
 
     private final String name;

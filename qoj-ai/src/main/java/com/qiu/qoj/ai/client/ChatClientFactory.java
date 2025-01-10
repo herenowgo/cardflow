@@ -19,6 +19,9 @@ public class ChatClientFactory {
     @Resource
     ChatClient gemini;
 
+    @Resource
+    ChatClient deepSeek;
+
     Map<AIModel, ChatClient> map = new HashMap<>();
 
     @PostConstruct
@@ -29,6 +32,7 @@ public class ChatClientFactory {
         map.put(AIModel.GLM_4_PLUS, zhiPu);
         map.put(AIModel.GEMINI_1_5_PRO_EXP, gemini);
         map.put(AIModel.GEMINI_2_0_FLASH_EXP, gemini);
+        map.put(AIModel.DEEP_SEEK, deepSeek);
     }
 
     public ChatClient getClient(AIModel model) {

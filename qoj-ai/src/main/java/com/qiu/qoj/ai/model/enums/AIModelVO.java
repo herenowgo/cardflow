@@ -10,6 +10,7 @@ public enum AIModelVO {
     PLUS("plus"),
     GEMINI_1_5_PRO_EXP("gemini-1.5-pro-exp"),
     GEMINI_2_0_FLASH_EXP("gemini-2.0-flash-exp"),
+    DEEP_SEEK("DeepSeek-V3"),
     ;
 
     private final String name;
