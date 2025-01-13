@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.qiu.qoj.common.api.BaseResponse;
@@ -128,5 +129,12 @@ public class StudyResourceController {
                         @Parameter(description = "学习资源请求", required = true) @RequestBody @Valid StudyResourceRequest request) {
                 StudyResourceVO resource = studyResourceService.createResource(UserContext.getUserId(), request);
                 return BaseResponse.success(resource);
+        }
+
+        @Operation(summary = "获取资源详情", description = "根据资源ID获取资源的详细信息")
+        @GetMapping("/{id}")
+        public BaseResponse<StudyResourceVO> getResourceDetail(
+                        @Parameter(description = "资源ID", required = true) @PathVariable String id) {
+                return BaseResponse.success(studyResourceService.getResourceById(id));
         }
 }

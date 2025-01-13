@@ -93,6 +93,14 @@ public interface StudyResourceService {
     List<StudyResource> getRecentlyDeletedFiles(int days);
 
     /**
+     * 根据ID获取资源详细信息
+     *
+     * @param id 资源ID
+     * @return 资源详细信息
+     */
+    StudyResourceVO getResourceById(String id);
+
+    /**
      * 创建非文档类型学习资源
      *
      * @param userId  用户ID

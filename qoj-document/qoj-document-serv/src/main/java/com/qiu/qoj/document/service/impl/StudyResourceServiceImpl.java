@@ -98,7 +98,7 @@ public class StudyResourceServiceImpl implements StudyResourceService {
         StudyResource folder = StudyResource.builder()
                 .userId(UserContext.getUserId())
                 .name(name)
-                .path(parentPath + name + "/")
+                .path(buildFullPath(parentPath, name + "/"))
                 .parentPath(parentPath)
                 .isFolder(true)
                 .isDeleted(false)
@@ -152,7 +152,10 @@ public class StudyResourceServiceImpl implements StudyResourceService {
         checkNameExists(newName, file.getParentPath());
 
         // 3. 更新文件名和路径
-        String newPath = file.getParentPath() + newName;
+        String newPath = buildFullPath(file.getParentPath(), newName);
+        if (file.getIsFolder()) {
+            newPath += "/";
+        }
         file.setName(newName);
         file.setPath(newPath);
         file.setUpdateTime(new Date());
@@ -168,7 +171,10 @@ public class StudyResourceServiceImpl implements StudyResourceService {
         checkNameExists(sourceFile.getName(), targetPath);
 
         // 3. 更新路径
-        String newPath = targetPath + sourceFile.getName();
+        String newPath = buildFullPath(targetPath, sourceFile.getName());
+        if (sourceFile.getIsFolder()) {
+            newPath += "/";
+        }
         sourceFile.setPath(newPath);
         sourceFile.setParentPath(targetPath);
         sourceFile.setUpdateTime(new Date());
@@ -323,6 +329,16 @@ public class StudyResourceServiceImpl implements StudyResourceService {
                 fileName;
     }
 
+    /**
+     * 确保路径以/结尾并拼接文件名
+     */
+    private String buildFullPath(String parentPath, String name) {
+        if (!parentPath.endsWith("/")) {
+            parentPath = parentPath + "/";
+        }
+        return parentPath + name;
+    }
+
     @Override
     public void checkStorageQuota(long fileSize) {
         Long userId = UserContext.getUserId();
@@ -418,7 +434,7 @@ public class StudyResourceServiceImpl implements StudyResourceService {
                 .userId(userId)
                 .name(request.getName())
                 .resourceType(request.getResourceType())
-                .path(request.getParentPath() + request.getName())
+                .path(buildFullPath(request.getParentPath(), request.getName()))
                 .parentPath(request.getParentPath())
                 .coverUrl(request.getCoverUrl())
                 .description(request.getDescription())
@@ -435,6 +451,25 @@ public class StudyResourceServiceImpl implements StudyResourceService {
         resource = studyResourceRepository.save(resource);
 
         // 6. 转换为VO并返回
+        StudyResourceVO vo = new StudyResourceVO();
+        BeanUtils.copyProperties(resource, vo);
+        return vo;
+    }
+
+    @Override
+    public StudyResourceVO getResourceById(String id) {
+        // 1. 查找资源
+        StudyResource resource = studyResourceRepository.findById(id)
+                .orElseThrow(() -> new ApiException("资源不存在"));
+
+        // 2. 检查资源是否已删除
+        Asserts.failIf(resource.getIsDeleted(), "资源已删除");
+
+        // 3. 检查访问权限
+        Asserts.failIf(!UserContext.getUserId().equals(resource.getUserId()) && !UserContext.isAdmin(),
+                "无权限访问该资源");
+
+        // 4. 转换为VO并返回
         StudyResourceVO vo = new StudyResourceVO();
         BeanUtils.copyProperties(resource, vo);
         return vo;
