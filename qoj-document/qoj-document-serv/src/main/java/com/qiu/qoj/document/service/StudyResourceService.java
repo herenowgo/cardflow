@@ -1,14 +1,17 @@
 package com.qiu.qoj.document.service;
 
-import com.qiu.qoj.document.model.dto.file.FilePreviewDTO;
-import com.qiu.qoj.document.model.entity.UserFile;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public interface UserFileService {
+import org.springframework.web.multipart.MultipartFile;
+
+import com.qiu.qoj.document.model.dto.UpdateStudyResourceRequest;
+import com.qiu.qoj.document.model.dto.file.FilePreviewDTO;
+import com.qiu.qoj.document.model.entity.StudyResource;
+import com.qiu.qoj.document.model.vo.StudyResourceVO;
+
+public interface StudyResourceService {
     /**
      * 上传文件
      */
@@ -47,7 +50,7 @@ public interface UserFileService {
     /**
      * 列出指定路径下的文件和文件夹
      */
-    List<UserFile> listFiles(String path);
+    List<StudyResource> listFiles(String path);
 
     /**
      * 获取文件预览信息
@@ -72,15 +75,24 @@ public interface UserFileService {
     /**
      * 获取指定时间段内创建的文件
      */
-    List<UserFile> getFilesByTimeRange(Date startTime, Date endTime);
+    List<StudyResource> getFilesByTimeRange(Date startTime, Date endTime);
 
     /**
      * 获取最近修改的文件
      */
-    List<UserFile> getRecentFiles(int limit);
+    List<StudyResource> getRecentFiles(int limit);
 
     /**
      * 获取最近删除的文件(用于回收站功能)
      */
-    List<UserFile> getRecentlyDeletedFiles(int days);
-} 
+    List<StudyResource> getRecentlyDeletedFiles(int days);
+
+    /**
+     * 更新学习资源
+     *
+     * @param userId  用户ID
+     * @param request 更新请求
+     * @return 更新后的资源信息
+     */
+    StudyResourceVO updateResource(Long userId, UpdateStudyResourceRequest request);
+}

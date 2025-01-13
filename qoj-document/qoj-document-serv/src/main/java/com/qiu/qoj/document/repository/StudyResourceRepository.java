@@ -1,19 +1,19 @@
 package com.qiu.qoj.document.repository;
 
-import com.qiu.qoj.document.model.entity.UserFile;
-import org.springframework.data.mongodb.repository.Aggregation;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
-import org.springframework.data.domain.Pageable;
-
 import java.util.Date;
 import java.util.List;
 
-public interface UserFileRepository extends MongoRepository<UserFile, String> {
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.repository.Aggregation;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-    List<UserFile> findByUserIdAndParentPathAndIsDeletedFalse(Long userId, String parentPath);
+import com.qiu.qoj.document.model.entity.StudyResource;
 
-    UserFile findByPathAndIsDeletedFalse(String path);
+public interface StudyResourceRepository extends MongoRepository<StudyResource, String> {
+
+    List<StudyResource> findByUserIdAndParentPathAndIsDeletedFalse(Long userId, String parentPath);
+
+    StudyResource findByPathAndIsDeletedFalse(String path);
 
     boolean existsByUserIdAndParentPathAndNameAndIsDeletedFalse(
             Long userId, String parentPath, String name);
@@ -36,18 +36,18 @@ public interface UserFileRepository extends MongoRepository<UserFile, String> {
     /**
      * 查找指定时间段内创建的文件
      */
-    List<UserFile> findByUserIdAndCreateTimeBetweenAndIsDeletedFalse(
+    List<StudyResource> findByUserIdAndCreateTimeBetweenAndIsDeletedFalse(
             Long userId, Date startTime, Date endTime);
 
     /**
      * 查找最近修改的文件
      */
-    List<UserFile> findByUserIdAndIsDeletedFalseOrderByUpdateTimeDesc(
+    List<StudyResource> findByUserIdAndIsDeletedFalseOrderByUpdateTimeDesc(
             Long userId, Pageable pageable);
 
     /**
      * 查找最近删除的文件
      */
-    List<UserFile> findByUserIdAndIsDeletedTrueAndDeleteTimeGreaterThan(
+    List<StudyResource> findByUserIdAndIsDeletedTrueAndDeleteTimeGreaterThan(
             Long userId, Date time);
 } 
