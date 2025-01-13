@@ -11,6 +11,9 @@ import lombok.Data;
 @Builder
 @Schema(description = "文件列表项")
 public class FileListVO {
+    @Schema(description = "文件/文件夹ID")
+    private String id;
+
     @Schema(description = "文件/文件夹名称")
     private String name;
 

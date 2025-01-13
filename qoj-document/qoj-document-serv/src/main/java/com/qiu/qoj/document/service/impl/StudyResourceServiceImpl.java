@@ -197,6 +197,7 @@ public class StudyResourceServiceImpl implements StudyResourceService {
 
         return resources.stream()
                 .map(resource -> FileListVO.builder()
+                        .id(resource.getId())
                         .name(resource.getName())
                         .isFolder(resource.getIsFolder())
                         .build())
