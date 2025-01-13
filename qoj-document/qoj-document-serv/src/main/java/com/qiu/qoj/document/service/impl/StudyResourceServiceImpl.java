@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +23,7 @@ import com.qiu.qoj.document.model.dto.file.FileDTO;
 import com.qiu.qoj.document.model.dto.file.FilePreviewDTO;
 import com.qiu.qoj.document.model.entity.StudyResource;
 import com.qiu.qoj.document.model.enums.ResourceType;
+import com.qiu.qoj.document.model.vo.FileListVO;
 import com.qiu.qoj.document.model.vo.StudyResourceVO;
 import com.qiu.qoj.document.repository.StudyResourceRepository;
 import com.qiu.qoj.document.service.ObjectStorage;
@@ -189,9 +191,16 @@ public class StudyResourceServiceImpl implements StudyResourceService {
     }
 
     @Override
-    public List<StudyResource> listFiles(String path) {
-        return studyResourceRepository.findByUserIdAndParentPathAndIsDeletedFalse(
+    public List<FileListVO> listFiles(String path) {
+        List<StudyResource> resources = studyResourceRepository.findBasicFileInfoByUserIdAndParentPath(
                 UserContext.getUserId(), path);
+
+        return resources.stream()
+                .map(resource -> FileListVO.builder()
+                        .name(resource.getName())
+                        .isFolder(resource.getIsFolder())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override

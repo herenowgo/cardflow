@@ -21,6 +21,7 @@ import com.qiu.qoj.document.model.dto.StudyResourceRequest;
 import com.qiu.qoj.document.model.dto.UpdateStudyResourceRequest;
 import com.qiu.qoj.document.model.dto.file.FilePreviewDTO;
 import com.qiu.qoj.document.model.entity.StudyResource;
+import com.qiu.qoj.document.model.vo.FileListVO;
 import com.qiu.qoj.document.model.vo.StudyResourceVO;
 import com.qiu.qoj.document.service.StudyResourceService;
 
@@ -99,9 +100,9 @@ public class StudyResourceController {
                 return BaseResponse.success(studyResourceService.getStorageStats());
         }
 
-        @Operation(summary = "获取文件列表", description = "获取指定目录下的文件和文件夹列表，不包括已删除的文件")
+        @Operation(summary = "获取文件列表", description = "获取指定目录下的文件和文件夹列表，只返回名称和类型信息")
         @GetMapping("/list")
-        public BaseResponse<List<StudyResource>> listFiles(
+        public BaseResponse<List<FileListVO>> listFiles(
                         @Parameter(description = "目录路径", schema = @Schema(defaultValue = "/")) @RequestParam(required = false, defaultValue = "/") String path) {
                 return BaseResponse.success(studyResourceService.listFiles(path));
         }

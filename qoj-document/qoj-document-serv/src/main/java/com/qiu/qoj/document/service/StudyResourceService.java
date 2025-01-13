@@ -11,6 +11,7 @@ import com.qiu.qoj.document.model.dto.UpdateStudyResourceRequest;
 import com.qiu.qoj.document.model.dto.file.FilePreviewDTO;
 import com.qiu.qoj.document.model.entity.StudyResource;
 import com.qiu.qoj.document.model.vo.StudyResourceVO;
+import com.qiu.qoj.document.model.vo.FileListVO;
 
 public interface StudyResourceService {
     /**
@@ -50,8 +51,11 @@ public interface StudyResourceService {
 
     /**
      * 列出指定路径下的文件和文件夹
+     * 
+     * @param path 目录路径
+     * @return 文件和文件夹列表
      */
-    List<StudyResource> listFiles(String path);
+    List<FileListVO> listFiles(String path);
 
     /**
      * 获取文件预览信息
