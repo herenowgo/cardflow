@@ -9,12 +9,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum ResourceType {
-    IMAGE("IMAGE", "图片"),
     PDF("PDF", "PDF文件"),
     ARTICLE("ARTICLE", "文章"),
     NOTE("NOTE", "笔记"),
-    URL("URL", "在线资源"),
-    OTHER("OTHER", "其他");
+    URL("URL", "在线资源");
 
     private final String code;
     private final String description;

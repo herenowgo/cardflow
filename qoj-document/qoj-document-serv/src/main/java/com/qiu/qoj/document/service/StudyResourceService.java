@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.qiu.qoj.document.model.dto.StudyResourceRequest;
 import com.qiu.qoj.document.model.dto.UpdateStudyResourceRequest;
 import com.qiu.qoj.document.model.dto.file.FilePreviewDTO;
 import com.qiu.qoj.document.model.entity.StudyResource;
@@ -86,6 +87,15 @@ public interface StudyResourceService {
      * 获取最近删除的文件(用于回收站功能)
      */
     List<StudyResource> getRecentlyDeletedFiles(int days);
+
+    /**
+     * 创建非文档类型学习资源
+     *
+     * @param userId  用户ID
+     * @param request 创建资源请求
+     * @return 创建后的资源信息
+     */
+    StudyResourceVO createResource(Long userId, StudyResourceRequest request);
 
     /**
      * 更新学习资源

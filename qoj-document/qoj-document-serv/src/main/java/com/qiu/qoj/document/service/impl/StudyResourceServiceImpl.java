@@ -16,6 +16,7 @@ import com.qiu.qoj.common.api.UserContext;
 import com.qiu.qoj.common.exception.ApiException;
 import com.qiu.qoj.common.exception.Asserts;
 import com.qiu.qoj.document.constant.DocumentConstant;
+import com.qiu.qoj.document.model.dto.StudyResourceRequest;
 import com.qiu.qoj.document.model.dto.UpdateStudyResourceRequest;
 import com.qiu.qoj.document.model.dto.file.FileDTO;
 import com.qiu.qoj.document.model.dto.file.FilePreviewDTO;
@@ -27,6 +28,8 @@ import com.qiu.qoj.document.service.ObjectStorage;
 import com.qiu.qoj.document.service.StudyResourceService;
 import com.qiu.qoj.document.util.FileValidationUtil;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.io.FileTypeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -370,29 +373,55 @@ public class StudyResourceServiceImpl implements StudyResourceService {
         }
 
         // 3. 更新允许修改的字段
-        if (request.getName() != null) {
-            resource.setName(request.getName());
-        }
-        if (request.getDescription() != null) {
-            resource.setDescription(request.getDescription());
-        }
-        if (request.getContent() != null) {
-            resource.setContent(request.getContent());
-        }
-        if (request.getNote() != null) {
-            resource.setNote(request.getNote());
-        }
-        if (request.getCoverUrl() != null) {
-            resource.setCoverUrl(request.getCoverUrl());
-        }
-        if (request.getResourceUrl() != null) {
-            resource.setResourceUrl(request.getResourceUrl());
-        }
+        BeanUtil.copyProperties(request, resource, CopyOptions.create()
+                .setIgnoreNullValue(true)
+                .setIgnoreProperties("id")); // 忽略id字段,防止覆盖
 
         // 4. 更新时间
         resource.setUpdateTime(new Date());
 
         // 5. 保存更新
+        resource = studyResourceRepository.save(resource);
+
+        // 6. 转换为VO并返回
+        StudyResourceVO vo = new StudyResourceVO();
+        BeanUtils.copyProperties(resource, vo);
+        return vo;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public StudyResourceVO createResource(Long userId, StudyResourceRequest request) {
+        // 1. 验证资源类型
+        Asserts.failIf(ResourceType.PDF.equals(request.getResourceType()),
+                "PDF类型资源请使用文件上传接口");
+
+        // 2. 检查父目录路径
+        FileValidationUtil.validatePath(request.getParentPath());
+
+        // 3. 检查同名文件
+        checkNameExists(request.getName(), request.getParentPath());
+
+        // 4. 创建资源对象
+        Date now = new Date();
+        StudyResource resource = StudyResource.builder()
+                .userId(userId)
+                .name(request.getName())
+                .resourceType(request.getResourceType())
+                .path(request.getParentPath() + request.getName())
+                .parentPath(request.getParentPath())
+                .coverUrl(request.getCoverUrl())
+                .description(request.getDescription())
+                .content(request.getContent())
+                .note(request.getNote())
+                .resourceUrl(request.getResourceUrl())
+                .isFolder(false)
+                .isDeleted(false)
+                .createTime(now)
+                .updateTime(now)
+                .build();
+
+        // 5. 保存资源
         resource = studyResourceRepository.save(resource);
 
         // 6. 转换为VO并返回

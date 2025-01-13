@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.qiu.qoj.common.api.BaseResponse;
 import com.qiu.qoj.common.api.UserContext;
+import com.qiu.qoj.document.model.dto.StudyResourceRequest;
 import com.qiu.qoj.document.model.dto.UpdateStudyResourceRequest;
 import com.qiu.qoj.document.model.dto.file.FilePreviewDTO;
 import com.qiu.qoj.document.model.entity.StudyResource;
@@ -33,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/file")
+@RequestMapping("/resource")
 @RequiredArgsConstructor
 @Tag(name = "StudyResourceController", description = "提供文件上传、下载、预览等功能")
 public class StudyResourceController {
@@ -118,5 +119,13 @@ public class StudyResourceController {
                         @Parameter(description = "更新资源请求", required = true) @RequestBody @Valid UpdateStudyResourceRequest request) {
                 return BaseResponse.success(
                                 studyResourceService.updateResource(UserContext.getUserId(), request));
+        }
+
+        @Operation(summary = "创建非文档类型学习资源", description = "创建不需要上传文件的学习资源，如文章、笔记、在线资源等")
+        @PostMapping
+        public BaseResponse<StudyResourceVO> createResource(
+                        @Parameter(description = "学习资源请求", required = true) @RequestBody @Valid StudyResourceRequest request) {
+                StudyResourceVO resource = studyResourceService.createResource(UserContext.getUserId(), request);
+                return BaseResponse.success(resource);
         }
 }
