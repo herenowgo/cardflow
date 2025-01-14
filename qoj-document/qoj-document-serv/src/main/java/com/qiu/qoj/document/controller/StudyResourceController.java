@@ -90,10 +90,10 @@ public class StudyResourceController {
 
         @Operation(summary = "更新学习资源", description = "更新学习资源的基本信息")
         @PutMapping
-        public BaseResponse<StudyResourceVO> updateResource(
+        public BaseResponse<Void> updateResource(
                         @Parameter(description = "更新资源请求", required = true) @RequestBody @Valid UpdateStudyResourceRequest request) {
-                return BaseResponse.success(
-                                studyResourceService.updateResource(UserContext.getUserId(), request));
+                studyResourceService.updateResource(UserContext.getUserId(), request);
+                return BaseResponse.success(null);
         }
 
         @Operation(summary = "创建非文档类型学习资源", description = "创建不需要上传文件的学习资源，如文章、笔记、在线资源等")

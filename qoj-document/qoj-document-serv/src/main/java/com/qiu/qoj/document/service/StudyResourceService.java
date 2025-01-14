@@ -102,9 +102,8 @@ public interface StudyResourceService {
      *
      * @param userId  用户ID
      * @param request 更新请求
-     * @return 更新后的资源信息
      */
-    StudyResourceVO updateResource(Long userId, UpdateStudyResourceRequest request);
+    void updateResource(Long userId, UpdateStudyResourceRequest request);
 
     /**
      * 上传资源封面图片

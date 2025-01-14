@@ -69,7 +69,7 @@ public class StudyResourceServiceImpl implements StudyResourceService {
         FileDTO fileDTO = new FileDTO();
         fileDTO.setFile(file);
         fileDTO.setPath(storagePath);
-        fileDTO.setOverwrite(false);
+        fileDTO.setOverwrite(true);
         storagePath = objectStorage.uploadFile(fileDTO);
 
         // 3. 保存逻辑文件对象到MongoDB
@@ -185,35 +185,36 @@ public class StudyResourceServiceImpl implements StudyResourceService {
         Asserts.failIf(resource.getIsFolder(), "文件夹不支持预览");
 
         // 4. 获取文件类型
-        String type = FileTypeUtil.getType(resource.getName());
-        boolean canPreview = isPreviewable(type);
+        // String type = FileTypeUtil.getType(resource.get());
+        // boolean canPreview = isPreviewable(type);
 
-        // 5. 如果不支持预览,只返回基本信息
-        if (!canPreview) {
-            return FilePreviewDTO.builder()
-                    .type(type)
-                    .canPreview(false)
-                    .build();
-        }
+        // // 5. 如果不支持预览,只返回基本信息
+        // if (!canPreview) {
+        // return FilePreviewDTO.builder()
+        // .type(type)
+        // .canPreview(false)
+        // .build();
+        // }
 
         // 6. 根据文件类型处理预览
         String previewUrl = null;
         String content = null;
 
-        if (isImageType(type)) {
-            // 图片类型 - 返回临时访问URL
-            previewUrl = objectStorage.getPresignedUrl(resource.getObjectStorageFileName(), 30);
-        } else if (isTextType(type)) {
-            // 文本类型 - 读取文件内容
-            content = objectStorage.getTextContent(resource.getObjectStorageFileName(),
-                    DocumentConstant.MAX_TEXT_PREVIEW_SIZE);
-        } else if (isPdfType(type)) {
-            // PDF类型 - 返回临时访问URL
-            previewUrl = objectStorage.getPresignedUrl(resource.getObjectStorageFileName(), 360);
-        }
+        // if (isImageType(type)) {
+        // // 图片类型 - 返回临时访问URL
+        // previewUrl =
+        // objectStorage.getPresignedUrl(resource.getObjectStorageFileName(), 30);
+        // } else if (isTextType(type)) {
+        // // 文本类型 - 读取文件内容
+        // content = objectStorage.getTextContent(resource.getObjectStorageFileName(),
+        // DocumentConstant.MAX_TEXT_PREVIEW_SIZE);
+        // } else if (isPdfType(type)) {
+        // PDF类型 - 返回临时访问URL
+        previewUrl = objectStorage.getPresignedUrl(resource.getObjectStorageFileName(), 360);
+        // }
 
         return FilePreviewDTO.builder()
-                .type(type)
+                .type("pdf")
                 .url(previewUrl)
                 .content(content)
                 .canPreview(true)
@@ -368,7 +369,7 @@ public class StudyResourceServiceImpl implements StudyResourceService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public StudyResourceVO updateResource(Long userId, UpdateStudyResourceRequest request) {
+    public void updateResource(Long userId, UpdateStudyResourceRequest request) {
         // 1. 检查资源是否存在
         StudyResource resource = studyResourceRepository.findById(request.getId())
                 .orElseThrow(() -> new ApiException("资源不存在"));
@@ -387,12 +388,7 @@ public class StudyResourceServiceImpl implements StudyResourceService {
         resource.setUpdateTime(new Date());
 
         // 5. 保存更新
-        resource = studyResourceRepository.save(resource);
-
-        // 6. 转换为VO并返回
-        StudyResourceVO vo = new StudyResourceVO();
-        BeanUtils.copyProperties(resource, vo);
-        return vo;
+        studyResourceRepository.save(resource);
     }
 
     @Override
