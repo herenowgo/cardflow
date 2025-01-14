@@ -142,16 +142,6 @@ public class StudyResourceServiceImpl implements StudyResourceService {
     }
 
     @Override
-    public String getFileUrl(String path) throws Exception {
-        // 1. 获取文件
-        StudyResource file = getUserFile(path);
-        Asserts.failIf(file.getIsFolder(), "Folders do not have URLs");
-
-        // 2. 生成临时访问URL(默认30分钟)
-        return objectStorage.getPresignedUrl(file.getObjectStorageFileName(), 30);
-    }
-
-    @Override
     public Map<String, Long> getStorageStats() {
         Long userId = UserContext.getUserId();
         Map<String, Long> stats = new HashMap<>();
@@ -182,15 +172,23 @@ public class StudyResourceServiceImpl implements StudyResourceService {
     }
 
     @Override
-    public FilePreviewDTO getPreview(String path) throws Exception {
-        // 1. 获取文件信息
-        StudyResource file = getUserFile(path);
-        Asserts.failIf(file.getIsFolder(), "Folders cannot be previewed");
+    public FilePreviewDTO getPreview(String id) throws Exception {
+        // 1. 获取资源信息
+        StudyResource resource = studyResourceRepository.findById(id)
+                .orElseThrow(() -> new ApiException("资源不存在"));
 
-        String type = FileTypeUtil.getType(file.getName());
+        // 2. 检查访问权限
+        Asserts.failIf(!UserContext.getUserId().equals(resource.getUserId()) && !UserContext.isAdmin(),
+                "无权限访问该资源");
+
+        // 3. 检查是否为文件夹
+        Asserts.failIf(resource.getIsFolder(), "文件夹不支持预览");
+
+        // 4. 获取文件类型
+        String type = FileTypeUtil.getType(resource.getName());
         boolean canPreview = isPreviewable(type);
 
-        // 2. 如果不支持预览,只返回基本信息
+        // 5. 如果不支持预览,只返回基本信息
         if (!canPreview) {
             return FilePreviewDTO.builder()
                     .type(type)
@@ -198,19 +196,20 @@ public class StudyResourceServiceImpl implements StudyResourceService {
                     .build();
         }
 
-        // 3. 根据文件类型处理预览
+        // 6. 根据文件类型处理预览
         String previewUrl = null;
         String content = null;
 
         if (isImageType(type)) {
             // 图片类型 - 返回临时访问URL
-            previewUrl = objectStorage.getPresignedUrl(path, 99999);
+            previewUrl = objectStorage.getPresignedUrl(resource.getObjectStorageFileName(), 30);
         } else if (isTextType(type)) {
             // 文本类型 - 读取文件内容
-            content = getTextContent(path);
+            content = objectStorage.getTextContent(resource.getObjectStorageFileName(),
+                    DocumentConstant.MAX_TEXT_PREVIEW_SIZE);
         } else if (isPdfType(type)) {
             // PDF类型 - 返回临时访问URL
-            previewUrl = objectStorage.getPresignedUrl(path, 30);
+            previewUrl = objectStorage.getPresignedUrl(resource.getObjectStorageFileName(), 360);
         }
 
         return FilePreviewDTO.builder()

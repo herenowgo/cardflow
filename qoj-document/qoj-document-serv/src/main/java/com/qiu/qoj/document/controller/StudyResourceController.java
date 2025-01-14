@@ -68,14 +68,6 @@ public class StudyResourceController {
                 return BaseResponse.success(null);
         }
 
-        @Operation(summary = "获取文件访问URL", description = "获取文件的临时访问URL，默认有效期30分钟")
-        @GetMapping("/url")
-        public BaseResponse<String> getFileUrl(
-                        @Parameter(description = "文件路径", required = true) @RequestParam String path) throws Exception {
-                String url = studyResourceService.getFileUrl(path);
-                return BaseResponse.success(url);
-        }
-
         @Operation(summary = "获取存储空间统计", description = "获取当前用户的存储空间使用情况，包括已用空间和总空间")
         @GetMapping("/storage/stats")
         public BaseResponse<Map<String, Long>> getStorageStats() {
@@ -90,10 +82,10 @@ public class StudyResourceController {
         }
 
         @Operation(summary = "预览文件", description = "获取文件的预览信息，支持文本、图片、PDF等格式，返回对应的预览URL或内容")
-        @GetMapping("/preview")
+        @GetMapping("/preview/{id}")
         public BaseResponse<FilePreviewDTO> previewFile(
-                        @Parameter(description = "文件路径", required = true) @RequestParam String path) throws Exception {
-                return BaseResponse.success(studyResourceService.getPreview(path));
+                        @Parameter(description = "资源ID", required = true) @PathVariable String id) throws Exception {
+                return BaseResponse.success(studyResourceService.getPreview(id));
         }
 
         @Operation(summary = "更新学习资源", description = "更新学习资源的基本信息")

@@ -32,11 +32,6 @@ public interface StudyResourceService {
     void delete(String id);
 
     /**
-     * 获取文件访问URL
-     */
-    String getFileUrl(String path) throws Exception;
-
-    /**
      * 获取用户存储空间使用情况
      */
     Map<String, Long> getStorageStats();
@@ -52,10 +47,11 @@ public interface StudyResourceService {
     /**
      * 获取文件预览信息
      *
-     * @param path 文件路径
+     * @param id 资源ID
      * @return 预览信息
+     * @throws Exception 如果获取预览失败或资源不存在
      */
-    FilePreviewDTO getPreview(String path) throws Exception;
+    FilePreviewDTO getPreview(String id) throws Exception;
 
     /**
      * 检查用户存储空间是否足够
