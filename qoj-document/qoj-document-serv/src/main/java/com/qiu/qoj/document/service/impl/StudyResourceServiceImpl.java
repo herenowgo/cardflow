@@ -1,10 +1,12 @@
 package com.qiu.qoj.document.service.impl;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
@@ -44,6 +46,7 @@ public class StudyResourceServiceImpl implements StudyResourceService {
     private final ObjectStorage objectStorage;
     private final StudyResourceRepository studyResourceRepository;
     private StudyResource studyResource;
+    private FileDTO fileDTO;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -60,21 +63,20 @@ public class StudyResourceServiceImpl implements StudyResourceService {
 
         // 1. 构建文件路径
         String fileName = file.getOriginalFilename();
-        String path = buildFilePath(fileName);
+        String storagePath = buildFilePath(fileName);
 
         // 2. 上传到对象存储
         FileDTO fileDTO = new FileDTO();
         fileDTO.setFile(file);
-        fileDTO.setPath(path);
+        fileDTO.setPath(storagePath);
         fileDTO.setOverwrite(false);
-        String storagePath = objectStorage.uploadFile(fileDTO);
+        storagePath = objectStorage.uploadFile(fileDTO);
 
         // 3. 保存逻辑文件对象到MongoDB
         StudyResource studyResource = StudyResource.builder()
                 .userId(UserContext.getUserId())
                 .objectStorageFileName(storagePath)
                 .name(fileName)
-                .path(parentPath + fileName)
                 .resourceType(ResourceType.PDF)
                 .size(file.getSize())
                 .parentPath(parentPath)
@@ -98,7 +100,6 @@ public class StudyResourceServiceImpl implements StudyResourceService {
         StudyResource folder = StudyResource.builder()
                 .userId(UserContext.getUserId())
                 .name(name)
-                .path(buildFullPath(parentPath, name + "/"))
                 .parentPath(parentPath)
                 .isFolder(true)
                 .isDeleted(false)
@@ -110,27 +111,34 @@ public class StudyResourceServiceImpl implements StudyResourceService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void delete(String path) {
-        // 1. 获取文件/文件夹信息
-        StudyResource file = getUserFile(path);
+    public void delete(String id) {
+        // 1. 查找资源
+        StudyResource resource = studyResourceRepository.findById(id)
+                .orElseThrow(() -> new ApiException("资源不存在"));
 
-        // 2. 如果是文件夹，递归删除所有子文件和子文件夹
-        if (file.getIsFolder()) {
-            deleteFolder(path);
+        // 2. 检查访问权限
+        Asserts.failIf(!UserContext.getUserId().equals(resource.getUserId()) && !UserContext.isAdmin(),
+                "无权限删除该资源");
+
+        // 3. 如果是文件夹，递归删除所有子文件和子文件夹
+        if (resource.getIsFolder()) {
+            deleteFolder(resource.getPath());
         } else {
-            // 3. 如果是文件，删除对象存储中的文件
+            // 4. 如果是文件，删除对象存储中的文件
             try {
-                objectStorage.deleteFile(file.getObjectStorageFileName());
+                if (resource.getObjectStorageFileName() != null) {
+                    objectStorage.deleteFile(resource.getObjectStorageFileName());
+                }
             } catch (Exception e) {
-                log.error("Delete file from storage failed: {}", path, e);
+                log.error("Delete file from storage failed: {}", resource.getPath(), e);
                 throw new RuntimeException("Delete file failed", e);
             }
         }
 
-        // 4. 标记为已删除
-        file.setIsDeleted(true);
-        file.setDeleteTime(new Date());
-        studyResourceRepository.save(file);
+        // 5. 标记为已删除
+        resource.setIsDeleted(true);
+        resource.setDeleteTime(new Date());
+        studyResourceRepository.save(resource);
     }
 
     @Override
@@ -141,44 +149,6 @@ public class StudyResourceServiceImpl implements StudyResourceService {
 
         // 2. 生成临时访问URL(默认30分钟)
         return objectStorage.getPresignedUrl(file.getObjectStorageFileName(), 30);
-    }
-
-    @Override
-    public void rename(String path, String newName) {
-        // 1. 获取文件/文件夹信息
-        StudyResource file = getUserFile(path);
-
-        // 2. 检查新名称是否已存在
-        checkNameExists(newName, file.getParentPath());
-
-        // 3. 更新文件名和路径
-        String newPath = buildFullPath(file.getParentPath(), newName);
-        if (file.getIsFolder()) {
-            newPath += "/";
-        }
-        file.setName(newName);
-        file.setPath(newPath);
-        file.setUpdateTime(new Date());
-        studyResourceRepository.save(file);
-    }
-
-    @Override
-    public void move(String sourcePath, String targetPath) {
-        // 1. 获取源文件/文件夹信息
-        StudyResource sourceFile = getUserFile(sourcePath);
-
-        // 2. 检查目标路径是否存在同名文件
-        checkNameExists(sourceFile.getName(), targetPath);
-
-        // 3. 更新路径
-        String newPath = buildFullPath(targetPath, sourceFile.getName());
-        if (sourceFile.getIsFolder()) {
-            newPath += "/";
-        }
-        sourceFile.setPath(newPath);
-        sourceFile.setParentPath(targetPath);
-        sourceFile.setUpdateTime(new Date());
-        studyResourceRepository.save(sourceFile);
     }
 
     @Override
@@ -206,6 +176,7 @@ public class StudyResourceServiceImpl implements StudyResourceService {
                         .id(resource.getId())
                         .name(resource.getName())
                         .isFolder(resource.getIsFolder())
+                        .resourceType(resource.getResourceType())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -293,7 +264,7 @@ public class StudyResourceServiceImpl implements StudyResourceService {
                 UserContext.getUserId(), folderPath);
 
         for (StudyResource child : children) {
-            delete(child.getPath());
+            delete(child.getId());
         }
     }
 
@@ -310,7 +281,17 @@ public class StudyResourceServiceImpl implements StudyResourceService {
      * 获取文件/文件夹信息并检查权限
      */
     private StudyResource getUserFile(String path) {
-        StudyResource file = studyResourceRepository.findByPathAndIsDeletedFalse(path);
+        // 解析路径获取父目录和文件名
+        String parentPath = path.substring(0, path.lastIndexOf('/') + 1);
+        String name = path.substring(path.lastIndexOf('/') + 1);
+        if (name.isEmpty() && parentPath.length() > 1) {
+            // 处理以/结尾的文件夹路径
+            parentPath = parentPath.substring(0, parentPath.length() - 1);
+            name = parentPath.substring(parentPath.lastIndexOf('/') + 1) + "/";
+            parentPath = parentPath.substring(0, parentPath.lastIndexOf('/') + 1);
+        }
+
+        StudyResource file = studyResourceRepository.findByParentPathAndNameAndIsDeletedFalse(parentPath, name);
         Asserts.failIf(file == null, "File/folder not found");
 
         // 检查权限
@@ -434,7 +415,6 @@ public class StudyResourceServiceImpl implements StudyResourceService {
                 .userId(userId)
                 .name(request.getName())
                 .resourceType(request.getResourceType())
-                .path(buildFullPath(request.getParentPath(), request.getName()))
                 .parentPath(request.getParentPath())
                 .coverUrl(request.getCoverUrl())
                 .description(request.getDescription())
@@ -473,5 +453,38 @@ public class StudyResourceServiceImpl implements StudyResourceService {
         StudyResourceVO vo = new StudyResourceVO();
         BeanUtils.copyProperties(resource, vo);
         return vo;
+    }
+
+    @Override
+    public String uploadCover(MultipartFile file) throws Exception {
+        // 验证文件类型
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new ApiException("只支持上传图片文件");
+        }
+
+        // 验证图片格式
+        String extension = FileTypeUtil.getType(file.getOriginalFilename());
+        if (!Arrays.asList("jpg", "jpeg", "png").contains(extension.toLowerCase())) {
+            throw new ApiException("只支持jpg、jpeg、png格式的图片");
+        }
+
+        // 验证文件大小（限制为2MB）
+        if (file.getSize() > 2 * 1024 * 1024) {
+            throw new ApiException("图片大小不能超过2MB");
+        }
+
+        // 构建文件路径
+        String filePath = DocumentConstant.USER_PREFIX + UserContext.getUserId() + "/" + DocumentConstant.COVER_PREFIX
+                + UUID.randomUUID().toString() + "." + extension;
+
+        // 上传到对象存储
+        FileDTO fileDTO = FileDTO.builder()
+                .file(file)
+                .path(filePath)
+                .overwrite(false)
+                .build();
+
+        return objectStorage.uploadFile(fileDTO);
     }
 }

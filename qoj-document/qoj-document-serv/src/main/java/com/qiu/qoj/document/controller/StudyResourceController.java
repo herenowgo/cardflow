@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.qiu.qoj.common.api.BaseResponse;
@@ -21,7 +21,6 @@ import com.qiu.qoj.common.api.UserContext;
 import com.qiu.qoj.document.model.dto.StudyResourceRequest;
 import com.qiu.qoj.document.model.dto.UpdateStudyResourceRequest;
 import com.qiu.qoj.document.model.dto.file.FilePreviewDTO;
-import com.qiu.qoj.document.model.entity.StudyResource;
 import com.qiu.qoj.document.model.vo.FileListVO;
 import com.qiu.qoj.document.model.vo.StudyResourceVO;
 import com.qiu.qoj.document.service.StudyResourceService;
@@ -61,11 +60,11 @@ public class StudyResourceController {
                 return BaseResponse.success(null);
         }
 
-        @Operation(summary = "删除文件/文件夹", description = "删除指定路径的文件或文件夹，文件夹会递归删除其下所有内容")
-        @DeleteMapping
+        @Operation(summary = "删除文件/文件夹", description = "删除指定ID的文件或文件夹，文件夹会递归删除其下所有内容")
+        @DeleteMapping("/{id}")
         public BaseResponse<Void> delete(
-                        @Parameter(description = "文件/文件夹路径", required = true) @RequestParam String path) {
-                studyResourceService.delete(path);
+                        @Parameter(description = "资源ID", required = true) @PathVariable String id) {
+                studyResourceService.delete(id);
                 return BaseResponse.success(null);
         }
 
@@ -75,24 +74,6 @@ public class StudyResourceController {
                         @Parameter(description = "文件路径", required = true) @RequestParam String path) throws Exception {
                 String url = studyResourceService.getFileUrl(path);
                 return BaseResponse.success(url);
-        }
-
-        @Operation(summary = "重命名文件/文件夹", description = "重命名指定路径的文件或文件夹，新名称不能与同目录下的其他文件重名")
-        @PutMapping("/rename")
-        public BaseResponse<Void> rename(
-                        @Parameter(description = "文件/文件夹路径", required = true) @RequestParam String path,
-                        @Parameter(description = "新名称", required = true) @RequestParam String newName) {
-                studyResourceService.rename(path, newName);
-                return BaseResponse.success(null);
-        }
-
-        @Operation(summary = "移动文件/文件夹", description = "移动文件/文件夹到新的目录，目标路径必须存在且为文件夹")
-        @PostMapping("/move")
-        public BaseResponse<Void> move(
-                        @Parameter(description = "源文件/文件夹路径", required = true) @RequestParam String sourcePath,
-                        @Parameter(description = "目标目录路径", required = true) @RequestParam String targetPath) {
-                studyResourceService.move(sourcePath, targetPath);
-                return BaseResponse.success(null);
         }
 
         @Operation(summary = "获取存储空间统计", description = "获取当前用户的存储空间使用情况，包括已用空间和总空间")
@@ -116,7 +97,7 @@ public class StudyResourceController {
         }
 
         @Operation(summary = "更新学习资源", description = "更新学习资源的基本信息")
-        @PutMapping("/update")
+        @PutMapping
         public BaseResponse<StudyResourceVO> updateResource(
                         @Parameter(description = "更新资源请求", required = true) @RequestBody @Valid UpdateStudyResourceRequest request) {
                 return BaseResponse.success(
@@ -136,5 +117,14 @@ public class StudyResourceController {
         public BaseResponse<StudyResourceVO> getResourceDetail(
                         @Parameter(description = "资源ID", required = true) @PathVariable String id) {
                 return BaseResponse.success(studyResourceService.getResourceById(id));
+        }
+
+        @Operation(summary = "上传资源封面", description = "上传资源封面图片，返回永久访问URL，支持jpg、png、jpeg格式")
+        @PostMapping(value = "/cover", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+        public BaseResponse<String> uploadCover(
+                        @Parameter(description = "封面图片文件", required = true) @RequestPart("file") MultipartFile file)
+                        throws Exception {
+                String coverUrl = studyResourceService.uploadCover(file);
+                return BaseResponse.success(coverUrl);
         }
 }

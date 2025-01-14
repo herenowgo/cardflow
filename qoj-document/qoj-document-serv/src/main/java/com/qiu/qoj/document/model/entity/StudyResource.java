@@ -32,9 +32,6 @@ public class StudyResource {
     @Schema(description = "资源类型")
     private ResourceType resourceType;
 
-    @Schema(description = "逻辑存储路径")
-    private String path;
-
     @Schema(description = "逻辑父目录路径")
     private String parentPath;
 
@@ -56,7 +53,6 @@ public class StudyResource {
     @Schema(description = "在线资源URL")
     private String resourceUrl;
 
-    // 对象存储中的文件名
     @Schema(description = "对象存储中的文件名")
     private String objectStorageFileName;
 
@@ -74,4 +70,17 @@ public class StudyResource {
 
     @Schema(description = "删除时间")
     private Date deleteTime;
+
+    /**
+     * 获取资源的完整路径
+     * 
+     * @return 完整路径
+     */
+    public String getPath() {
+        if (parentPath == null) {
+            parentPath = "/";
+        }
+        String fullPath = parentPath.endsWith("/") ? parentPath + name : parentPath + "/" + name;
+        return isFolder ? fullPath + "/" : fullPath;
+    }
 }

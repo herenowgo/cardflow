@@ -5,6 +5,7 @@ import java.util.Set;
 
 public interface DocumentConstant {
     String USER_PREFIX = "user/";
+    String COVER_PREFIX = "covers/";
     String USER_ID = "userId";
 
     // 文件大小限制

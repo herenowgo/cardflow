@@ -26,23 +26,15 @@ public interface StudyResourceService {
 
     /**
      * 删除文件/文件夹
+     * 
+     * @param id 资源ID
      */
-    void delete(String path);
+    void delete(String id);
 
     /**
      * 获取文件访问URL
      */
     String getFileUrl(String path) throws Exception;
-
-    /**
-     * 重命名文件/文件夹
-     */
-    void rename(String path, String newName);
-
-    /**
-     * 移动文件/文件夹
-     */
-    void move(String sourcePath, String targetPath);
 
     /**
      * 获取用户存储空间使用情况
@@ -117,4 +109,13 @@ public interface StudyResourceService {
      * @return 更新后的资源信息
      */
     StudyResourceVO updateResource(Long userId, UpdateStudyResourceRequest request);
+
+    /**
+     * 上传资源封面图片
+     * 
+     * @param file 封面图片文件
+     * @return 图片的永久访问URL
+     * @throws Exception 如果上传失败或文件格式不支持
+     */
+    String uploadCover(MultipartFile file) throws Exception;
 }

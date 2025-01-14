@@ -13,14 +13,17 @@ import com.qiu.qoj.document.model.entity.StudyResource;
 public interface StudyResourceRepository extends MongoRepository<StudyResource, String> {
 
         /**
-         * 查询指定目录下的文件和文件夹的基本信息（只返回ID、名称和类型）
+         * 查询指定目录下的文件和文件夹的基本信息（只返回ID、名称、类型和资源类型）
          */
-        @Query(value = "{'userId': ?0, 'parentPath': ?1, 'isDeleted': false}", fields = "{'id': 1, 'name': 1, 'isFolder': 1}")
+        @Query(value = "{'userId': ?0, 'parentPath': ?1, 'isDeleted': false}", fields = "{'id': 1, 'name': 1, 'isFolder': 1, 'resourceType': 1}")
         List<StudyResource> findBasicFileInfoByUserIdAndParentPath(Long userId, String parentPath);
 
         List<StudyResource> findByUserIdAndParentPathAndIsDeletedFalse(Long userId, String parentPath);
 
-        StudyResource findByPathAndIsDeletedFalse(String path);
+        /**
+         * 根据父目录路径和名称查找资源
+         */
+        StudyResource findByParentPathAndNameAndIsDeletedFalse(String parentPath, String name);
 
         boolean existsByUserIdAndParentPathAndNameAndIsDeletedFalse(
                         Long userId, String parentPath, String name);
