@@ -3,8 +3,8 @@ package com.qiu.qoj.common.api;
 import com.qiu.qoj.common.enums.UserRoleEnum;
 
 public class UserContext {
-    private static final ThreadLocal<Long> userIdThreadLocal = new ThreadLocal<>();
-    private static final ThreadLocal<String> userRoleThreadLocal = new ThreadLocal<>();
+    private static final ThreadLocal<Long> userIdThreadLocal = new InheritableThreadLocal<>();
+    private static final ThreadLocal<String> userRoleThreadLocal = new InheritableThreadLocal<>();
 
     // 获取 user-id
     public static Long getUserId() {
