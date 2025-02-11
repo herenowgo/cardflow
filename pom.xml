@@ -4,25 +4,25 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.qiu.qoj</groupId>
-    <artifactId>qoj</artifactId>
+    <groupId>com.qiu.cardflow</groupId>
+    <artifactId>cardflow</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
-        <module>qoj-question</module>
-        <module>qoj-question/qoj-question-serv</module>
-        <module>qoj-gateway</module>
-        <module>qoj-common</module>
-        <module>qoj-user</module>
-        <module>qoj-judge</module>
-        <module>qoj-codeSandBox</module>
-        <module>qoj-eventStream</module>
-        <module>qoj-discussion</module>
-        <module>qoj-ai</module>
-        <module>qoj-document</module>
-        <module>qoj-common-api</module>
-        <module>qoj-question/qoj-question-api</module>
-        <module>codeflow-graph</module>
+        <module>cardflow-question</module>
+        <module>cardflow-question/cardflow-question-serv</module>
+        <module>cardflow-gateway</module>
+        <module>cardflow-common</module>
+        <module>cardflow-user</module>
+        <module>cardflow-judge</module>
+        <module>cardflow-codeSandBox</module>
+        <module>cardflow-eventStream</module>
+        <module>cardflow-discussion</module>
+        <module>cardflow-ai</module>
+        <module>cardflow-document</module>
+        <module>cardflow-common-api</module>
+        <module>cardflow-question/cardflow-question-api</module>
+        <module>cardflow-graph</module>
     </modules>
 
 
