@@ -22,7 +22,12 @@
         <module>cardflow-document</module>
         <module>cardflow-common-api</module>
         <module>cardflow-question/cardflow-question-api</module>
-        <module>cardflow-graph</module>
+        <module>cardflow-graph-provider</module>
+        <module>cardflow-graph-interface</module>
+        <module>demo</module>
+        <module>cardflow-framework</module>
+        <module>cardflow-common-interface</module>
+        <!--        <module>demo</module>-->
     </modules>
 
 
@@ -65,14 +70,6 @@
     </properties>
 
     <dependencies>
-        <!--        <dependency>-->
-        <!--            <groupId>org.springframework.boot</groupId>-->
-        <!--            <artifactId>spring-boot-starter-actuator</artifactId>-->
-        <!--        </dependency>-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -85,15 +82,22 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
-        </dependency>
+<!--        &lt;!&ndash; 读取bootstrap文件 &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-bootstrap</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.alibaba.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>-->
+<!--        </dependency>-->
     </dependencies>
 
+
     <dependencyManagement>
+
         <dependencies>
             <!--Spring Cloud 相关依赖-->
             <dependency>
