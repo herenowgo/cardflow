@@ -24,11 +24,9 @@
         <module>cardflow-question/cardflow-question-api</module>
         <module>cardflow-graph-provider</module>
         <module>cardflow-graph-interface</module>
-        <module>demo</module>
         <module>cardflow-framework</module>
         <module>cardflow-common-interface</module>
         <module>cardflow-api</module>
-        <!--        <module>demo</module>-->
     </modules>
 
 
