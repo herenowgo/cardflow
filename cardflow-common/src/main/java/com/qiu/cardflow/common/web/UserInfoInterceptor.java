@@ -5,11 +5,13 @@ import com.qiu.cardflow.common.api.UserContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.Ordered;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 /**
  * 将用户的信息设置到线程上下文中
  */
+@Component
 public class UserInfoInterceptor implements HandlerInterceptor, Ordered {
 
     @Override

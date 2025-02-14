@@ -1,19 +1,18 @@
-package com.qiu.cardflow.document;
+package com.qiu.cardflow.api;
 
+import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
-/**
- * 主类（项目启动入口）
- */
 
 @SpringBootApplication
 @EnableDiscoveryClient
-public class DocumentApplication {
+@EnableDubbo
+public class ApiApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(DocumentApplication.class, args);
+        SpringApplication.run(ApiApplication.class, args);
     }
 
 }

@@ -27,6 +27,7 @@
         <module>demo</module>
         <module>cardflow-framework</module>
         <module>cardflow-common-interface</module>
+        <module>cardflow-api</module>
         <!--        <module>demo</module>-->
     </modules>
 

@@ -15,7 +15,6 @@ import com.qiu.cardflow.graph.service.IGraphService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,34 +30,20 @@ public class IGraphServiceImpl implements IGraphService {
     private final UserNodeRepository userNodeRepository;
 
     @Override
-    @Transactional
     public boolean addCard(CardDTO cardDTO) {
         try {
             // 1. 创建或获取用户节点
-            UserNode userNode = userNodeRepository.findById(cardDTO.getUserId())
-                    .orElseGet(() -> {
-                        UserNode newUser = new UserNode();
-                        newUser.setUserId(cardDTO.getUserId());
-                        return userNodeRepository.save(newUser);
-                    });
-
+            UserNode userNode = userNodeRepository.save(new UserNode(cardDTO.getUserId()));
             // 2. 创建卡片节点
             CardNode cardNode = new CardNode();
             cardNode.setCardId(cardDTO.getCardId());
             cardNode.setUserNode(userNode);
 
             // 3. 创建或获取标签节点
-            List<TagNode> tagNodes = new ArrayList<>();
-            for (String tagName : cardDTO.getTags()) {
-                TagNode tagNode = tagNodeRepository.findById(tagName)
-                        .orElseGet(() -> {
-                            TagNode newTag = new TagNode();
-                            newTag.setName(tagName);
-                            return tagNodeRepository.save(newTag);
-                        });
-                tagNodes.add(tagNode);
-            }
-            cardNode.setTagNodeList(tagNodes);
+            List<TagNode> tagNodeList = cardDTO.getTags().stream()
+                    .map(TagNode::new)
+                    .toList();
+            cardNode.setTagNodeList(tagNodeList);
 
             // 4. 保存卡片节点及其关系
             cardNodeRepository.save(cardNode);
@@ -70,7 +55,6 @@ public class IGraphServiceImpl implements IGraphService {
     }
 
     @Override
-    @Transactional
     public boolean removeCard(String cardId) {
         try {
             // 使用新的删除方法，同时删除节点和关系
@@ -83,7 +67,6 @@ public class IGraphServiceImpl implements IGraphService {
     }
 
     @Override
-    @Transactional
     public boolean updateCard(CardDTO cardDTO) {
         try {
             // 1. 更新卡片的标签关系
@@ -130,7 +113,7 @@ public class IGraphServiceImpl implements IGraphService {
             edge.setSource(tagNameToId.get(coOccurrence.getSourceTag()));
             edge.setTarget(tagNameToId.get(coOccurrence.getTargetTag()));
             edge.setWeight(coOccurrence.getWeight().intValue());
-            edge.setName("相关"); // 边的类型名称
+//            edge.setName("相关"); // 边的类型名称
 
             edges.add(edge);
         }

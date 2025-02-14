@@ -8,5 +8,5 @@ import org.springframework.data.neo4j.core.schema.Node;
 @Node("Tag")
 public class TagNode {
     @Id
-    private String name;
+    private final String name;
 } 

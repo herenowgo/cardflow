@@ -5,6 +5,7 @@ import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.data.neo4j.core.schema.Relationship.Direction.INCOMING;
@@ -20,5 +21,5 @@ public class CardNode {
     private UserNode userNode;
 
     @Relationship(type = "HAS_TAG", direction = OUTGOING)
-    private List<TagNode> tagNodeList;
+    private List<TagNode> tagNodeList = new ArrayList<>();
 } 

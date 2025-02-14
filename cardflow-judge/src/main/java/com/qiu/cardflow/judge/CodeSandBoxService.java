@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.io.IOException;
 
-@FeignClient("qoj-codeSandBox")
+@FeignClient("cardflow-codeSandBox")
 public interface CodeSandBoxService {
 
     /**
