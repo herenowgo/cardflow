@@ -18,7 +18,6 @@
         <module>cardflow-codeSandBox</module>
         <module>cardflow-eventStream</module>
         <module>cardflow-discussion</module>
-        <module>cardflow-ai</module>
         <module>cardflow-document</module>
         <module>cardflow-common-api</module>
         <module>cardflow-question/cardflow-question-api</module>
@@ -27,7 +26,7 @@
         <module>cardflow-framework</module>
         <module>cardflow-common-interface</module>
         <module>cardflow-api</module>
-        <module>cardflow-ai-new</module>
+        <module>cardflow-ai</module>
         <module>cardflow-ai-interface</module>
     </modules>
 

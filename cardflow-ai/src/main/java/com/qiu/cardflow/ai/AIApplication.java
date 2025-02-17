@@ -1,22 +1,20 @@
 package com.qiu.cardflow.ai;
 
-import org.mybatis.spring.annotation.MapperScan;
+import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 /**
  * 主类（项目启动入口）
  */
 
-@SpringBootApplication(scanBasePackages = "com.qiu.cardflow")
-@EnableDiscoveryClient
-//@EnableFeignClients
-@MapperScan("com.qiu.cardflow.ai.mapper")
+@SpringBootApplication
+@EnableDubbo
 public class AIApplication {
-
     public static void main(String[] args) {
-        SpringApplication.run(AIApplication.class, args);
+        SpringApplication springApplication = new SpringApplication(AIApplication.class);
+        springApplication.setWebApplicationType(WebApplicationType.NONE);
+        springApplication.run(args);
     }
-
 }

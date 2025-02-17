@@ -1,41 +1,31 @@
 package com.qiu.cardflow.ai.client;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Component;
 
-import com.qiu.cardflow.ai.model.enums.AIModel;
-
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
+import java.util.HashMap;
+import java.util.List;
 
 @Component
 public class ChatClientFactory {
     @Resource
-    ChatClient zhiPu;
+    private List<IChatClient> chatClientList;
 
-    @Resource
-    ChatClient gemini;
+    private HashMap<String, ChatClient> chatClientMap = new HashMap<>();
 
-    @Resource
-    ChatClient deepSeek;
-
-    Map<AIModel, ChatClient> map = new HashMap<>();
 
     @PostConstruct
     public void init() {
-        map.put(AIModel.GLM_4_Flash, zhiPu);
-        map.put(AIModel.GLM_4_Air, zhiPu);
-        map.put(AIModel.GLM_4_AirX, zhiPu);
-        map.put(AIModel.GLM_4_PLUS, zhiPu);
-        map.put(AIModel.GEMINI_1_5_PRO_EXP, gemini);
-        map.put(AIModel.GEMINI_2_0_FLASH_EXP, gemini);
-        map.put(AIModel.DEEP_SEEK, deepSeek);
+        chatClientList.forEach(
+                iChatClient -> {
+                    chatClientMap.putAll(iChatClient.getModelNameToChatClientMap());
+                }
+        );
     }
 
-    public ChatClient getClient(AIModel model) {
-        return map.get(model);
+    public ChatClient getChatClient(String modelName) {
+        return chatClientMap.get(modelName);
     }
 }
