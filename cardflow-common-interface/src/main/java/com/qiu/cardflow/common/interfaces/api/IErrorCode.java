@@ -1,4 +1,4 @@
-package com.qiu.cardflow.web.starter.constants;
+package com.qiu.cardflow.common.interfaces.api;
 
 /**
  * 封装API的错误码

@@ -1,19 +1,17 @@
 package com.qiu.cardflow.ai.controller;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.qiu.cardflow.ai.model.dto.ai.AIChatRequest;
 import com.qiu.cardflow.ai.model.dto.ai.UserCodeAnalysisRequest;
 import com.qiu.cardflow.ai.service.AIService;
 import com.qiu.cardflow.ai.utils.ContentCleaner;
 import com.qiu.cardflow.common.api.BaseResponse;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -44,7 +42,7 @@ public class ChatController {
 
     /**
      * 与AI进行对话
-     * 
+     *
      * @param aiChatRequest AI对话请求参数
      * @return 请求ID，用于获取流式响应
      */

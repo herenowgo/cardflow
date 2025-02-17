@@ -1,5 +1,6 @@
 package com.qiu.cardflow.api.service.impl;
 
+import com.qiu.cardflow.api.service.IGraphService;
 import com.qiu.cardflow.graph.dto.CardDTO;
 import com.qiu.cardflow.graph.dto.GraphDTO;
 import com.qiu.cardflow.graph.interfaces.IGraphRpc;
@@ -46,11 +47,6 @@ public class GraphServiceImpl implements IGraphService {
 
     @Override
     public GraphDTO getTagsGraph(Long userId) {
-        try {
-            return graphRpc.getTagsGraph(userId);
-        } catch (Exception e) {
-            log.error("获取用户知识图谱失败", e);
-            return new GraphDTO();
-        }
+        return graphRpc.getTagsGraph(userId);
     }
 }

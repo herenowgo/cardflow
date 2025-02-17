@@ -1,7 +1,9 @@
 package com.qiu.cardflow.web.starter.exception;
 
 import cn.dev33.satoken.exception.NotLoginException;
-import com.qiu.cardflow.web.starter.constants.BaseResponse;
+import com.qiu.cardflow.common.interfaces.api.BaseResponse;
+import com.qiu.cardflow.common.interfaces.exception.BusinessException;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -15,14 +17,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @ControllerAdvice
 public class GlobalExceptionHandler {
-
     @ResponseBody
-    @ExceptionHandler(value = ApiException.class)
-    public BaseResponse handle(ApiException e) {
-        if (e.getErrorCode() != null) {
-            return BaseResponse.failed(e.getErrorCode());
-        }
-        return BaseResponse.failed(e.getMessage());
+    @ExceptionHandler(value = BusinessException.class)
+    public BaseResponse handleValidException(BusinessException e) {
+        String message = e.getMessage();
+        return BaseResponse.failed(message);
     }
 
     @ResponseBody
@@ -36,6 +35,13 @@ public class GlobalExceptionHandler {
                 message = fieldError.getField() + fieldError.getDefaultMessage();
             }
         }
+        return BaseResponse.validateFailed(message);
+    }
+
+    @ResponseBody
+    @ExceptionHandler(value = ConstraintViolationException.class)
+    public BaseResponse handleConstraintViolationExceptions(ConstraintViolationException e) {
+        String message = e.getMessage();
         return BaseResponse.validateFailed(message);
     }
 

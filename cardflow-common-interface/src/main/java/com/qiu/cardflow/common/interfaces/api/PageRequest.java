@@ -1,8 +1,6 @@
-package com.qiu.cardflow.web.starter.constants;
+package com.qiu.cardflow.common.interfaces.api;
 
 import lombok.Data;
-
-import static com.qiu.cardflow.web.starter.constants.CommonConstant.SORT_ORDER_ASC;
 
 
 /**
@@ -29,5 +27,5 @@ public class PageRequest {
     /**
      * 排序顺序（默认升序）
      */
-    private String sortOrder = SORT_ORDER_ASC;
+    private String sortOrder = "asc";
 }

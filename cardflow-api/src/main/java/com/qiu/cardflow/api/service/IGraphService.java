@@ -1,4 +1,4 @@
-package com.qiu.cardflow.api.service.impl;
+package com.qiu.cardflow.api.service;
 
 import com.qiu.cardflow.graph.dto.CardDTO;
 import com.qiu.cardflow.graph.dto.GraphDTO;

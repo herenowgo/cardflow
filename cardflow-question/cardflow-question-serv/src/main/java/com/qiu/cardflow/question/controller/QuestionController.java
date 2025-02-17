@@ -184,7 +184,7 @@ public class QuestionController {
 //        if (StringUtils.isAllBlank(questionQueryRequest.getTitle(), questionQueryRequest.getAnswer(), questionQueryRequest.getContent()) && CollectionUtils.isEmpty(questionQueryRequest.getTags())) {
 //            questionPage = questionService.simplePageUseCache(current, size);
 //        } else {
-            questionPage = questionService.page(new Page<>(current, size), questionService.getQueryWrapper(questionQueryRequest));
+        questionPage = questionService.page(new Page<>(current, size), questionService.getQueryWrapper(questionQueryRequest));
 //        }
 
         return BaseResponse.success(questionService.getQuestionVOPage(questionPage, request));

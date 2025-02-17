@@ -1,9 +1,9 @@
 package com.qiu.cardflow.api.controller;
 
-import com.qiu.cardflow.api.service.impl.IGraphService;
+import com.qiu.cardflow.api.service.IGraphService;
+import com.qiu.cardflow.common.interfaces.api.BaseResponse;
 import com.qiu.cardflow.graph.dto.CardDTO;
 import com.qiu.cardflow.graph.dto.GraphDTO;
-import com.qiu.cardflow.web.starter.constants.BaseResponse;
 import com.qiu.cardflow.web.starter.context.UserContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

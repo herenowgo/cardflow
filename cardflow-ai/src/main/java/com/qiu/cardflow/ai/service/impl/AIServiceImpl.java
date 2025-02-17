@@ -1,19 +1,7 @@
 package com.qiu.cardflow.ai.service.impl;
 
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.memory.InMemoryChatMemory;
-import org.springframework.ai.chat.prompt.ChatOptions;
-import org.springframework.cloud.stream.function.StreamBridge;
-import org.springframework.stereotype.Service;
-
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.qiu.cardflow.ai.client.ChatClientFactory;
 import com.qiu.cardflow.ai.constant.AIConstant;
 import com.qiu.cardflow.ai.judge.codesandbox.model.JudgeInfo;
@@ -28,14 +16,24 @@ import com.qiu.cardflow.ai.service.AIService;
 import com.qiu.cardflow.ai.service.QuestionService;
 import com.qiu.cardflow.ai.service.QuestionSubmitService;
 import com.qiu.cardflow.common.api.UserContext;
-
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
-import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Flux;
 import com.qiu.codeflow.eventStream.dto.EventMessage;
 import com.qiu.codeflow.eventStream.dto.EventType;
 import com.qiu.codeflow.eventStream.util.EventMessageUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.memory.InMemoryChatMemory;
+import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Service
 @RequiredArgsConstructor
@@ -213,9 +211,7 @@ public class AIServiceImpl implements AIService {
                         .options(ChatOptions.builder()
                                 .model(aiModel.getName())
                                 .build())
-
                         .advisors(memoryAdvisor)
-                        
                         .system(systemPrompt)
                         .user(sanitizedContent)
                         .stream()
@@ -229,7 +225,8 @@ public class AIServiceImpl implements AIService {
                                     Math.toIntExact(message.getT1()) + 1);
                         })
                         .doOnComplete(() -> sendEndMessageToQueue(requestId, EventType.ANSWER, userId))
-                        .blockLast();
+                        .subscribe();
+
             } catch (Exception e) {
                 e.printStackTrace();
             }

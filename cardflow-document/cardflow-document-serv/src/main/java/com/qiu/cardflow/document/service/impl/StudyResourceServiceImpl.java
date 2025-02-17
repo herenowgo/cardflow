@@ -1,20 +1,8 @@
 package com.qiu.cardflow.document.service.impl;
 
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
+import cn.hutool.core.io.FileTypeUtil;
 import com.qiu.cardflow.common.api.UserContext;
 import com.qiu.cardflow.common.exception.ApiException;
 import com.qiu.cardflow.common.exception.Asserts;
@@ -31,12 +19,16 @@ import com.qiu.cardflow.document.repository.StudyResourceRepository;
 import com.qiu.cardflow.document.service.ObjectStorage;
 import com.qiu.cardflow.document.service.StudyResourceService;
 import com.qiu.cardflow.document.util.FileValidationUtil;
-
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.bean.copier.CopyOptions;
-import cn.hutool.core.io.FileTypeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service

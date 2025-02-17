@@ -21,7 +21,6 @@ public class AIClientConfig {
     @Value("${spring.ai.gemini.api-key}")
     private String geminiAiApiToken;
 
-
     @Value("${spring.ai.gemini.api-url}")
     private String geminiAiApiUrl;
 
@@ -49,7 +48,6 @@ public class AIClientConfig {
                 .model("gemini-exp-1206")
                 .build();
         ChatModel chatModel = new OpenAiChatModel(openAiApi, options);
-
         return ChatClient.builder(chatModel).build();
     }
 
