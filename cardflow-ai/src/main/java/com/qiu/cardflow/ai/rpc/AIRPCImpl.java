@@ -22,17 +22,13 @@ public class AIRPCImpl implements IAIRPC {
 
     @Override
     public String chat(@Valid ChatRequestDTO chatRequestDTO) {
-            chatRequestDTO.setUserPrompt(ContentCleaner.cleanHtmlContent(chatRequestDTO.getUserPrompt()));
-            return aiService.chat(chatRequestDTO);
+        chatRequestDTO.setUserPrompt(ContentCleaner.cleanHtmlContent(chatRequestDTO.getUserPrompt()));
+        return aiService.chat(chatRequestDTO);
     }
 
     @Override
-    public String structuredOutput(@Valid StructuredOutputRequestDTO structuredOutputRequestDTO) {
-        try {
-            structuredOutputRequestDTO.setUserPrompt(ContentCleaner.cleanHtmlContent(structuredOutputRequestDTO.getUserPrompt()));
-            return aiService.structuredOutput(structuredOutputRequestDTO);
-        } catch (Exception e) {
-            throw new BusinessException("AI结构化输出失败", e);
-        }
+    public String structuredOutput(@Valid StructuredOutputRequestDTO structuredOutputRequestDTO) throws BusinessException {
+        structuredOutputRequestDTO.setUserPrompt(ContentCleaner.cleanHtmlContent(structuredOutputRequestDTO.getUserPrompt()));
+        return aiService.structuredOutput(structuredOutputRequestDTO);
     }
 }

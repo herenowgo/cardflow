@@ -24,16 +24,15 @@ public class AIController {
 
 
 //    @PostMapping("/tags")
-//    public BaseResponse<String> getTags(@RequestBody AIChatRequest aiChatRequest) {
-//        aiChatRequest.setContent(ContentCleaner.cleanHtmlContent(aiChatRequest.getContent()));
-//        return BaseResponse.success(aiService.generateTags(aiChatRequest));
+//    public BaseResponse<String> getTags(@RequestBody AIChatRequest chatRequest) {
+//        chatRequest.setContent(ContentCleaner.cleanHtmlContent(chatRequest.getContent()));
+//        return BaseResponse.success(aiService.generateTags(chatRequest));
 //    }
 //
-//    @PostMapping("/cards")
-//    public BaseResponse<String> getCards(@RequestBody AIChatRequest aiChatRequest) {
-//        aiChatRequest.setContent(ContentCleaner.cleanHtmlContent(aiChatRequest.getContent()));
-//        return BaseResponse.success(aiService.generateCards(aiChatRequest));
-//    }
+    @PostMapping("/cards")
+    public BaseResponse<String> getCards(@RequestBody @Valid ChatRequest chatRequest) {
+        return BaseResponse.success(aiService.generateCards(chatRequest));
+    }
 //
 //    @PostMapping("/codeAnalysis")
 //    public BaseResponse<String> analysisUserCode(@RequestBody UserCodeAnalysisRequest userCodeAnalysisRequest) {

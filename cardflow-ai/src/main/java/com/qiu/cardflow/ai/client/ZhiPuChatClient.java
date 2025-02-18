@@ -3,9 +3,9 @@ package com.qiu.cardflow.ai.client;
 import lombok.Getter;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
+import org.springframework.ai.zhipuai.ZhiPuAiChatOptions;
+import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,33 +16,31 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Configuration
-public class GoogleChatClient implements IChatClient {
+public class ZhiPuChatClient implements IChatClient {
 
-    @Value("${spring.ai.gemini.api-key}")
-    private String geminiAiApiToken;
-
-    @Value("${spring.ai.gemini.api-url}")
-    private String geminiAiApiUrl;
+    @Value("${spring.ai.zhipuai.api-key}")
+    private String zhiPuAiApiToken;
 
     /**
      * 会有动态代理，不会重复创建实例
      *
      * @return
      */
-    @Bean("googleChatClient1")
+    @Bean("zhiPuChatClient1")
     public ChatClient chatClient() {
-        OpenAiApi openAiApi = new OpenAiApi(geminiAiApiUrl, geminiAiApiToken);
-        OpenAiChatOptions options = OpenAiChatOptions.builder()
-                .model("gemini-2.0-flash-exp")
-                .build();
-        ChatModel chatModel = new OpenAiChatModel(openAiApi, options);
+        ZhiPuAiApi zhiPuAiApi = new ZhiPuAiApi(zhiPuAiApiToken);
+
+        ChatModel chatModel = new ZhiPuAiChatModel(zhiPuAiApi, ZhiPuAiChatOptions.builder()
+                .model(ZhiPuAiApi.ChatModel.GLM_4_Flash.getValue())
+                .build());
+
         return ChatClient.builder(chatModel).build();
     }
 
 
     @Override
     public String getName() {
-        return "gemini";
+        return "zhipu";
     }
 
     @Override
@@ -66,7 +64,7 @@ public class GoogleChatClient implements IChatClient {
 
     @Getter
     public enum AIModel {
-        GEMINI_2_0_FLASH_EXP("gemini-2.0-flash-exp"),
+        GLM_4_Flash(ZhiPuAiApi.ChatModel.GLM_4_Flash.getValue()),
         ;
 
         final String name;

@@ -4,6 +4,7 @@ import com.qiu.cardflow.ai.client.ChatClientFactory;
 import com.qiu.cardflow.ai.dto.ChatRequestDTO;
 import com.qiu.cardflow.ai.dto.StructuredOutputRequestDTO;
 import com.qiu.cardflow.ai.service.IAIService;
+import com.qiu.cardflow.ai.structured.TargetType;
 import com.qiu.cardflow.ai.util.ChatClientRequestSpecBuilder;
 import com.qiu.cardflow.common.interfaces.exception.Assert;
 import com.qiu.codeflow.eventStream.dto.EventMessage;
@@ -55,11 +56,11 @@ public class AIServiceImpl implements IAIService {
 
         ChatClient chatClient = chatClientFactory.getChatClient(model);
         Assert.notNull(chatClient, "模型不存在");
-
+        String realModelName = chatClientFactory.getRealModelName(model);
         ChatClient.ChatClientRequestSpec chatClientRequestSpec = ChatClientRequestSpecBuilder
                 .builder()
                 .withOptions(ChatOptions.builder()
-                        .model(model)
+                        .model(realModelName)
                         .build())
                 .withSystemPrompt(systemPrompt)
                 .withUserPrompt(userPrompt)
@@ -68,16 +69,25 @@ public class AIServiceImpl implements IAIService {
                 .withConversationId(conversationId)
                 .build(chatClient);
 
-        Flux<String> result = chatClientRequestSpec.stream().content();
-        result
-                .bufferTimeout(maxSize, Duration.ofMillis(maxMills))
-                .index()
-                .doOnNext(message -> {
-                    sendToQueue(message.getT2(), requestId, eventType, userId,
-                            Math.toIntExact(message.getT1()) + 1);
-                })
-                .doOnComplete(() -> sendEndMessageToQueue(requestId, eventType, userId))
-                .subscribe();
+        try {
+            Flux<String> result = chatClientRequestSpec.stream().content();
+            result
+                    .bufferTimeout(maxSize, Duration.ofMillis(maxMills))
+                    .index()
+                    .doOnNext(message -> {
+                        sendToQueue(message.getT2(), requestId, eventType, userId,
+                                Math.toIntExact(message.getT1()) + 1);
+                    })
+                    .doOnComplete(() -> sendEndMessageToQueue(null, requestId, eventType, userId))
+                    .doOnError((e) -> {
+                        log.error("AI模型调用失败", e);
+                        sendEndMessageToQueue("该AI模型暂时不可用，请切换模型或稍后再试", requestId, eventType, userId);
+                    })
+                    .subscribe();
+        } catch (Exception e) {
+            sendEndMessageToQueue("该AI模型暂时不可用，请切换模型或稍后再试", requestId, eventType, userId);
+            throw new RuntimeException(e);
+        }
 
         return requestId;
     }
@@ -85,7 +95,7 @@ public class AIServiceImpl implements IAIService {
 
     @Override
     public String structuredOutput(StructuredOutputRequestDTO structuredOutputRequestDTO) {
-        Class type = structuredOutputRequestDTO.getTargetType();
+        TargetType targetType = structuredOutputRequestDTO.getTargetType();
         String userPrompt = structuredOutputRequestDTO.getUserPrompt();
         String systemPrompt = structuredOutputRequestDTO.getSystemPrompt();
         String model = structuredOutputRequestDTO.getModel();
@@ -97,13 +107,13 @@ public class AIServiceImpl implements IAIService {
 
         ChatClient chatClient = chatClientFactory.getChatClient(model);
         Assert.notNull(chatClient, "模型不存在");
-
+        String realModelName = chatClientFactory.getRealModelName(model);
         executorService.submit(() -> {
             try {
                 ChatClient.ChatClientRequestSpec chatClientRequestSpec = ChatClientRequestSpecBuilder
                         .builder()
                         .withOptions(ChatOptions.builder()
-                                .model(model)
+                                .model(realModelName)
                                 .build())
                         .withSystemPrompt(systemPrompt)
                         .withUserPrompt(userPrompt)
@@ -113,10 +123,11 @@ public class AIServiceImpl implements IAIService {
                         .build(chatClient);
                 Object resultObject = chatClientRequestSpec
                         .call()
-                        .entity(type);
+                        .entity(targetType.getType());
                 sendToQueue(resultObject, requestId, eventType, userId);
             } catch (Exception e) {
                 log.error("结构化输出异常", e);
+                sendEndMessageToQueue("该AI模型暂时不可用，请切换模型或稍后再试", requestId, eventType, userId);
                 throw new RuntimeException(e);
             }
         });
@@ -153,9 +164,10 @@ public class AIServiceImpl implements IAIService {
         streamBridge.send("eventMessage-out-0", eventMessage);
     }
 
-    private void sendEndMessageToQueue(String requestId, EventType eventType, String userId) {
+    private void sendEndMessageToQueue(String endMessage, String requestId, EventType eventType, String userId) {
         EventMessage eventMessage = EventMessage.builder()
                 .userId(userId)
+                .data(endMessage)
                 .eventType(eventType)
                 .requestId(requestId)
                 .sequence(-1)

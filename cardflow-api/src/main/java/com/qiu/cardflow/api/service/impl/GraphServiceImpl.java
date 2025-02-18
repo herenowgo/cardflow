@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class GraphServiceImpl implements IGraphService {
 
-    @DubboReference
+    @DubboReference(validation = "true")
     private IGraphRpc graphRpc;
 
     @Override
@@ -46,7 +46,7 @@ public class GraphServiceImpl implements IGraphService {
     }
 
     @Override
-    public GraphDTO getTagsGraph(Long userId) {
+    public GraphDTO getTagsGraph(Long userId)  {
         return graphRpc.getTagsGraph(userId);
     }
 }

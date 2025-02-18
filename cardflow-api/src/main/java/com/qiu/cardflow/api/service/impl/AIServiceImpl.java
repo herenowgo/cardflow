@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.qiu.cardflow.ai.dto.ChatRequestDTO;
 import com.qiu.cardflow.ai.dto.StructuredOutputRequestDTO;
 import com.qiu.cardflow.ai.interfaces.IAIRPC;
+import com.qiu.cardflow.ai.structured.TargetType;
 import com.qiu.cardflow.api.service.IAIService;
 import com.qiu.cardflow.api.vo.ai.ChatRequest;
 import com.qiu.cardflow.web.starter.context.UserContext;
@@ -21,9 +22,9 @@ public class AIServiceImpl implements IAIService {
     @Override
     public String chat(ChatRequest chatRequest) {
         ChatRequestDTO chatRequestDTO = ChatRequestDTO.builder()
-                .maxSize(10)
+                .maxSize(8)
                 .maxMills(400)
-                .chatHistoryWindowSize(6)
+                .chatHistoryWindowSize(5)
                 .eventType(EventType.ANSWER)
                 .userId(UserContext.getUserId().toString())
                 .build();
@@ -32,12 +33,16 @@ public class AIServiceImpl implements IAIService {
     }
 
     @Override
-    public String structuredOutput(StructuredOutputRequestDTO structuredOutputRequestDTO) {
+    public String generateCards(ChatRequest chatRequest) {
+        StructuredOutputRequestDTO structuredOutputRequestDTO = StructuredOutputRequestDTO.builder()
+                .eventType(EventType.CARDS_GENERATE)
+                .userId(UserContext.getUserId().toString())
+                .targetType(TargetType.CARDS)
+                .build();
+        BeanUtil.copyProperties(chatRequest, structuredOutputRequestDTO);
+
         return aiRpc.structuredOutput(structuredOutputRequestDTO);
     }
 
-    @Override
-    public String generateCards(ChatRequest chatRequest) {
-        return null;
-    }
+
 }

@@ -3,6 +3,7 @@ package com.qiu.cardflow.web.starter.exception;
 import cn.dev33.satoken.exception.NotLoginException;
 import com.qiu.cardflow.common.interfaces.api.BaseResponse;
 import com.qiu.cardflow.common.interfaces.exception.BusinessException;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -19,9 +20,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class GlobalExceptionHandler {
     @ResponseBody
     @ExceptionHandler(value = BusinessException.class)
-    public BaseResponse handleValidException(BusinessException e) {
-        String message = e.getMessage();
-        return BaseResponse.failed(message);
+    public BaseResponse handleBusinessException(BusinessException e) {
+        return BaseResponse.failed(e.getMessage());
     }
 
     @ResponseBody
@@ -39,10 +39,13 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseBody
-    @ExceptionHandler(value = ConstraintViolationException.class)
-    public BaseResponse handleConstraintViolationExceptions(ConstraintViolationException e) {
-        String message = e.getMessage();
-        return BaseResponse.validateFailed(message);
+    @ExceptionHandler(ConstraintViolationException.class)
+    public BaseResponse handleConstraintViolationException(ConstraintViolationException ex) {
+        // 提取第一个校验失败信息
+        ConstraintViolation<?> violation = ex.getConstraintViolations().iterator().next();
+        String errorMessage = String.format("%s",
+                violation.getMessage());
+        return BaseResponse.validateFailed(errorMessage);
     }
 
     @ResponseBody
@@ -64,5 +67,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = NotLoginException.class)
     public BaseResponse handleValidException(NotLoginException e) {
         return BaseResponse.failed(e.getMessage());
+    }
+
+    @ResponseBody
+    @ExceptionHandler(value = Exception.class)
+    public BaseResponse handleException(Exception e) {
+        return BaseResponse.failed("服务器异常，请稍后再试");
     }
 }

@@ -1,5 +1,6 @@
 package com.qiu.cardflow.ai.dto;
 
+import com.qiu.cardflow.ai.structured.TargetType;
 import com.qiu.codeflow.eventStream.dto.EventType;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
@@ -17,7 +18,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class StructuredOutputRequestDTO implements Serializable {
     @NotNull
-    private Class targetType;
+    private TargetType targetType;
 
     @NotEmpty(message = "输入不能为空")
     private String userPrompt;

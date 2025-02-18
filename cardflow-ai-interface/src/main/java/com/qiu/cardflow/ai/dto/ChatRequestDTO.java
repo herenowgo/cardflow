@@ -27,7 +27,6 @@ public class ChatRequestDTO implements Serializable {
     @NotEmpty(message = "用户id不能为空")
     private String userId;
 
-
     private String conversationId;
 
     @Min(value = 1, message = "对话记忆窗口大小不能小于1")
@@ -45,6 +44,6 @@ public class ChatRequestDTO implements Serializable {
     @Min(value = 10, message = "最大收集时间不能小于10毫秒")
     private Integer maxMills = 700;
 
-    private static final long serialVersionUID = 1L;
+    // private static final long serialVersionUID = 1L;
 
 }

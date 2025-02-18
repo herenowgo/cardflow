@@ -1,6 +1,7 @@
 package com.qiu.cardflow.web.starter.context;
 
 
+import com.qiu.cardflow.common.interfaces.exception.Assert;
 import com.qiu.cardflow.web.starter.enums.UserRoleEnum;
 
 import java.util.HashMap;
@@ -32,10 +33,12 @@ public class UserContext {
 
     // 获取 user-id
     public static Long getUserId() {
+        Assert.notNull(get(USER_ID), "用户id不能为空");
         return (Long) get(USER_ID);
     }
 
     public static String getUserRole() {
+        Assert.notNull(get(USER_ROLE), "用户角色不能为空");
         return (String) get(USER_ROLE);
     }
 

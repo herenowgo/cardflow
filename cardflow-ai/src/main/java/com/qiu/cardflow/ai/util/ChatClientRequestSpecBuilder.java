@@ -18,7 +18,7 @@ public class ChatClientRequestSpecBuilder {
     // 默认对话ID
     private String conversationId;
     // 聊天历史窗口大小
-    private Integer chatHistoryWindowSize;
+    private Integer chatHistoryWindowSize = 5;
 
     // 静态构造方法
     public static ChatClientRequestSpecBuilder builder() {
