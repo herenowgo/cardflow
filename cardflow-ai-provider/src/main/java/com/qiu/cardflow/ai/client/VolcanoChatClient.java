@@ -29,11 +29,17 @@ public class VolcanoChatClient implements IChatClient {
      */
     @Bean("VolcanoChatClient1")
     public ChatClient chatClient() {
-        OpenAiApi openAiApi = new OpenAiApi(aiApiUrl, aiApiToken);
-//        OpenAiApi.builder().completionsPath("");
+        OpenAiApi openAiApi = OpenAiApi.builder()
+                .baseUrl(aiApiUrl)
+                .apiKey(aiApiToken)
+                .build();
         OpenAiChatOptions options = OpenAiChatOptions.builder()
                 .build();
-        ChatModel chatModel = new OpenAiChatModel(openAiApi, options);
+        ChatModel chatModel = OpenAiChatModel.builder()
+                .openAiApi(openAiApi)
+                .defaultOptions(options)
+                .build();
+
         return ChatClient.builder(chatModel).build();
     }
 

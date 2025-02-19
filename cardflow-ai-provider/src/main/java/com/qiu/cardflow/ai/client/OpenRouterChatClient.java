@@ -29,11 +29,17 @@ public class OpenRouterChatClient implements IChatClient {
      */
     @Bean("openRouterChatClient1")
     public ChatClient chatClient() {
-        OpenAiApi openAiApi = new OpenAiApi(aiApiUrl, aiApiToken);
-        OpenAiChatOptions options = OpenAiChatOptions.builder()
-                .model("gemini-2.0-flash-exp")
+        OpenAiApi openAiApi = OpenAiApi.builder()
+                .baseUrl(aiApiUrl)
+                .apiKey(aiApiToken)
                 .build();
-        ChatModel chatModel = new OpenAiChatModel(openAiApi, options);
+        OpenAiChatOptions options = OpenAiChatOptions.builder()
+                .build();
+        ChatModel chatModel = OpenAiChatModel.builder()
+                .openAiApi(openAiApi)
+                .defaultOptions(options)
+                .build();
+
         return ChatClient.builder(chatModel).build();
     }
 
