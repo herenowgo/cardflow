@@ -12,26 +12,24 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Configuration
-public class GoogleChatClient implements IChatClient {
+public class OpenRouterChatClient implements IChatClient {
 
-    @Value("${spring.ai.gemini.api-key}")
-    private String geminiAiApiToken;
+    @Value("${spring.ai.openrouter.api-key}")
+    private String aiApiToken;
 
-    @Value("${spring.ai.gemini.api-url}")
-    private String geminiAiApiUrl;
+    @Value("${spring.ai.openrouter.api-url}")
+    private String aiApiUrl;
 
     /**
      * 会有动态代理，不会重复创建实例
      *
      * @return
      */
-    @Bean("googleChatClient1")
+    @Bean("openRouterChatClient1")
     public ChatClient chatClient() {
-        OpenAiApi openAiApi = new OpenAiApi(geminiAiApiUrl, geminiAiApiToken);
+        OpenAiApi openAiApi = new OpenAiApi(aiApiUrl, aiApiToken);
         OpenAiChatOptions options = OpenAiChatOptions.builder()
                 .model("gemini-2.0-flash-exp")
                 .build();
@@ -42,7 +40,7 @@ public class GoogleChatClient implements IChatClient {
 
     @Override
     public String getName() {
-        return "gemini";
+        return "openrouter";
     }
 
     @Override
@@ -51,25 +49,21 @@ public class GoogleChatClient implements IChatClient {
     }
 
     @Override
-    public List<String> getModelNameList() {
+    public List<String> getModelVONameList() {
         return Arrays.stream(AIModel.values())
-                .map(AIModel::getName)
+                .map(aiModel -> getName() + ":" + aiModel.getName())
                 .toList();
-    }
-
-    @Override
-    public Map<String, ChatClient> getModelNameToChatClientMap() {
-        return getModelNameList().stream()
-                .collect(Collectors.toMap(modelName -> getName() + ":" + modelName, name -> getChatClient()));
     }
 
 
     @Getter
     public enum AIModel {
-        GEMINI_2_0_FLASH_EXP("gemini-2.0-flash-exp"),
+        GEMINI_2_0_PRC_EXP_02_05_FREE("google/gemini-2.0-pro-exp-02-05:free"),
+        DEEPSEEK_R1("deepseek/deepseek-r1:free"),
+        DEEPSEEK_V3("deepseek/deepseek-chat:free")
         ;
 
-        final String name;
+        private final String name;
 
         AIModel(String name) {
             this.name = name;

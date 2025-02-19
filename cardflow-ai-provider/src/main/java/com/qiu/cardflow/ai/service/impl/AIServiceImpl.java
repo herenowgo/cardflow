@@ -56,11 +56,11 @@ public class AIServiceImpl implements IAIService {
 
         ChatClient chatClient = chatClientFactory.getChatClient(model);
         Assert.notNull(chatClient, "模型不存在");
-        String realModelName = chatClientFactory.getRealModelName(model);
+        String modelName = chatClientFactory.getModelName(model);
         ChatClient.ChatClientRequestSpec chatClientRequestSpec = ChatClientRequestSpecBuilder
                 .builder()
                 .withOptions(ChatOptions.builder()
-                        .model(realModelName)
+                        .model(modelName)
                         .build())
                 .withSystemPrompt(systemPrompt)
                 .withUserPrompt(userPrompt)
@@ -107,13 +107,13 @@ public class AIServiceImpl implements IAIService {
 
         ChatClient chatClient = chatClientFactory.getChatClient(model);
         Assert.notNull(chatClient, "模型不存在");
-        String realModelName = chatClientFactory.getRealModelName(model);
+        String modelName = chatClientFactory.getModelName(model);
         executorService.submit(() -> {
             try {
                 ChatClient.ChatClientRequestSpec chatClientRequestSpec = ChatClientRequestSpecBuilder
                         .builder()
                         .withOptions(ChatOptions.builder()
-                                .model(realModelName)
+                                .model(modelName)
                                 .build())
                         .withSystemPrompt(systemPrompt)
                         .withUserPrompt(userPrompt)

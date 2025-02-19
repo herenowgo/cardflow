@@ -12,14 +12,12 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Configuration
 public class ZhiPuChatClient implements IChatClient {
 
     @Value("${spring.ai.zhipuai.api-key}")
-    private String zhiPuAiApiToken;
+    private String aiApiToken;
 
     /**
      * 会有动态代理，不会重复创建实例
@@ -28,7 +26,7 @@ public class ZhiPuChatClient implements IChatClient {
      */
     @Bean("zhiPuChatClient1")
     public ChatClient chatClient() {
-        ZhiPuAiApi zhiPuAiApi = new ZhiPuAiApi(zhiPuAiApiToken);
+        ZhiPuAiApi zhiPuAiApi = new ZhiPuAiApi(aiApiToken);
 
         ChatModel chatModel = new ZhiPuAiChatModel(zhiPuAiApi, ZhiPuAiChatOptions.builder()
                 .model(ZhiPuAiApi.ChatModel.GLM_4_Flash.getValue())
@@ -49,16 +47,10 @@ public class ZhiPuChatClient implements IChatClient {
     }
 
     @Override
-    public List<String> getModelNameList() {
+    public List<String> getModelVONameList() {
         return Arrays.stream(AIModel.values())
-                .map(AIModel::getName)
+                .map(aiModel -> getName() + ":" + aiModel.getName())
                 .toList();
-    }
-
-    @Override
-    public Map<String, ChatClient> getModelNameToChatClientMap() {
-        return getModelNameList().stream()
-                .collect(Collectors.toMap(modelName -> getName() + ":" + modelName, name -> getChatClient()));
     }
 
 

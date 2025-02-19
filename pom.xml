@@ -26,7 +26,7 @@
         <module>cardflow-framework</module>
         <module>cardflow-common-interface</module>
         <module>cardflow-api</module>
-        <module>cardflow-ai</module>
+        <module>cardflow-ai-provider</module>
         <module>cardflow-ai-interface</module>
     </modules>
 

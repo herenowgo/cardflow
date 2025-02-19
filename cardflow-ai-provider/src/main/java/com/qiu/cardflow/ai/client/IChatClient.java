@@ -4,6 +4,7 @@ import org.springframework.ai.chat.client.ChatClient;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 抽象AI聊天客户端
@@ -16,9 +17,14 @@ public interface IChatClient {
 
     /**
      * 获取模型名称列表
+     *
      * @return
      */
-    List<String> getModelNameList();
+    List<String> getModelVONameList();
 
-    Map<String, ChatClient> getModelNameToChatClientMap();
+    default Map<String, ChatClient> getModelVONameToChatClientMap() {
+        return getModelVONameList().stream()
+                .collect(Collectors.toMap(modelVOName -> modelVOName, modelVOName -> getChatClient()));
+
+    }
 }

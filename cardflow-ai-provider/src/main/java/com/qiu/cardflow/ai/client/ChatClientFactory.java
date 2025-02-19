@@ -15,15 +15,15 @@ public class ChatClientFactory {
     @Resource
     private List<IChatClient> chatClientList;
 
-    private HashMap<String, ChatClient> chatClientMap = new HashMap<>();
-    private HashMap<String, String> ModelVONameToModelNameMap = new HashMap<>();
+    private final HashMap<String, ChatClient> chatClientMap = new HashMap<>();
+    private final HashMap<String, String> ModelVONameToModelNameMap = new HashMap<>();
 
     @PostConstruct
     public void init() {
         chatClientList.forEach(
                 iChatClient -> {
-                    chatClientMap.putAll(iChatClient.getModelNameToChatClientMap());
-                    ModelVONameToModelNameMap.putAll(iChatClient.getModelNameList().stream().collect(Collectors.toMap(name-> name, name -> name.substring(name.indexOf(":") + 1))));
+                    chatClientMap.putAll(iChatClient.getModelVONameToChatClientMap());
+                    ModelVONameToModelNameMap.putAll(iChatClient.getModelVONameList().stream().collect(Collectors.toMap( modelVOName-> modelVOName, name -> name.substring(name.indexOf(":") + 1))));
                 }
         );
     }
@@ -31,7 +31,7 @@ public class ChatClientFactory {
     public ChatClient getChatClient(String modelName) {
         return chatClientMap.get(modelName);
     }
-    public String getRealModelName(String modelVOName) {
+    public String getModelName(String modelVOName) {
         return ModelVONameToModelNameMap.get(modelVOName);
     }
 }
