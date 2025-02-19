@@ -1,8 +1,10 @@
 package com.qiu.cardflow.ai.service.impl;
 
-import com.qiu.cardflow.ai.client.ChatClientFactory;
+
 import com.qiu.cardflow.ai.dto.ChatRequestDTO;
 import com.qiu.cardflow.ai.dto.StructuredOutputRequestDTO;
+import com.qiu.cardflow.ai.model.AIModelFactory;
+import com.qiu.cardflow.ai.model.AIModelInstance;
 import com.qiu.cardflow.ai.service.IAIService;
 import com.qiu.cardflow.ai.structured.TargetType;
 import com.qiu.cardflow.ai.util.ChatClientRequestSpecBuilder;
@@ -29,9 +31,10 @@ import java.util.concurrent.Executors;
 @Slf4j
 public class AIServiceImpl implements IAIService {
 
-    private final ChatClientFactory chatClientFactory;
 
     private final StreamBridge streamBridge;
+
+    private final AIModelFactory aiModelFactory;
 
     // 用于存储会话记录
     private final InMemoryChatMemory chatMemory = new InMemoryChatMemory();
@@ -54,9 +57,11 @@ public class AIServiceImpl implements IAIService {
 
         String requestId = EventMessageUtil.generateRequestId();
 
-        ChatClient chatClient = chatClientFactory.getChatClient(model);
-        Assert.notNull(chatClient, "模型不存在");
-        String modelName = chatClientFactory.getModelName(model);
+        AIModelInstance aiModelInstance = aiModelFactory.getAIModelInstance(model);
+        Assert.notNull(aiModelInstance, "模型实例不存在");
+        ChatClient chatClient = aiModelInstance.getChatClient();
+
+        String modelName = aiModelInstance.getModelNameInSupplier();
         ChatClient.ChatClientRequestSpec chatClientRequestSpec = ChatClientRequestSpecBuilder
                 .builder()
                 .withOptions(ChatOptions.builder()
@@ -105,9 +110,10 @@ public class AIServiceImpl implements IAIService {
         Integer chatHistoryWindowSize = structuredOutputRequestDTO.getChatHistoryWindowSize();
         String requestId = EventMessageUtil.generateRequestId();
 
-        ChatClient chatClient = chatClientFactory.getChatClient(model);
-        Assert.notNull(chatClient, "模型不存在");
-        String modelName = chatClientFactory.getModelName(model);
+        AIModelInstance aiModelInstance = aiModelFactory.getAIModelInstance(model);
+        ChatClient chatClient = aiModelInstance.getChatClient();
+        Assert.notNull(aiModelInstance, "AI模型实例不存在");
+        String modelName = aiModelInstance.getModelNameInSupplier();
         executorService.submit(() -> {
             try {
                 ChatClient.ChatClientRequestSpec chatClientRequestSpec = ChatClientRequestSpecBuilder
