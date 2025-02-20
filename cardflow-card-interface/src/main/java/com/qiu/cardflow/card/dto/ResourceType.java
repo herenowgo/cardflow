@@ -1,14 +1,16 @@
-package com.qiu.cardflow.card.model.enums;
+package com.qiu.cardflow.card.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import java.io.Serializable;
 
 /**
  * 学习资源类型枚举
  */
 @Getter
 @AllArgsConstructor
-public enum ResourceType {
+public enum ResourceType implements Serializable {
     PDF("PDF", "PDF文件"),
     ARTICLE("ARTICLE", "文章"),
     NOTE("NOTE", "笔记"),

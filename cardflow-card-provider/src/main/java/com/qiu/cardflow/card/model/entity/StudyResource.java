@@ -1,6 +1,6 @@
 package com.qiu.cardflow.card.model.entity;
 
-import com.qiu.cardflow.document.model.enums.ResourceType;
+import com.qiu.cardflow.card.dto.ResourceType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;

@@ -15,6 +15,7 @@ public class UserContext {
 
     // 获取 user-id
     public static Long getUserId() {
+        Assert.notNull(get(USER_ID), "用户id不能为空");
         return (Long) get(USER_ID);
     }
 

@@ -1,6 +1,6 @@
 package com.qiu.cardflow.card.model.dto;
 
-import com.qiu.cardflow.document.model.enums.ResourceType;
+import com.qiu.cardflow.card.dto.ResourceType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

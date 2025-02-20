@@ -1,5 +1,6 @@
 package com.qiu.cardflow.card.repository;
 
+
 import com.qiu.cardflow.card.model.entity.Card;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

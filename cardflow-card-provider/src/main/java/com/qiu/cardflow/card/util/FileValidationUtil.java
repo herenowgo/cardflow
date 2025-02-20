@@ -1,7 +1,8 @@
 package com.qiu.cardflow.card.util;
 
-import com.qiu.cardflow.common.exception.Asserts;
-import com.qiu.cardflow.document.constant.DocumentConstant;
+
+import com.qiu.cardflow.card.constant.DocumentConstant;
+import com.qiu.cardflow.common.interfaces.exception.Assert;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,14 +13,13 @@ public class FileValidationUtil {
      */
     public static void validateFileName(String fileName) {
         // 检查文件名长度
-        Asserts.failIf(fileName.length() > DocumentConstant.MAX_FILENAME_LENGTH,
-                "File name too long, max length is " + DocumentConstant.MAX_FILENAME_LENGTH);
+        Assert.isTrue(fileName.length() <= DocumentConstant.MAX_FILENAME_LENGTH, "File name too long, max length is " + DocumentConstant.MAX_FILENAME_LENGTH);
+
 
         // 检查文件名是否包含非法字符
         String invalidChars = "<>:\"/\\|?*";
         for (char c : invalidChars.toCharArray()) {
-            Asserts.failIf(fileName.indexOf(c) != -1,
-                    "File name contains invalid character: " + c);
+            Assert.isTrue(fileName.indexOf(c) == -1, "File name contains invalid character: " + c);
         }
     }
 
@@ -29,11 +29,11 @@ public class FileValidationUtil {
     public static void validatePath(String path) {
         // 检查路径深度
         String[] parts = path.split("/");
-        Asserts.failIf(parts.length > DocumentConstant.MAX_PATH_DEPTH,
+        Assert.isTrue(parts.length <= DocumentConstant.MAX_PATH_DEPTH,
                 "Path depth exceeds limit: " + DocumentConstant.MAX_PATH_DEPTH);
 
         // 检查路径是否包含非法字符
-        Asserts.failIf(!path.matches("^[a-zA-Z0-9/_-]+$"),
+        Assert.isTrue(path.matches("^[a-zA-Z0-9/_-]+$"),
                 "Path contains invalid characters");
     }
 
@@ -47,12 +47,12 @@ public class FileValidationUtil {
 
         // 检查文件类型
         String extension = FilenameUtils.getExtension(fileName).toLowerCase();
-        Asserts.failIf(!DocumentConstant.ALLOW_FILE_TYPE.contains(extension),
+        Assert.isTrue(DocumentConstant.ALLOW_FILE_TYPE.contains(extension),
                 "File type not allowed: " + extension);
 
         // 检查文件大小
         long maxSize = DocumentConstant.FILE_TYPE_SIZE_LIMIT.get(extension);
-        Asserts.failIf(file.getSize() > maxSize,
+        Assert.isTrue(file.getSize() <= maxSize,
                 "File size exceeds limit for type " + extension + ": " + maxSize + " bytes");
     }
 } 

@@ -1,6 +1,5 @@
 package com.qiu.cardflow.card.model.dto.card;
 
-import com.qiu.cardflow.document.model.dto.card.AnkiNoteAddRequest;
 import lombok.Builder;
 import lombok.Data;
 
