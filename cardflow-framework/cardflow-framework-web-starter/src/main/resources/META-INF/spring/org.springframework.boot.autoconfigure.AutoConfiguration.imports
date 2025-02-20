@@ -1,2 +1,1 @@
-com.qiu.cardflow.web.starter.context.WebConfig
-com.qiu.cardflow.web.starter.exception.GlobalExceptionHandler
+com.qiu.cardflow.api.exception.GlobalExceptionHandler

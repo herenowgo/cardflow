@@ -5,9 +5,7 @@ import com.qiu.cardflow.graph.dto.CardDTO;
 import com.qiu.cardflow.graph.dto.GraphDTO;
 import com.qiu.cardflow.graph.interfaces.IGraphRpc;
 import com.qiu.cardflow.graph.service.IGraphService;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import com.qiu.cardflow.rpc.starter.RPCContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -36,7 +34,7 @@ public class GraphRpcImpl implements IGraphRpc {
     }
 
     @Override
-    public GraphDTO getTagsGraph(@Valid @NotNull(message = "用户id不能为空!") @Min(value = 1, message = "用户id不能小于1") Long userId) throws BusinessException {
-        return IGraphService.getTagsGraph(userId);
+    public GraphDTO getTagsGraph() throws BusinessException {
+        return IGraphService.getTagsGraph(RPCContext.getUserId());
     }
 }

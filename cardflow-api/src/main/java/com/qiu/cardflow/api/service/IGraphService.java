@@ -22,5 +22,5 @@ public interface IGraphService {
     /**
      * 获取用户的知识标签图谱
      */
-    GraphDTO getTagsGraph(Long userId);
+    GraphDTO getTagsGraph();
 }

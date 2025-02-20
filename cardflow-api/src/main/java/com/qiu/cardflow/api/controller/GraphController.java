@@ -1,10 +1,10 @@
 package com.qiu.cardflow.api.controller;
 
+import com.qiu.cardflow.api.common.BaseResponse;
+import com.qiu.cardflow.api.context.UserContext;
 import com.qiu.cardflow.api.service.IGraphService;
-import com.qiu.cardflow.common.interfaces.api.BaseResponse;
 import com.qiu.cardflow.graph.dto.CardDTO;
 import com.qiu.cardflow.graph.dto.GraphDTO;
-import com.qiu.cardflow.web.starter.context.UserContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +48,7 @@ public class GraphController {
     @GetMapping("/tags")
     @Operation(summary = "获取用户的知识标签图谱")
     public BaseResponse<GraphDTO> getTagsGraph() {
-        GraphDTO graphDTO = graphService.getTagsGraph(UserContext.getUserId());
+        GraphDTO graphDTO = graphService.getTagsGraph();
         return BaseResponse.success(graphDTO);
     }
 }

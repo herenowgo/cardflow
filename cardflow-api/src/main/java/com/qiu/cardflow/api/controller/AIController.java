@@ -1,9 +1,9 @@
 package com.qiu.cardflow.api.controller;
 
 
+import com.qiu.cardflow.api.common.BaseResponse;
 import com.qiu.cardflow.api.service.IAIService;
 import com.qiu.cardflow.api.vo.ai.ChatRequest;
-import com.qiu.cardflow.common.interfaces.api.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;

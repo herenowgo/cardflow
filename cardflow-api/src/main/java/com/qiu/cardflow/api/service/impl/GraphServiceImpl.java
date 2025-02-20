@@ -46,7 +46,7 @@ public class GraphServiceImpl implements IGraphService {
     }
 
     @Override
-    public GraphDTO getTagsGraph(Long userId)  {
-        return graphRpc.getTagsGraph(userId);
+    public GraphDTO getTagsGraph() {
+        return graphRpc.getTagsGraph();
     }
 }

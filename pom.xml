@@ -28,6 +28,8 @@
         <module>cardflow-api</module>
         <module>cardflow-ai-provider</module>
         <module>cardflow-ai-interface</module>
+        <module>cardflow-card-provider</module>
+        <module>cardflow-card-interface</module>
     </modules>
 
 
