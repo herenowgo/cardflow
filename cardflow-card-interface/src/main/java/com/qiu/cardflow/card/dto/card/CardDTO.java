@@ -1,21 +1,14 @@
-package com.qiu.cardflow.card.model.entity;
+package com.qiu.cardflow.card.dto.card;
 
 import com.qiu.cardflow.card.dto.anki.AnkiInfo;
-import com.qiu.cardflow.card.dto.card.FSRSCard;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Document(collection = "cards")
-public class Card {
-    @Id
+public class CardDTO implements Serializable {
+
     private String id;          // MongoDB的_id
 
     private Long userId;        // 用户ID
@@ -32,12 +25,4 @@ public class Card {
 
     // FSRS 相关字段
     private FSRSCard fsrsCard;
-
-
-    // 工具方法：获取当前Unix时间戳（秒）
-    public static Long getCurrentUnixTime() {
-        return System.currentTimeMillis() / 1000;
-    }
-
 }
-

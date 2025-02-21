@@ -1,11 +1,10 @@
-package com.qiu.cardflow.card.interfaces;
+package com.qiu.cardflow.card.service;
 
 import com.qiu.cardflow.common.interfaces.exception.BusinessException;
-import com.qiu.cardflow.common.interfaces.exception.RPC;
 
 import java.util.List;
 
-public interface IGroupRPC extends RPC {
+public interface IGroupService {
 
     List<String> getUserGroups() throws BusinessException;
 

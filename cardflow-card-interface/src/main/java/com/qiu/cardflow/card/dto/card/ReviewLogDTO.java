@@ -1,23 +1,17 @@
-package com.qiu.cardflow.card.model.entity;
+package com.qiu.cardflow.card.dto.card;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "review_logs")
-public class ReviewLog {
-    @Id
-    private String id;
-
+public class ReviewLogDTO implements Serializable {
     private String cardId; // 关联的卡片ID
-    private Long userId;   // 用户ID
 
     private String rating; // 复习的评级（手动变更，重来，困难，良好，容易）
     private String state; // 复习的状态（新卡片、学习中、复习中、重新学习中）

@@ -22,7 +22,6 @@ import com.qiu.cardflow.document.util.FileValidationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -313,16 +312,6 @@ public class StudyResourceServiceImpl implements StudyResourceService {
     }
 
     @Override
-    public void checkStorageQuota(long fileSize) {
-        Long userId = UserContext.getUserId();
-        long usedSpace = studyResourceRepository.calculateUserStorageUsed(userId);
-        long quota = getUserQuota();
-
-        Asserts.failIf(usedSpace + fileSize > quota,
-                "Storage quota exceeded. Available: " + (quota - usedSpace) + " bytes");
-    }
-
-    @Override
     public long getUserQuota() {
         // 根据用户角色返回不同的配额
         return UserContext.isAdmin() ? DocumentConstant.VIP_USER_QUOTA : DocumentConstant.DEFAULT_USER_QUOTA;
@@ -339,25 +328,6 @@ public class StudyResourceServiceImpl implements StudyResourceService {
                 "Folder file count limit exceeded: " + DocumentConstant.MAX_FILES_PER_FOLDER);
     }
 
-    @Override
-    public List<StudyResource> getFilesByTimeRange(Date startTime, Date endTime) {
-        return studyResourceRepository.findByUserIdAndCreateTimeBetweenAndIsDeletedFalse(
-                UserContext.getUserId(), startTime, endTime);
-    }
-
-    @Override
-    public List<StudyResource> getRecentFiles(int limit) {
-        return studyResourceRepository.findByUserIdAndIsDeletedFalseOrderByUpdateTimeDesc(
-                UserContext.getUserId(), PageRequest.of(0, limit));
-    }
-
-    @Override
-    public List<StudyResource> getRecentlyDeletedFiles(int days) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_MONTH, -days);
-        return studyResourceRepository.findByUserIdAndIsDeletedTrueAndDeleteTimeGreaterThan(
-                UserContext.getUserId(), calendar.getTime());
-    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
