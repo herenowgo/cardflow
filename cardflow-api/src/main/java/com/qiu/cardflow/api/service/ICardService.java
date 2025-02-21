@@ -3,6 +3,7 @@ package com.qiu.cardflow.api.service;
 import com.qiu.cardflow.card.dto.anki.AnkiSyncResponse;
 import com.qiu.cardflow.card.dto.card.CardAddRequest;
 import com.qiu.cardflow.card.dto.card.CardDTO;
+import com.qiu.cardflow.card.dto.card.CardIdsRequest;
 import com.qiu.cardflow.card.dto.card.CardUpdateRequest;
 import com.qiu.cardflow.card.dto.card.ReviewLogDTO;
 import com.qiu.cardflow.common.interfaces.exception.BusinessException;

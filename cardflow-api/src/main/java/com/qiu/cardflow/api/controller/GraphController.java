@@ -6,7 +6,6 @@ import com.qiu.cardflow.api.service.IGraphService;
 import com.qiu.cardflow.graph.dto.CardDTO;
 import com.qiu.cardflow.graph.dto.GraphDTO;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/graph")
-@Tag(name = "知识图谱接口")
 @RequiredArgsConstructor
 @Slf4j
 @Validated

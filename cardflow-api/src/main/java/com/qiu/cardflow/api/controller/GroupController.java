@@ -2,7 +2,6 @@ package com.qiu.cardflow.api.controller;
 
 import com.qiu.cardflow.api.common.BaseResponse;
 import com.qiu.cardflow.api.service.IGroupService;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,10 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/groups")
+@RequestMapping("/api/groups")
 @Slf4j
 @RequiredArgsConstructor
-@Api(tags = "分组管理")
 public class GroupController {
 
     private final IGroupService groupService;
