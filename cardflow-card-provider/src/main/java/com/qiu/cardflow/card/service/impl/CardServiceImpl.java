@@ -22,6 +22,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,6 +38,13 @@ public class CardServiceImpl implements ICardService {
 
     // 更新卡片
     public Boolean updateCardContent(CardUpdateRequest cardUpdateRequest) {
+        Card card = parseCardRequestToCard(cardUpdateRequest);
+
+        cardRepository.save(card);
+        return true;
+    }
+
+    private Card parseCardRequestToCard(CardUpdateRequest cardUpdateRequest) {
         String id = cardUpdateRequest.getId();
         Card card = cardRepository.findByIdAndUserIdAndIsDeletedFalse(id, RPCContext.getUserId());
         Assert.notNull(card, "Card not found");
@@ -59,8 +68,14 @@ public class CardServiceImpl implements ICardService {
             // 只是系统中的卡片发生了更新
             card.setModifiedTime(com.qiu.cardflow.card.model.entity.Card.getCurrentUnixTime());
         }
+        return card;
+    }
 
-        cardRepository.save(card);
+    @Override
+    public Boolean updateCards(List<CardUpdateRequest> cardUpdateRequests) throws BusinessException {
+        cardRepository.saveAll(cardUpdateRequests.stream()
+                .map(this::parseCardRequestToCard)
+                .toList());
         return true;
     }
 
@@ -145,6 +160,7 @@ public class CardServiceImpl implements ICardService {
     public AnkiSyncResponse syncWithAnki(String group) {
         // 获取该分组下所有已经与Anki同步过的卡片
         List<Card> cards = cardRepository.findCardSyncInfoByUserIdAndGroup(RPCContext.getUserId(), group);
+        // todo 性能优化：只获取需要的字段
         List<AnkiSyncResponse.AnkiSyncedCard> ankiSyncedCards = cards.stream()
                 .map(card -> AnkiSyncResponse.AnkiSyncedCard.builder()
                         .id(card.getId())
@@ -159,7 +175,8 @@ public class CardServiceImpl implements ICardService {
                 .collect(Collectors.toList());
 
         // 获取该分组下未同步的卡片
-        List<Card> unsynchronizedCards = cardRepository.findUnsynchronizedCardsByUserIdAndGroup(RPCContext.getUserId(), group);
+        List<Card> unsynchronizedCards = cardRepository.findUnsynchronizedCardsByUserIdAndGroup(RPCContext.getUserId(),
+                group);
         List<AnkiNoteAddRequest> ankiNoteAddRequests = unsynchronizedCards.stream()
                 .map(card -> AnkiNoteAddRequest.builder()
                         .id(card.getId())
@@ -241,9 +258,14 @@ public class CardServiceImpl implements ICardService {
         return reviewLogRepository.findByCardId(cardId);
     }
 
+    // @Override
+    // public void saveReviewLog(ReviewLog reviewLog) throws BusinessException {
+    //     reviewLogRepository.save(reviewLog);
+    // }
+
     @Override
-    public void saveReviewLog(ReviewLog reviewLog) throws BusinessException {
-        reviewLogRepository.save(reviewLog);
+    public void saveReviewLogs(List<ReviewLog> reviewLogs) throws BusinessException {
+        reviewLogRepository.saveAll(reviewLogs);
     }
 
 }

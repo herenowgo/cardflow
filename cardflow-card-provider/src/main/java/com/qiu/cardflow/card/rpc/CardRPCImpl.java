@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @DubboService
 @Slf4j
@@ -43,6 +44,11 @@ public class CardRPCImpl implements ICardRPC {
     @Override
     public Boolean updateCardContent(CardUpdateRequest cardUpdateRequest) throws BusinessException {
         return cardService.updateCardContent(cardUpdateRequest);
+    }
+
+    @Override
+    public Boolean updateCards(List<CardUpdateRequest> cardUpdateRequests) throws BusinessException {
+        return cardService.updateCards(cardUpdateRequests);
     }
 
     @Override
@@ -104,12 +110,23 @@ public class CardRPCImpl implements ICardRPC {
         return BeanUtil.copyToList(reviewLogsByCardId, ReviewLogDTO.class);
     }
 
-    @Override
-    public void saveReviewLog(ReviewLogDTO reviewLogDTO) throws BusinessException {
-        ReviewLog reviewLog = BeanUtil.copyProperties(reviewLogDTO, ReviewLog.class);
-        reviewLog.setUserId(RPCContext.getUserId());
-        cardService.saveReviewLog(reviewLog);
-    }
+    // @Override
+    // public void saveReviewLog(ReviewLogDTO reviewLogDTO) throws BusinessException {
+    //     ReviewLog reviewLog = BeanUtil.copyProperties(reviewLogDTO, ReviewLog.class);
+    //     reviewLog.setUserId(RPCContext.getUserId());
+    //     cardService.saveReviewLog(reviewLog);
+    // }
 
+    @Override
+    public void saveReviewLogs(List<ReviewLogDTO> reviewLogDTOs) throws BusinessException {
+        List<ReviewLog> reviewLogs = reviewLogDTOs.stream()
+                .map(dto -> {
+                    ReviewLog reviewLog = BeanUtil.copyProperties(dto, ReviewLog.class);
+                    reviewLog.setUserId(RPCContext.getUserId());
+                    return reviewLog;
+                })
+                .collect(Collectors.toList());
+        cardService.saveReviewLogs(reviewLogs);
+    }
 
 }

@@ -44,6 +44,12 @@ public class CardController {
         return BaseResponse.success(cardService.updateCardContent(cardUpdateRequest));
     }
 
+    @PutMapping("/batch")
+    @Operation(summary = "批量更新卡片", description = "批量更新多个卡片的内容")
+    public BaseResponse<Boolean> updateCards(@RequestBody @Valid List<CardUpdateRequest> cardUpdateRequests) {
+        return BaseResponse.success(cardService.updateCards(cardUpdateRequests));
+    }
+
     /**
      * 为了与anki进行双向同步，返回必须的信息
      * 包括系统新增的卡片以及已经同步过的卡片的一些用来双向比较的信息
@@ -122,6 +128,13 @@ public class CardController {
     @PostMapping("/reviewLog")
     public BaseResponse<Void> saveReviewLog(@RequestBody @Valid ReviewLogDTO reviewLogDTO) {
         cardService.saveReviewLog(reviewLogDTO);
+        return BaseResponse.success(null);
+    }
+
+    @Operation(summary = "批量保存卡片的复习日志", description = "批量保存卡片的复习日志")
+    @PostMapping("/reviewLogs")
+    public BaseResponse<Void> saveReviewLogs(@RequestBody @Valid List<ReviewLogDTO> reviewLogDTOs) {
+        cardService.saveReviewLogs(reviewLogDTOs);
         return BaseResponse.success(null);
     }
 

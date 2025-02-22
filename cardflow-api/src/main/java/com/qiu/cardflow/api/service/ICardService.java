@@ -1,18 +1,16 @@
 package com.qiu.cardflow.api.service;
 
+import java.util.List;
+
 import com.qiu.cardflow.card.dto.anki.AnkiSyncResponse;
 import com.qiu.cardflow.card.dto.card.CardAddRequest;
 import com.qiu.cardflow.card.dto.card.CardDTO;
-import com.qiu.cardflow.card.dto.card.CardIdsRequest;
 import com.qiu.cardflow.card.dto.card.CardUpdateRequest;
 import com.qiu.cardflow.card.dto.card.ReviewLogDTO;
 import com.qiu.cardflow.common.interfaces.exception.BusinessException;
 import com.qiu.cardflow.common.interfaces.exception.PageResult;
 
-import java.util.List;
-
 public interface ICardService {
-
 
     Boolean createCard(CardAddRequest cardAddRequest) throws BusinessException;
 
@@ -38,4 +36,8 @@ public interface ICardService {
     List<ReviewLogDTO> getReviewLogsByCardId(String cardId) throws BusinessException;
 
     void saveReviewLog(ReviewLogDTO reviewLog) throws BusinessException;
+
+    void saveReviewLogs(List<ReviewLogDTO> reviewLogs) throws BusinessException;
+
+    Boolean updateCards(List<CardUpdateRequest> cardUpdateRequests) throws BusinessException;
 }

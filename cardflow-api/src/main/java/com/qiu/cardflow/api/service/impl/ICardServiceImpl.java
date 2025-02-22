@@ -70,14 +70,24 @@ public class ICardServiceImpl implements ICardService {
         return cardRPC.getCardsByAnkiCardIds(cardIds);
     }
 
-
     @Override
     public List<ReviewLogDTO> getReviewLogsByCardId(String cardId) throws BusinessException {
         return cardRPC.getReviewLogsByCardId(cardId);
     }
 
+    // @Override
+    // public void saveReviewLog(ReviewLogDTO reviewLog) throws BusinessException {
+    //     cardRPC.saveReviewLog(reviewLog);
+    // }
+
     @Override
-    public void saveReviewLog(ReviewLogDTO reviewLog) throws BusinessException {
-        cardRPC.saveReviewLog(reviewLog);
+    public void saveReviewLogs(List<ReviewLogDTO> reviewLogs) throws BusinessException {
+        cardRPC.saveReviewLogs(reviewLogs);
     }
+
+    @Override
+    public Boolean updateCards(List<CardUpdateRequest> cardUpdateRequests) throws BusinessException {
+        return cardRPC.updateCards(cardUpdateRequests);
+    }
+
 }

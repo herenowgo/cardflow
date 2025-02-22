@@ -1,6 +1,8 @@
 package com.qiu.cardflow.card.interfaces;
 
 
+import java.util.List;
+
 import com.qiu.cardflow.card.dto.anki.AnkiSyncResponse;
 import com.qiu.cardflow.card.dto.card.CardAddRequest;
 import com.qiu.cardflow.card.dto.card.CardDTO;
@@ -9,8 +11,6 @@ import com.qiu.cardflow.card.dto.card.ReviewLogDTO;
 import com.qiu.cardflow.common.interfaces.exception.BusinessException;
 import com.qiu.cardflow.common.interfaces.exception.PageResult;
 import com.qiu.cardflow.common.interfaces.exception.RPC;
-
-import java.util.List;
 
 public interface ICardRPC extends RPC {
 
@@ -36,5 +36,9 @@ public interface ICardRPC extends RPC {
 
     List<ReviewLogDTO> getReviewLogsByCardId(String cardId) throws BusinessException;
 
-    void saveReviewLog(ReviewLogDTO reviewLogDTO) throws BusinessException;
+    // void saveReviewLog(ReviewLogDTO reviewLogDTO) throws BusinessException;
+
+    void saveReviewLogs(List<ReviewLogDTO> reviewLogDTOs) throws BusinessException;
+
+    Boolean updateCards(List<CardUpdateRequest> cardUpdateRequests) throws BusinessException;
 }
