@@ -1,7 +1,7 @@
 package com.qiu.cardflow.graph.service.impl;
 
 import com.qiu.cardflow.graph.constants.NodeType;
-import com.qiu.cardflow.graph.dto.CardDTO;
+import com.qiu.cardflow.graph.dto.CardNodeDTO;
 import com.qiu.cardflow.graph.dto.EdgeDTO;
 import com.qiu.cardflow.graph.dto.GraphDTO;
 import com.qiu.cardflow.graph.dto.NodeDTO;
@@ -32,7 +32,7 @@ public class IGraphServiceImpl implements IGraphService {
     private final UserNodeRepository userNodeRepository;
 
     @Override
-    public boolean addCard(CardDTO cardDTO) {
+    public boolean addCard(CardNodeDTO cardDTO) {
         try {
             // 1. 创建或获取用户节点
             UserNode userNode = userNodeRepository.save(new UserNode(cardDTO.getUserId()));
@@ -69,7 +69,7 @@ public class IGraphServiceImpl implements IGraphService {
     }
 
     @Override
-    public boolean updateCard(CardDTO cardDTO) {
+    public boolean updateCard(CardNodeDTO cardDTO) {
         try {
             // 1. 更新卡片的标签关系
             cardNodeRepository.updateCardTags(cardDTO.getCardId(), cardDTO.getTags());

@@ -35,7 +35,7 @@ public interface ICardService {
     // ReviewLog related interfaces
     List<ReviewLogDTO> getReviewLogsByCardId(String cardId) throws BusinessException;
 
-    void saveReviewLog(ReviewLogDTO reviewLog) throws BusinessException;
+    // void saveReviewLog(ReviewLogDTO reviewLog) throws BusinessException;
 
     void saveReviewLogs(List<ReviewLogDTO> reviewLogs) throws BusinessException;
 

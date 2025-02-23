@@ -3,7 +3,7 @@ package com.qiu.cardflow.api.controller;
 import com.qiu.cardflow.api.common.BaseResponse;
 import com.qiu.cardflow.api.context.UserContext;
 import com.qiu.cardflow.api.service.IGraphService;
-import com.qiu.cardflow.graph.dto.CardDTO;
+import com.qiu.cardflow.graph.dto.CardNodeDTO;
 import com.qiu.cardflow.graph.dto.GraphDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class GraphController {
 
     @PostMapping("/card")
     @Operation(summary = "添加卡片到知识图谱")
-    public BaseResponse<Boolean> addCard(@RequestBody CardDTO cardDTO) {
+    public BaseResponse<Boolean> addCard(@RequestBody CardNodeDTO cardDTO) {
         cardDTO.setUserId(UserContext.getUserId());
         boolean result = graphService.addCard(cardDTO);
         return BaseResponse.success(result);
@@ -37,7 +37,7 @@ public class GraphController {
 
     @PutMapping("/card")
     @Operation(summary = "更新知识图谱中的卡片")
-    public BaseResponse<Boolean> updateCard(@RequestBody CardDTO cardDTO) {
+    public BaseResponse<Boolean> updateCard(@RequestBody CardNodeDTO cardDTO) {
         cardDTO.setUserId(UserContext.getUserId());
         boolean result = graphService.updateCard(cardDTO);
         return BaseResponse.success(result);

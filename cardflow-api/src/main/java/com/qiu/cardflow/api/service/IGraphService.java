@@ -1,13 +1,13 @@
 package com.qiu.cardflow.api.service;
 
-import com.qiu.cardflow.graph.dto.CardDTO;
+import com.qiu.cardflow.graph.dto.CardNodeDTO;
 import com.qiu.cardflow.graph.dto.GraphDTO;
 
 public interface IGraphService {
     /**
      * 添加卡片到知识图谱
      */
-    boolean addCard(CardDTO cardDTO);
+    boolean addCard(CardNodeDTO cardDTO);
 
     /**
      * 从知识图谱中删除卡片
@@ -17,7 +17,7 @@ public interface IGraphService {
     /**
      * 更新知识图谱中的卡片
      */
-    boolean updateCard(CardDTO cardDTO);
+    boolean updateCard(CardNodeDTO cardDTO);
 
     /**
      * 获取用户的知识标签图谱

@@ -124,12 +124,12 @@ public class CardController {
         return BaseResponse.success(cardService.getReviewLogsByCardId(cardId));
     }
 
-    @Operation(summary = "保存卡片的复习日志", description = "保存卡片的复习日志")
-    @PostMapping("/reviewLog")
-    public BaseResponse<Void> saveReviewLog(@RequestBody @Valid ReviewLogDTO reviewLogDTO) {
-        cardService.saveReviewLog(reviewLogDTO);
-        return BaseResponse.success(null);
-    }
+    // @Operation(summary = "保存卡片的复习日志", description = "保存卡片的复习日志")
+    // @PostMapping("/reviewLog")
+    // public BaseResponse<Void> saveReviewLog(@RequestBody @Valid ReviewLogDTO reviewLogDTO) {
+    //     cardService.saveReviewLog(reviewLogDTO);
+    //     return BaseResponse.success(null);
+    // }
 
     @Operation(summary = "批量保存卡片的复习日志", description = "批量保存卡片的复习日志")
     @PostMapping("/reviewLogs")

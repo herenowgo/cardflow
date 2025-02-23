@@ -1,7 +1,7 @@
 package com.qiu.cardflow.graph.rpc;
 
 import com.qiu.cardflow.common.interfaces.exception.BusinessException;
-import com.qiu.cardflow.graph.dto.CardDTO;
+import com.qiu.cardflow.graph.dto.CardNodeDTO;
 import com.qiu.cardflow.graph.dto.GraphDTO;
 import com.qiu.cardflow.graph.interfaces.IGraphRpc;
 import com.qiu.cardflow.graph.service.IGraphService;
@@ -19,7 +19,7 @@ public class GraphRpcImpl implements IGraphRpc {
     private final IGraphService IGraphService;
 
     @Override
-    public boolean addCard(CardDTO cardDTO) {
+    public boolean addCard(CardNodeDTO cardDTO) {
         return IGraphService.addCard(cardDTO);
     }
 
@@ -29,7 +29,7 @@ public class GraphRpcImpl implements IGraphRpc {
     }
 
     @Override
-    public boolean updateCard(CardDTO cardDTO) {
+    public boolean updateCard(CardNodeDTO cardDTO) {
         return IGraphService.updateCard(cardDTO);
     }
 

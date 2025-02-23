@@ -2,7 +2,7 @@ package com.qiu.cardflow.graph.interfaces;
 
 import com.qiu.cardflow.common.interfaces.exception.BusinessException;
 import com.qiu.cardflow.common.interfaces.exception.RPC;
-import com.qiu.cardflow.graph.dto.CardDTO;
+import com.qiu.cardflow.graph.dto.CardNodeDTO;
 import com.qiu.cardflow.graph.dto.GraphDTO;
 
 /**
@@ -15,7 +15,7 @@ public interface IGraphRpc extends RPC {
      *
      * @return
      */
-    boolean addCard(CardDTO cardDTO) throws BusinessException;
+    boolean addCard(CardNodeDTO cardDTO) throws BusinessException;
 
     /**
      * 删除抽认卡
@@ -30,7 +30,7 @@ public interface IGraphRpc extends RPC {
      *
      * @return
      */
-    boolean updateCard(CardDTO cardDTO) throws BusinessException;
+    boolean updateCard(CardNodeDTO cardDTO) throws BusinessException;
 
     /**
      * 获取用户的知识图谱

@@ -1,7 +1,7 @@
 package com.qiu.cardflow.api.service.impl;
 
 import com.qiu.cardflow.api.service.IGraphService;
-import com.qiu.cardflow.graph.dto.CardDTO;
+import com.qiu.cardflow.graph.dto.CardNodeDTO;
 import com.qiu.cardflow.graph.dto.GraphDTO;
 import com.qiu.cardflow.graph.interfaces.IGraphRpc;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,7 @@ public class GraphServiceImpl implements IGraphService {
     private IGraphRpc graphRpc;
 
     @Override
-    public boolean addCard(CardDTO cardDTO) {
+    public boolean addCard(CardNodeDTO cardDTO) {
         try {
             return graphRpc.addCard(cardDTO);
         } catch (Exception e) {
@@ -36,7 +36,7 @@ public class GraphServiceImpl implements IGraphService {
     }
 
     @Override
-    public boolean updateCard(CardDTO cardDTO) {
+    public boolean updateCard(CardNodeDTO cardDTO) {
         try {
             return graphRpc.updateCard(cardDTO);
         } catch (Exception e) {
