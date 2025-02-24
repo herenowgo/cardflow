@@ -23,7 +23,6 @@ public class GraphController {
     @PostMapping("/card")
     @Operation(summary = "添加卡片到知识图谱")
     public BaseResponse<Boolean> addCard(@RequestBody CardNodeDTO cardDTO) {
-        cardDTO.setUserId(UserContext.getUserId());
         boolean result = graphService.addCard(cardDTO);
         return BaseResponse.success(result);
     }
@@ -38,7 +37,6 @@ public class GraphController {
     @PutMapping("/card")
     @Operation(summary = "更新知识图谱中的卡片")
     public BaseResponse<Boolean> updateCard(@RequestBody CardNodeDTO cardDTO) {
-        cardDTO.setUserId(UserContext.getUserId());
         boolean result = graphService.updateCard(cardDTO);
         return BaseResponse.success(result);
     }

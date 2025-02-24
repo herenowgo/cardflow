@@ -1,5 +1,6 @@
 package com.qiu.cardflow.graph.service.impl;
 
+import com.qiu.cardflow.common.interfaces.exception.BusinessException;
 import com.qiu.cardflow.graph.constants.NodeType;
 import com.qiu.cardflow.graph.dto.CardNodeDTO;
 import com.qiu.cardflow.graph.dto.EdgeDTO;
@@ -12,6 +13,8 @@ import com.qiu.cardflow.graph.repository.CardNodeRepository;
 import com.qiu.cardflow.graph.repository.TagNodeRepository;
 import com.qiu.cardflow.graph.repository.UserNodeRepository;
 import com.qiu.cardflow.graph.service.IGraphService;
+import com.qiu.cardflow.rpc.starter.RPCContext;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,38 +36,33 @@ public class IGraphServiceImpl implements IGraphService {
 
     @Override
     public boolean addCard(CardNodeDTO cardDTO) {
-        try {
-            // 1. 创建或获取用户节点
-            UserNode userNode = userNodeRepository.save(new UserNode(cardDTO.getUserId()));
-            // 2. 创建卡片节点
-            CardNode cardNode = new CardNode();
-            cardNode.setCardId(cardDTO.getCardId());
-            cardNode.setUserNode(userNode);
 
-            // 3. 创建或获取标签节点
-            List<TagNode> tagNodeList = cardDTO.getTags().stream()
-                    .map(TagNode::new)
-                    .toList();
-            cardNode.setTagNodeList(tagNodeList);
+        UserNode userNode = new UserNode(RPCContext.getUserId());
+        List<TagNode> tagNodeList = cardDTO.getTags().stream()
+                .map(TagNode::new)
+                .toList();
 
-            // 4. 保存卡片节点及其关系
-            cardNodeRepository.save(cardNode);
-            return true;
-        } catch (Exception e) {
-            log.error("添加卡片失败", e);
-            return false;
-        }
+        CardNode cardNode = CardNode.builder()
+                .userNode(userNode)
+                .cardId(cardDTO.getCardId())
+                .tagNodeList(tagNodeList)
+                .build();
+
+        // 4. 保存卡片节点及其关系
+        cardNodeRepository.save(cardNode);
+        return true;
+
     }
 
     @Override
     public boolean removeCard(String cardId) {
         try {
             // 使用新的删除方法，同时删除节点和关系
-            cardNodeRepository.deleteCardWithRelationships(cardId);
+            cardNodeRepository.deleteCardWithRelationships(cardId, RPCContext.getUserId());
             return true;
         } catch (Exception e) {
             log.error("删除卡片及其关系失败，cardId: {}", cardId, e);
-            return false;
+            throw new BusinessException("删除卡片失败");
         }
     }
 
@@ -72,11 +70,11 @@ public class IGraphServiceImpl implements IGraphService {
     public boolean updateCard(CardNodeDTO cardDTO) {
         try {
             // 1. 更新卡片的标签关系
-            cardNodeRepository.updateCardTags(cardDTO.getCardId(), cardDTO.getTags());
+            cardNodeRepository.updateCardTags(cardDTO.getCardId(), RPCContext.getUserId(), cardDTO.getTags());
             return true;
         } catch (Exception e) {
             log.error("更新卡片失败，cardId: {}", cardDTO.getCardId(), e);
-            return false;
+            throw new BusinessException("更新卡片失败");
         }
     }
 
@@ -115,7 +113,7 @@ public class IGraphServiceImpl implements IGraphService {
             edge.setSource(tagNameToId.get(coOccurrence.getSourceTag()));
             edge.setTarget(tagNameToId.get(coOccurrence.getTargetTag()));
             edge.setWeight(coOccurrence.getWeight().intValue());
-//            edge.setName("相关"); // 边的类型名称
+            // edge.setName("相关"); // 边的类型名称
 
             edges.add(edge);
         }
@@ -124,4 +122,4 @@ public class IGraphServiceImpl implements IGraphService {
         graphDTO.setEdges(edges);
         return graphDTO;
     }
-} 
+}

@@ -19,10 +19,24 @@ public interface CardNodeRepository extends ListCrudRepository<CardNode, String>
 
        /**
         * 删除卡片节点及其关联关系
+        * 如果还有其他用户连接到这个卡片，则只删除当前用户与卡片的关系
         */
-       @Query("MATCH (c:Card {cardId: $cardId}) " +
-                     "DETACH DELETE c")
-       void deleteCardWithRelationships(String cardId);
+       @Query("MATCH (u:User {userId: $userId})-[r:CREATED]->(c:Card {cardId: $cardId}) " +
+              "WITH c, r " +
+              "OPTIONAL MATCH (c)<-[:CREATED]-(otherUser:User) " +
+              "WITH c, r, count(otherUser) as userCount " +
+              "WHERE userCount = 1 " +
+              "OPTIONAL MATCH (c)-[t:HAS_TAG]->(:Tag) " +
+              // "DELETE t, c, r " +
+              "DETACH DELETE c " +
+              "UNION " +
+              "MATCH (u:User {userId: $userId})-[r:CREATED]->(c:Card {cardId: $cardId}) " +
+              "WITH c, r " +
+              "OPTIONAL MATCH (c)<-[:CREATED]-(otherUser:User) " +
+              "WITH c, r, count(otherUser) as userCount " +
+              "WHERE userCount > 1 " +
+              "DELETE r")
+       void deleteCardWithRelationships(String cardId, Long userId);
 
        /**
         * 更新卡片的标签关系
@@ -30,14 +44,15 @@ public interface CardNodeRepository extends ListCrudRepository<CardNode, String>
         * 2. 删除旧的标签关系
         * 3. 创建新的标签关系
         */
-       @Query("MATCH (c:Card {cardId: $cardId}) " +
+       @Query("MATCH (u:User {userId: $userId})-[:CREATED]->(c:Card {cardId: $cardId}) " +
+                     "WHERE c IS NOT NULL " +
                      "OPTIONAL MATCH (c)-[r:HAS_TAG]->(:Tag) " +
                      "DELETE r " +
                      "WITH c " +
                      "UNWIND $tagNames as tagName " +
                      "MERGE (t:Tag {name: tagName}) " +
                      "MERGE (c)-[:HAS_TAG]->(t)")
-       void updateCardTags(String cardId, List<String> tagNames);
+       void updateCardTags(String cardId, Long userId, List<String> tagNames);
 
        /**
         * 获取用户所有标签及其权重

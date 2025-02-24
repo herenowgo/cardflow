@@ -17,32 +17,19 @@ public class GraphServiceImpl implements IGraphService {
 
     @Override
     public boolean addCard(CardNodeDTO cardDTO) {
-        try {
-            return graphRpc.addCard(cardDTO);
-        } catch (Exception e) {
-            log.error("添加卡片到知识图谱失败", e);
-            return false;
-        }
+        return graphRpc.addCard(cardDTO);
     }
 
     @Override
     public boolean deleteCard(String cardId) {
-        try {
-            return graphRpc.deleteCard(cardId);
-        } catch (Exception e) {
-            log.error("从知识图谱删除卡片失败", e);
-            return false;
-        }
+        return graphRpc.deleteCard(cardId);
     }
 
     @Override
     public boolean updateCard(CardNodeDTO cardDTO) {
-        try {
-            return graphRpc.updateCard(cardDTO);
-        } catch (Exception e) {
-            log.error("更新知识图谱中的卡片失败", e);
-            return false;
-        }
+
+        return graphRpc.updateCard(cardDTO);
+
     }
 
     @Override
