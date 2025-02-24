@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.qiu.cardflow</groupId>
@@ -37,7 +37,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.2.2</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath /> <!-- lookup parent from repository -->
     </parent>
 
 
@@ -73,11 +73,11 @@
 
     <dependencies>
         <!--        https://doc.xiaominfo.com/knife4j/documentation/get_start.html-->
-        <!-- <dependency>
+        <dependency>
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>knife4j-spring-boot-starter</artifactId>
             <version>3.0.3</version>
-        </dependency> -->
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -103,21 +103,23 @@
         </dependency>
 
         <!--        &lt;!&ndash; 读取bootstrap文件 &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.cloud</groupId>-->
-<!--            <artifactId>spring-cloud-starter-bootstrap</artifactId>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>com.alibaba.cloud</groupId>-->
-<!--            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework.cloud</groupId>-->
+        <!--            <artifactId>spring-cloud-starter-bootstrap</artifactId>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.alibaba.cloud</groupId>-->
+        <!--            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>-->
+        <!--        </dependency>-->
+
     </dependencies>
 
 
     <dependencyManagement>
 
         <dependencies>
-            <!--Spring Cloud 相关依赖-->
+            <!--Spring
+            Cloud 相关依赖-->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
@@ -125,7 +127,8 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <!--Spring Cloud Alibaba 相关依赖-->
+            <!--Spring
+            Cloud Alibaba 相关依赖-->
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-alibaba-dependencies</artifactId>
@@ -140,7 +143,8 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <!--MyBatis Plus的Starter依赖-->
+            <!--MyBatis
+            Plus的Starter依赖-->
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
@@ -152,13 +156,15 @@
                 <artifactId>druid-spring-boot-starter</artifactId>
                 <version>${druid.version}</version>
             </dependency>
-            <!--Hutool Java工具包-->
+            <!--Hutool
+            Java工具包-->
             <dependency>
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
                 <version>${hutool.version}</version>
             </dependency>
-            <!--Knife4j API文档生产工具-->
+            <!--Knife4j
+            API文档生产工具-->
             <dependency>
                 <groupId>com.github.xiaoymin</groupId>
                 <artifactId>knife4j-gateway-spring-boot-starter</artifactId>
@@ -193,25 +199,29 @@
                 <artifactId>logstash-logback-encoder</artifactId>
                 <version>${logstash-logback.version}</version>
             </dependency>
-            <!--集成SpringBoot Admin监控-->
+            <!--集成SpringBoot
+            Admin监控-->
             <dependency>
                 <groupId>de.codecentric</groupId>
                 <artifactId>spring-boot-admin-starter-server</artifactId>
                 <version>${spring-boot-admin.version}</version>
             </dependency>
-            <!--集成SpringBoot Admin监控客户端-->
+            <!--集成SpringBoot
+            Admin监控客户端-->
             <dependency>
                 <groupId>de.codecentric</groupId>
                 <artifactId>spring-boot-admin-starter-client</artifactId>
                 <version>${spring-boot-admin.version}</version>
             </dependency>
-            <!--MinIO JAVA SDK-->
+            <!--MinIO
+            JAVA SDK-->
             <dependency>
                 <groupId>io.minio</groupId>
                 <artifactId>minio</artifactId>
                 <version>${minio.version}</version>
             </dependency>
-            <!--支付宝支付Java SDK-->
+            <!--支付宝支付Java
+            SDK-->
             <dependency>
                 <groupId>com.alipay.sdk</groupId>
                 <artifactId>alipay-sdk-java</artifactId>
@@ -288,7 +298,8 @@
                                         <descriptorRef>artifact</descriptorRef>
                                     </assembly>
                                     <!--定义容器启动命令-->
-                                    <entryPoint>["java",
+                                    <entryPoint>
+                                        ["java",
                                         "-jar","-Dspring.profiles.active=prod","/${project.build.finalName}.jar"]
                                     </entryPoint>
                                     <!--定义维护者-->
@@ -301,7 +312,8 @@
             </plugins>
         </pluginManagement>
         <plugins>
-            <!--解决SpringBoot 3.2 Parameter Name Retention 问题-->
+            <!--解决SpringBoot
+            3.2 Parameter Name Retention 问题-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

@@ -4,8 +4,12 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 与 anki 进行同步
@@ -34,7 +38,6 @@ public class AnkiSyncResponse implements Serializable {
     // 没有cardID的卡片
     List<AnkiNoteAddRequest> ankiNoteAddRequests;
 
-
     @Data
     @Builder
     public static class AnkiSyncedCard implements Serializable {
@@ -42,5 +45,7 @@ public class AnkiSyncResponse implements Serializable {
         Long cardId;
         Long syncTime;
         Long modifiedTime;
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        Date due;
     }
 }

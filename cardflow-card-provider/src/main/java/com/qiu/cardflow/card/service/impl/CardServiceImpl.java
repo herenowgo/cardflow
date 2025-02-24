@@ -46,7 +46,16 @@ public class CardServiceImpl implements ICardService {
 
     private Card parseCardRequestToCard(CardUpdateRequest cardUpdateRequest) {
         String id = cardUpdateRequest.getId();
+        
+        if (id == null) {
+            Card card = new Card();
+            card.setUserId(RPCContext.getUserId());
+            BeanUtil.copyProperties(cardUpdateRequest, card);
+            return card;
+        }
         Card card = cardRepository.findByIdAndUserIdAndIsDeletedFalse(id, RPCContext.getUserId());
+        card.setUserId(RPCContext.getUserId());
+
         Assert.notNull(card, "Card not found");
 
         CopyOptions copyOptions = CopyOptions.create()
@@ -167,6 +176,7 @@ public class CardServiceImpl implements ICardService {
                         .cardId(card.getAnkiInfo().getCardId())
                         .syncTime(card.getAnkiInfo().getSyncTime())
                         .modifiedTime(card.getModifiedTime())
+                        .due(card.getFsrsCard() != null ? card.getFsrsCard().getDue() : null)  // 设置 due 字段
                         .build())
                 .collect(Collectors.toList());
 
@@ -260,7 +270,7 @@ public class CardServiceImpl implements ICardService {
 
     // @Override
     // public void saveReviewLog(ReviewLog reviewLog) throws BusinessException {
-    //     reviewLogRepository.save(reviewLog);
+    // reviewLogRepository.save(reviewLog);
     // }
 
     @Override
