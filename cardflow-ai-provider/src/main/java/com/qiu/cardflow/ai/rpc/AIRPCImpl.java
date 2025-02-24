@@ -8,6 +8,9 @@ import com.qiu.cardflow.ai.util.ContentCleaner;
 import com.qiu.cardflow.common.interfaces.exception.BusinessException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Set;
+
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
@@ -30,5 +33,10 @@ public class AIRPCImpl implements IAIRPC {
     public String structuredOutput(@Valid StructuredOutputRequestDTO structuredOutputRequestDTO) throws BusinessException {
         structuredOutputRequestDTO.setUserPrompt(ContentCleaner.cleanHtmlContent(structuredOutputRequestDTO.getUserPrompt()));
         return aiService.structuredOutput(structuredOutputRequestDTO);
+    }
+
+    @Override
+    public Set<String> getAvailableModels() throws BusinessException {
+        return aiService.getAvailableModels();
     }
 }

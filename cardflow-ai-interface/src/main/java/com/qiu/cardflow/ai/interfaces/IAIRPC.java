@@ -1,5 +1,7 @@
 package com.qiu.cardflow.ai.interfaces;
 
+import java.util.Set;
+
 import com.qiu.cardflow.ai.dto.ChatRequestDTO;
 import com.qiu.cardflow.ai.dto.StructuredOutputRequestDTO;
 import com.qiu.cardflow.common.interfaces.exception.BusinessException;
@@ -10,4 +12,6 @@ public interface IAIRPC extends RPC {
     String chat(@Valid ChatRequestDTO chatRequestDTO) throws BusinessException;
 
     String structuredOutput(@Valid StructuredOutputRequestDTO structuredOutputRequestDTO) throws BusinessException;
+
+    Set<String> getAvailableModels() throws BusinessException;
 }

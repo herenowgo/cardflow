@@ -23,6 +23,7 @@ import reactor.core.publisher.Flux;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -179,5 +180,11 @@ public class AIServiceImpl implements IAIService {
                 .sequence(-1)
                 .build();
         streamBridge.send("eventMessage-out-0", eventMessage);
+    }
+
+
+    @Override
+    public Set<String> getAvailableModels() {
+        return AIModelFactory.aIModelMap.keySet();
     }
 }

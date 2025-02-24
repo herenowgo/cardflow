@@ -9,10 +9,13 @@ import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -53,6 +56,12 @@ public class AIController {
     public BaseResponse<String> chat(
             @Parameter(description = "AI对话请求参数", required = true) @RequestBody @Valid ChatRequest chatRequest) {
         return BaseResponse.success(aiService.chat(chatRequest));
+    }
+
+    @Operation(summary = "获取可用AI模型列表", description = "获取系统当前支持的所有AI模型列表")
+    @GetMapping("/models")
+    public BaseResponse<Set<String>> getAvailableModels() {
+        return BaseResponse.success(aiService.getAvailableModels());
     }
 
 }

@@ -21,7 +21,7 @@ public class AIModelFactory {
 
     private final AISupplierFactory aiSupplierFactory;
 
-    private Map<String, AIModel> aIModelMap = new HashMap<>();
+    public static Map<String, AIModel> aIModelMap = new HashMap<>();
 
     @PostConstruct
     private void init() {

@@ -12,6 +12,8 @@ import com.qiu.codeflow.eventStream.dto.EventType;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 @Service
 public class AIServiceImpl implements IAIService {
 
@@ -44,5 +46,9 @@ public class AIServiceImpl implements IAIService {
         return aiRpc.structuredOutput(structuredOutputRequestDTO);
     }
 
+    @Override
+    public Set<String> getAvailableModels() {
+        return aiRpc.getAvailableModels();
+    }
 
 }
