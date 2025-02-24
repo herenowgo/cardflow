@@ -69,7 +69,6 @@ public class IGraphServiceImpl implements IGraphService {
     @Override
     public boolean updateCard(CardNodeDTO cardDTO) {
         try {
-            // 1. 更新卡片的标签关系
             cardNodeRepository.updateCardTags(cardDTO.getCardId(), RPCContext.getUserId(), cardDTO.getTags());
             return true;
         } catch (Exception e) {
@@ -89,6 +88,7 @@ public class IGraphServiceImpl implements IGraphService {
 
         // 使用Map保存标签名到节点ID的映射，方便后续创建边
         Map<String, Long> tagNameToId = new HashMap<>();
+        Map<String, Integer> tagNameToWeight = new HashMap<>();
         long nodeId = 0;
 
         // 创建节点
@@ -101,19 +101,30 @@ public class IGraphServiceImpl implements IGraphService {
 
             nodes.add(node);
             tagNameToId.put(tagWeight.getTagName(), nodeId);
+            tagNameToWeight.put(tagWeight.getTagName(), tagWeight.getWeight());
             nodeId++;
         }
 
         // 2. 获取标签之间的共现关系
         List<CardNodeRepository.TagCoOccurrenceResult> coOccurrences = cardNodeRepository.findTagCoOccurrences(userId);
 
-        // 创建边
+        // 创建边，确保权重大的节点作为source
         for (CardNodeRepository.TagCoOccurrenceResult coOccurrence : coOccurrences) {
             EdgeDTO edge = new EdgeDTO();
-            edge.setSource(tagNameToId.get(coOccurrence.getSourceTag()));
-            edge.setTarget(tagNameToId.get(coOccurrence.getTargetTag()));
+            String sourceTag = coOccurrence.getSourceTag();
+            String targetTag = coOccurrence.getTargetTag();
+
+            // 比较权重，调整source和target
+            if (tagNameToWeight.get(sourceTag) < tagNameToWeight.get(targetTag)) {
+                // 交换source和target
+                String temp = sourceTag;
+                sourceTag = targetTag;
+                targetTag = temp;
+            }
+
+            edge.setSource(tagNameToId.get(sourceTag));
+            edge.setTarget(tagNameToId.get(targetTag));
             edge.setWeight(coOccurrence.getWeight().intValue());
-            // edge.setName("相关"); // 边的类型名称
 
             edges.add(edge);
         }

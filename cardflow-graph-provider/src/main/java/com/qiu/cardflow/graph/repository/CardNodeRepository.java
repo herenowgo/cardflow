@@ -76,7 +76,7 @@ public interface CardNodeRepository extends ListCrudRepository<CardNode, String>
        class TagWeightResult {
               String tagName;
 
-              Long weight;
+              Integer weight;
 
        }
 
