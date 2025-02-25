@@ -20,7 +20,6 @@ public class AIServiceImpl implements IAIService {
     @DubboReference
     private IAIRPC aiRpc;
 
-
     @Override
     public String chat(ChatRequest chatRequest) {
         ChatRequestDTO chatRequestDTO = ChatRequestDTO.builder()
@@ -28,7 +27,6 @@ public class AIServiceImpl implements IAIService {
                 .maxMills(400)
                 .chatHistoryWindowSize(5)
                 .eventType(EventType.ANSWER)
-                .userId(UserContext.getUserId().toString())
                 .build();
         BeanUtil.copyProperties(chatRequest, chatRequestDTO);
         return aiRpc.chat(chatRequestDTO);

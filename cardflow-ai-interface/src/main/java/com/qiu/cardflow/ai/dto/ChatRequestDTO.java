@@ -24,9 +24,6 @@ public class ChatRequestDTO implements Serializable {
     @NotEmpty(message = "模型不能为空")
     private String model;
 
-    @NotEmpty(message = "用户id不能为空")
-    private String userId;
-
     private String conversationId;
 
     @Min(value = 1, message = "对话记忆窗口大小不能小于1")

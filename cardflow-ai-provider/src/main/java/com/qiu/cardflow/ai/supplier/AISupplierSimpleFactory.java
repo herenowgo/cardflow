@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class AISupplierFactory {
+public class AISupplierSimpleFactory {
 
     private final AISupplierFactoryOfOpenAI aisupplierFactoryOfOpenAI;
 

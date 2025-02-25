@@ -32,5 +32,6 @@ public class AISupplierProperties {
     public static class ModelConfig {
         private String modelNameInSupplier; // 供应商内部模型名称
         private String standardModelName; // 对外暴露的统一模型名称
+        private Integer initialQuota; // 模型实例初始免费配额
     }
 }

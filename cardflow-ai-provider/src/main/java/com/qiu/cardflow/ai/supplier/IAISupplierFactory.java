@@ -28,6 +28,7 @@ public interface IAISupplierFactory {
                             .modelNameInSupplier(model.getModelNameInSupplier())
                             .standardModelName(model.getStandardModelName())
                             .chatClient(chatClient)
+                            .initialQuota(model.getInitialQuota() != null ? model.getInitialQuota() : 0)
                             .build();
                 })
                 .toList();

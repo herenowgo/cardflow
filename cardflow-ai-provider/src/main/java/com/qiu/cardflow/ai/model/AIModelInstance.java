@@ -13,4 +13,7 @@ public class AIModelInstance {
     private String standardModelName;
     // 聊天客户端
     private ChatClient chatClient;
+
+    // 模型实例的初始免费配额
+    private Integer initialQuota = 0;
 }
