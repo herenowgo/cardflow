@@ -24,7 +24,7 @@ public class FSRSCard implements Serializable {
      * 卡片下次复习的日期
      */
     @Schema(description = "卡片下次复习的日期")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     private Date due;
 
     /**
@@ -76,6 +76,6 @@ public class FSRSCard implements Serializable {
      * 最近一次复习的日期
      */
     @Schema(description = "最近一次复习的日期")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     private Date last_review;
 }

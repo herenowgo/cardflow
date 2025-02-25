@@ -138,6 +138,12 @@ public class CardController {
         return BaseResponse.success(null);
     }
 
+    @Operation(summary = "获取已到期的卡片", description = "获取当前用户所有已到期需要复习的卡片")
+    @GetMapping("/expired")
+    public BaseResponse<List<CardDTO>> getExpiredCards() {
+        return BaseResponse.success(cardService.getExpiredCards());
+    }
+
     // /**
     // * 检查一组Anki卡片ID是否存在
     // *

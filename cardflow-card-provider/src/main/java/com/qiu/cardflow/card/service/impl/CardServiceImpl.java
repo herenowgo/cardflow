@@ -23,7 +23,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,7 +49,7 @@ public class CardServiceImpl implements ICardService {
 
     private Card parseCardRequestToCard(CardUpdateRequest cardUpdateRequest) {
         String id = cardUpdateRequest.getId();
-        
+
         if (id == null) {
             Card card = new Card();
             card.setUserId(RPCContext.getUserId());
@@ -176,7 +179,7 @@ public class CardServiceImpl implements ICardService {
                         .cardId(card.getAnkiInfo().getCardId())
                         .syncTime(card.getAnkiInfo().getSyncTime())
                         .modifiedTime(card.getModifiedTime())
-                        .due(card.getFsrsCard() != null ? card.getFsrsCard().getDue() : null)  // 设置 due 字段
+                        .due(card.getFsrsCard() != null ? card.getFsrsCard().getDue() : null) // 设置 due 字段
                         .build())
                 .collect(Collectors.toList());
 
@@ -278,4 +281,9 @@ public class CardServiceImpl implements ICardService {
         reviewLogRepository.saveAll(reviewLogs);
     }
 
+    @Override
+    public List<Card> getExpiredCards() throws BusinessException {
+        Date now = new Date();
+        return cardRepository.findOverdueCardsByUserIdAndDate(RPCContext.getUserId(), now);
+    }
 }

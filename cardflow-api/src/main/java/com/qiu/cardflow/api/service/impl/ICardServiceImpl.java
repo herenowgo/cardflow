@@ -90,5 +90,9 @@ public class ICardServiceImpl implements ICardService {
         return cardRPC.updateCards(cardUpdateRequests);
     }
 
+    @Override
+    public List<CardDTO> getExpiredCards() throws BusinessException {
+        return cardRPC.getExpiredCards();
+    }
 
 }

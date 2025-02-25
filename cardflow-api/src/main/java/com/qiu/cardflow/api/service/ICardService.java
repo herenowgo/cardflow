@@ -40,4 +40,9 @@ public interface ICardService {
     void saveReviewLogs(List<ReviewLogDTO> reviewLogs) throws BusinessException;
 
     Boolean updateCards(List<CardUpdateRequest> cardUpdateRequests) throws BusinessException;
+    
+    /**
+     * 获取所有到期的卡片
+     */
+    List<CardDTO> getExpiredCards() throws BusinessException;
 }

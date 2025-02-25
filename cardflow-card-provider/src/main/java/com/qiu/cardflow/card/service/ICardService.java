@@ -39,4 +39,9 @@ public interface ICardService {
     List<ReviewLog> getReviewLogsByCardId(String cardId) throws BusinessException;
 
     void saveReviewLogs(List<ReviewLog> reviewLogs) throws BusinessException;
+
+    /**
+     * 获取所有到期的卡片
+     */
+    List<Card> getExpiredCards() throws BusinessException;
 }

@@ -129,4 +129,10 @@ public class CardRPCImpl implements ICardRPC {
         cardService.saveReviewLogs(reviewLogs);
     }
 
+    @Override
+    public List<CardDTO> getExpiredCards() throws BusinessException {
+        List<Card> expiredCards = cardService.getExpiredCards();
+        return BeanUtil.copyToList(expiredCards, CardDTO.class);
+    }
+
 }

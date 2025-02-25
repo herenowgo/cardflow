@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
+import java.util.Date;
 import java.util.List;
 
 public interface CardRepository extends MongoRepository<Card, String> {
@@ -68,5 +69,15 @@ public interface CardRepository extends MongoRepository<Card, String> {
      */
     @Query(value = "{ 'ankiInfo.cardId': { $in: ?0 }, 'isDeleted': false }")
     List<Card> findByAnkiInfoCardIdIn(List<Long> cardIds);
+
+        /**
+     * 获取指定用户在指定时间之前到期的卡片
+     * 
+     * @param userId 用户ID
+     * @param date   指定的时间
+     * @return 在指定时间之前到期的卡片列表
+     */
+    @Query(value = "{ 'userId': ?0, 'isDeleted': false, 'fsrsCard.due': { $lt: ?1 }}")
+    List<Card> findOverdueCardsByUserIdAndDate(Long userId, Date date);
 
 }
