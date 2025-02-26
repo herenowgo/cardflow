@@ -32,14 +32,14 @@ public class FSRSCard implements Serializable {
      * 表示记忆的牢固程度
      */
     @Schema(description = "记忆稳定性")
-    private Float stability;
+    private Double stability;
 
     /**
      * 卡片难度
      * 表示卡片的难易程度
      */
     @Schema(description = "卡片难度")
-    private Float difficulty;
+    private Double difficulty;
 
     /**
      * 自上次复习以来的天数
