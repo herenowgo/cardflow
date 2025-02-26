@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -215,6 +216,6 @@ public class AIServiceImpl implements IAIService {
 
     @Override
     public Set<String> getAvailableModels() {
-        return AIModelFactory.getAIModelNames();
+        return AIModelFactory.getAIModelNames().stream().sorted().collect(Collectors.toSet());
     }
 }

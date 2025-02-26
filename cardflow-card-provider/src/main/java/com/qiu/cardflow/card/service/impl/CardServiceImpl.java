@@ -85,6 +85,19 @@ public class CardServiceImpl implements ICardService {
 
     @Override
     public Boolean updateCards(List<CardUpdateRequest> cardUpdateRequests) throws BusinessException {
+        List<String> groupList = cardUpdateRequests.stream()
+                .map(card -> card.getGroup())
+                .filter(group -> group != null)
+                .distinct()
+                .toList();
+        // 检查牌组是否存在，不存在则创建
+        List<String> userGroups = groupServiceImpl.getUserGroups();
+        for (String group : groupList) {
+            if (!userGroups.contains(group)) {
+                groupServiceImpl.addGroup(group);
+            }
+        }
+
         cardRepository.saveAll(cardUpdateRequests.stream()
                 .map(this::parseCardRequestToCard)
                 .toList());

@@ -23,8 +23,8 @@ public class AIServiceImpl implements IAIService {
     @Override
     public String chat(ChatRequest chatRequest) {
         ChatRequestDTO chatRequestDTO = ChatRequestDTO.builder()
-                .maxSize(8)
-                .maxMills(400)
+                .maxSize(6)
+                .maxMills(300)
                 .chatHistoryWindowSize(5)
                 .eventType(EventType.ANSWER)
                 .build();
