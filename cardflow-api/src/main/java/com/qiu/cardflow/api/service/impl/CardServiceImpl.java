@@ -1,5 +1,10 @@
 package com.qiu.cardflow.api.service.impl;
 
+import java.util.List;
+
+import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.stereotype.Service;
+
 import com.qiu.cardflow.api.service.ICardService;
 import com.qiu.cardflow.card.dto.anki.AnkiSyncResponse;
 import com.qiu.cardflow.card.dto.card.CardAddRequest;
@@ -9,16 +14,17 @@ import com.qiu.cardflow.card.dto.card.ReviewLogDTO;
 import com.qiu.cardflow.card.interfaces.ICardRPC;
 import com.qiu.cardflow.common.interfaces.exception.BusinessException;
 import com.qiu.cardflow.common.interfaces.exception.PageResult;
-import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.stereotype.Service;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
-public class ICardServiceImpl implements ICardService {
+@RequiredArgsConstructor
+@Slf4j
+public class CardServiceImpl implements ICardService {
 
     @DubboReference
-    ICardRPC cardRPC;
+    private ICardRPC cardRPC;
 
     @Override
     public Boolean createCard(CardAddRequest cardAddRequest) throws BusinessException {
@@ -51,7 +57,8 @@ public class ICardServiceImpl implements ICardService {
     }
 
     @Override
-    public PageResult<CardDTO> getUserGroupCardsWithPagination(String group, int page, int size) throws BusinessException {
+    public PageResult<CardDTO> getUserGroupCardsWithPagination(String group, int page, int size)
+            throws BusinessException {
         return cardRPC.getUserGroupCardsWithPagination(group, page, size);
     }
 
@@ -77,7 +84,7 @@ public class ICardServiceImpl implements ICardService {
 
     // @Override
     // public void saveReviewLog(ReviewLogDTO reviewLog) throws BusinessException {
-    //     cardRPC.saveReviewLog(reviewLog);
+    // cardRPC.saveReviewLog(reviewLog);
     // }
 
     @Override
@@ -86,13 +93,13 @@ public class ICardServiceImpl implements ICardService {
     }
 
     @Override
-    public Boolean updateCards(List<CardUpdateRequest> cardUpdateRequests) throws BusinessException {
-        return cardRPC.updateCards(cardUpdateRequests);
+    public List<CardDTO> getExpiredCards() throws BusinessException {
+        return cardRPC.getExpiredCards();
     }
 
     @Override
-    public List<CardDTO> getExpiredCards() throws BusinessException {
-        return cardRPC.getExpiredCards();
+    public List<String> saveCards(List<CardUpdateRequest> cardUpdateRequests) {
+        return cardRPC.saveCards(cardUpdateRequests);
     }
 
 }

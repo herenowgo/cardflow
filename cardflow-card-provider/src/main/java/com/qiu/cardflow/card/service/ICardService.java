@@ -19,7 +19,7 @@ public interface ICardService {
 
     Boolean updateCardContent(CardUpdateRequest cardUpdateRequest) throws BusinessException;
 
-    Boolean updateCards(List<CardUpdateRequest> cardUpdateRequests) throws BusinessException;
+    List<String> saveCards(List<CardUpdateRequest> cardUpdateRequests);
 
     AnkiSyncResponse syncWithAnki(String group) throws BusinessException;
 
@@ -44,4 +44,5 @@ public interface ICardService {
      * 获取所有到期的卡片
      */
     List<Card> getExpiredCards() throws BusinessException;
+
 }

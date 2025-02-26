@@ -1,7 +1,14 @@
 package com.qiu.cardflow.card.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.bean.copier.CopyOptions;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
 import com.qiu.cardflow.card.dto.anki.AnkiInfo;
 import com.qiu.cardflow.card.dto.anki.AnkiNoteAddRequest;
 import com.qiu.cardflow.card.dto.anki.AnkiSyncResponse;
@@ -15,19 +22,10 @@ import com.qiu.cardflow.card.service.ICardService;
 import com.qiu.cardflow.common.interfaces.exception.Assert;
 import com.qiu.cardflow.common.interfaces.exception.BusinessException;
 import com.qiu.cardflow.rpc.starter.RPCContext;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.stream.Collectors;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -84,7 +82,7 @@ public class CardServiceImpl implements ICardService {
     }
 
     @Override
-    public Boolean updateCards(List<CardUpdateRequest> cardUpdateRequests) throws BusinessException {
+    public List<String> saveCards(List<CardUpdateRequest> cardUpdateRequests) throws BusinessException {
         List<String> groupList = cardUpdateRequests.stream()
                 .map(card -> card.getGroup())
                 .filter(group -> group != null)
@@ -98,10 +96,12 @@ public class CardServiceImpl implements ICardService {
             }
         }
 
-        cardRepository.saveAll(cardUpdateRequests.stream()
+        List<Card> savedCards = cardRepository.saveAll(cardUpdateRequests.stream()
                 .map(this::parseCardRequestToCard)
                 .toList());
-        return true;
+        return savedCards.stream()
+                .map(Card::getId)
+                .collect(Collectors.toList());
     }
 
     // 获取用户的所有卡片

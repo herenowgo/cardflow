@@ -45,9 +45,9 @@ public class CardController {
     }
 
     @PutMapping("/batch")
-    @Operation(summary = "批量更新卡片", description = "批量更新多个卡片的内容")
-    public BaseResponse<Boolean> updateCards(@RequestBody @Valid List<CardUpdateRequest> cardUpdateRequests) {
-        return BaseResponse.success(cardService.updateCards(cardUpdateRequests));
+    @Operation(summary = "批量保存卡片", description = "批量保存多个卡片的内容，返回更新或新创建的卡片ID列表")
+    public BaseResponse<List<String>> saveCards(@RequestBody @Valid List<CardUpdateRequest> cardUpdateRequests) {
+        return BaseResponse.success(cardService.saveCards(cardUpdateRequests));
     }
 
     /**

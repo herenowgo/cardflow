@@ -39,11 +39,11 @@ public interface ICardRPC extends RPC {
     // void saveReviewLog(ReviewLogDTO reviewLogDTO) throws BusinessException;
 
     void saveReviewLogs(List<ReviewLogDTO> reviewLogDTOs) throws BusinessException;
-
-    Boolean updateCards(List<CardUpdateRequest> cardUpdateRequests) throws BusinessException;
     
     /**
      * 获取所有到期的卡片
      */
     List<CardDTO> getExpiredCards() throws BusinessException;
+
+    List<String> saveCards(List<CardUpdateRequest> cardUpdateRequests) throws BusinessException;
 }

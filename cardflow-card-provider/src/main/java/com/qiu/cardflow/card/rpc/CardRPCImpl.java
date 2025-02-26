@@ -46,9 +46,10 @@ public class CardRPCImpl implements ICardRPC {
         return cardService.updateCardContent(cardUpdateRequest);
     }
 
+
     @Override
-    public Boolean updateCards(List<CardUpdateRequest> cardUpdateRequests) throws BusinessException {
-        return cardService.updateCards(cardUpdateRequests);
+    public List<String> saveCards(List<CardUpdateRequest> cardUpdateRequests) {
+        return cardService.saveCards(cardUpdateRequests);
     }
 
     @Override
