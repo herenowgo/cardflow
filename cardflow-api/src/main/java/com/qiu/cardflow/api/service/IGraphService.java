@@ -1,5 +1,8 @@
 package com.qiu.cardflow.api.service;
 
+import java.util.List;
+
+import com.qiu.cardflow.card.dto.card.CardDTO;
 import com.qiu.cardflow.graph.dto.CardNodeDTO;
 import com.qiu.cardflow.graph.dto.GraphDTO;
 
@@ -23,4 +26,9 @@ public interface IGraphService {
      * 获取用户的知识标签图谱
      */
     GraphDTO getTagsGraph();
+
+    /**
+     * 根据知识点标签获取卡片
+     */
+    List<CardDTO> getCardsByTags(List<String> tags);
 }

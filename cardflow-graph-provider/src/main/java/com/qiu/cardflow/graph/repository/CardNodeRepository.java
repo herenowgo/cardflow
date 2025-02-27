@@ -72,6 +72,18 @@ public interface CardNodeRepository extends ListCrudRepository<CardNode, String>
                      "RETURN t1.name as sourceTag, t2.name as targetTag, count(c) as weight")
        List<TagCoOccurrenceResult> findTagCoOccurrences(Long userId);
 
+       /**
+        * 根据标签名列表查询含有所有这些标签的卡片ID
+        * @param userId 用户ID
+        * @param tagNames 标签名列表
+        * @param tagCount 标签数量（用于确保卡片含有所有传入的标签）
+        * @return 卡片ID列表
+        */
+       @Query("MATCH (u:User {userId: $userId})-[:CREATED]->(c:Card) " +
+              "WHERE ALL(tagName IN $tagNames WHERE EXISTS((c)-[:HAS_TAG]->(:Tag {name: tagName}))) " +
+              "RETURN c.cardId as cardId")
+       List<String> findCardsByTagNames(Long userId, List<String> tagNames, int tagCount);
+
        @Data
        class TagWeightResult {
               String tagName;

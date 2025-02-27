@@ -1,5 +1,7 @@
 package com.qiu.cardflow.graph.interfaces;
 
+import java.util.List;
+
 import com.qiu.cardflow.common.interfaces.exception.BusinessException;
 import com.qiu.cardflow.common.interfaces.exception.RPC;
 import com.qiu.cardflow.graph.dto.CardNodeDTO;
@@ -38,4 +40,11 @@ public interface IGraphRpc extends RPC {
      * @return
      */
     GraphDTO getTagsGraph() throws BusinessException;
+
+    /**
+     * 根据知识点标签列表获取所有含有这些标签的卡片ID
+     * @param tagNames 标签名列表
+     * @return 卡片ID列表
+     */
+    List<String> getCardsByTags(List<String> tagNames) throws BusinessException;
 }

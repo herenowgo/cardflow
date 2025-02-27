@@ -29,7 +29,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 @Validated
-public class IGraphServiceImpl implements IGraphService {
+public class GraphServiceImpl implements IGraphService {
     private final CardNodeRepository cardNodeRepository;
     private final TagNodeRepository tagNodeRepository;
     private final UserNodeRepository userNodeRepository;
@@ -132,5 +132,19 @@ public class IGraphServiceImpl implements IGraphService {
         graphDTO.setNodes(nodes);
         graphDTO.setEdges(edges);
         return graphDTO;
+    }
+
+    @Override
+    public List<String> getCardsByTags(List<String> tagNames) {
+        try {
+            if (tagNames == null || tagNames.isEmpty()) {
+                return new ArrayList<>();
+            }
+            Long userId = RPCContext.getUserId();
+            return cardNodeRepository.findCardsByTagNames(userId, tagNames, tagNames.size());
+        } catch (Exception e) {
+            log.error("根据标签查询卡片失败，标签: {}", tagNames, e);
+            throw new BusinessException("根据标签查询卡片失败");
+        }
     }
 }

@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.List;
+
 @DubboService
 @Slf4j
 @RequiredArgsConstructor
@@ -36,5 +38,10 @@ public class GraphRpcImpl implements IGraphRpc {
     @Override
     public GraphDTO getTagsGraph() throws BusinessException {
         return IGraphService.getTagsGraph(RPCContext.getUserId());
+    }
+
+    @Override
+    public List<String> getCardsByTags(List<String> tagNames) throws BusinessException {
+        return IGraphService.getCardsByTags(tagNames);
     }
 }
