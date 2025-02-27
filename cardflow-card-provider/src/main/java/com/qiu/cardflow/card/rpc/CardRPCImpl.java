@@ -136,4 +136,9 @@ public class CardRPCImpl implements ICardRPC {
         return BeanUtil.copyToList(expiredCards, CardDTO.class);
     }
 
+    @Override
+    public Boolean setCardOvert(String cardId) throws BusinessException {
+        return cardService.setCardOvert(cardId);
+    }
+
 }

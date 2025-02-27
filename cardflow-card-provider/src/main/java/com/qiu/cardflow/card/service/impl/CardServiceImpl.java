@@ -299,4 +299,24 @@ public class CardServiceImpl implements ICardService {
         Date now = new Date();
         return cardRepository.findOverdueCardsByUserIdAndDate(RPCContext.getUserId(), now);
     }
+
+    @Override
+    public Boolean setCardOvert(String cardId) throws BusinessException {
+        // 检查当前用户是否为管理员
+        Assert.isTrue(RPCContext.isAdmin(), "只有管理员可以设置卡片为公开");
+        
+        // 获取卡片
+        Card card = cardRepository.findByIdAndIsDeletedFalse(cardId);
+        Assert.notNull(card, "卡片不存在");
+        
+        // 设置卡片为公开
+        if(card.getOvert() == null || card.getOvert() == false) {
+            card.setOvert(true);
+        } else {
+            card.setOvert(false);
+        }
+        cardRepository.save(card);
+        
+        return true;
+    }
 }

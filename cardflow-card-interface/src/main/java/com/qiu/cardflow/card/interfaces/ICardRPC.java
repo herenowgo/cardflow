@@ -46,4 +46,10 @@ public interface ICardRPC extends RPC {
     List<CardDTO> getExpiredCards() throws BusinessException;
 
     List<String> saveCards(List<CardUpdateRequest> cardUpdateRequests) throws BusinessException;
+
+    /**
+     * 设置卡片为公开
+     * 仅管理员可执行此操作
+     */
+    Boolean setCardOvert(String cardId) throws BusinessException;
 }

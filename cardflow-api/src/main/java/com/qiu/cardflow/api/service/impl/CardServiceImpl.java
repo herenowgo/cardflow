@@ -102,4 +102,9 @@ public class CardServiceImpl implements ICardService {
         return cardRPC.saveCards(cardUpdateRequests);
     }
 
+    @Override
+    public Boolean setCardOvert(String cardId) throws BusinessException {
+        return cardRPC.setCardOvert(cardId);
+    }
+
 }

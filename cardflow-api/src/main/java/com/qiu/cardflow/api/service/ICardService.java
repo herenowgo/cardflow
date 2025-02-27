@@ -2,6 +2,7 @@ package com.qiu.cardflow.api.service;
 
 import java.util.List;
 
+import com.qiu.cardflow.api.vo.CardPageRequest;
 import com.qiu.cardflow.card.dto.anki.AnkiSyncResponse;
 import com.qiu.cardflow.card.dto.card.CardAddRequest;
 import com.qiu.cardflow.card.dto.card.CardDTO;
@@ -38,11 +39,20 @@ public interface ICardService {
     // void saveReviewLog(ReviewLogDTO reviewLog) throws BusinessException;
 
     void saveReviewLogs(List<ReviewLogDTO> reviewLogs) throws BusinessException;
-    
+
     /**
      * 获取所有到期的卡片
      */
     List<CardDTO> getExpiredCards() throws BusinessException;
 
     List<String> saveCards(List<CardUpdateRequest> cardUpdateRequests);
+
+    /**
+     * 设置卡片为公开，仅管理员可执行此操作
+     */
+    Boolean setCardOvert(String cardId) throws BusinessException;
+
+    PageResult<List<CardDTO>> getCardsWithPagination(CardPageRequest cardPageRequest) throws BusinessException;
+
+    // Boolean
 }

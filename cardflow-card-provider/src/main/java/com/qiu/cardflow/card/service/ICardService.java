@@ -45,4 +45,10 @@ public interface ICardService {
      */
     List<Card> getExpiredCards() throws BusinessException;
 
+    /**
+     * 设置卡片为公开
+     * 仅管理员可执行此操作
+     */
+    Boolean setCardOvert(String cardId) throws BusinessException;
+
 }

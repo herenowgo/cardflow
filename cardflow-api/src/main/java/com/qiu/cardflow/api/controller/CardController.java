@@ -1,11 +1,17 @@
 package com.qiu.cardflow.api.controller;
 
 import com.qiu.cardflow.api.common.BaseResponse;
+import com.qiu.cardflow.api.context.UserContext;
 import com.qiu.cardflow.api.service.ICardService;
+import com.qiu.cardflow.api.service.impl.CardServiceImpl;
+import com.qiu.cardflow.api.vo.CardPageRequest;
 import com.qiu.cardflow.card.dto.anki.AnkiCardIdsRequest;
 import com.qiu.cardflow.card.dto.anki.AnkiSyncResponse;
 import com.qiu.cardflow.card.dto.card.*;
+import com.qiu.cardflow.common.interfaces.exception.Assert;
+import com.qiu.cardflow.common.interfaces.exception.BusinessException;
 import com.qiu.cardflow.common.interfaces.exception.PageResult;
+import com.qiu.cardflow.common.interfaces.exception.Result;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
@@ -91,6 +97,14 @@ public class CardController {
                         size));
     }
 
+    // 分页获取用户特定分组的卡片
+    @PostMapping("/page")
+    @Operation(summary = "多条件分页获取卡片", description = "多条件分页获取卡片")
+    public BaseResponse<PageResult<List<CardDTO>>> getCardsWithPagination(CardPageRequest cardPageRequest) {
+        return BaseResponse.success(
+                cardService.getCardsWithPagination(cardPageRequest));
+    }
+
     // 获取指定ID的卡片
     @GetMapping("/{cardId}")
     @Operation(summary = "获取指定ID的卡片", description = "根据卡片ID获取卡片")
@@ -126,9 +140,10 @@ public class CardController {
 
     // @Operation(summary = "保存卡片的复习日志", description = "保存卡片的复习日志")
     // @PostMapping("/reviewLog")
-    // public BaseResponse<Void> saveReviewLog(@RequestBody @Valid ReviewLogDTO reviewLogDTO) {
-    //     cardService.saveReviewLog(reviewLogDTO);
-    //     return BaseResponse.success(null);
+    // public BaseResponse<Void> saveReviewLog(@RequestBody @Valid ReviewLogDTO
+    // reviewLogDTO) {
+    // cardService.saveReviewLog(reviewLogDTO);
+    // return BaseResponse.success(null);
     // }
 
     @Operation(summary = "批量保存卡片的复习日志", description = "批量保存卡片的复习日志")
@@ -144,20 +159,17 @@ public class CardController {
         return BaseResponse.success(cardService.getExpiredCards());
     }
 
-    // /**
-    // * 检查一组Anki卡片ID是否存在
-    // *
-    // * @param cardIds Anki卡片ID列表
-    // * @return 布尔数组，表示对应位置的Anki卡片ID是否存在
-    // */
-    // @Operation(summary = "检查Anki卡片是否存在", description =
-    // "传入一组Anki卡片ID，返回每个ID是否存在的布尔数组")
-    // @PostMapping("/anki/exists")
-    // public BaseResponse<List<Boolean>> checkAnkiCardsExist(
-    // @Parameter(description = "Anki卡片ID列表", required = true) @RequestBody @Valid
-    // AnkiCardIdsRequest request) {
-    // return
-    // BaseResponse.success(cardService.checkAnkiCardsExist(request.getCardIds()));
-    // }
-
+    /**
+     * 设置卡片为公开或私有（仅管理员可操作）
+     *
+     * @param cardId 卡片ID
+     * @return 操作结果
+     * @throws BusinessException 业务异常
+     */
+    @Operation(summary = "设置卡片为公开或私有", description = "设置卡片为公开或私有")
+    @PostMapping("/admin/overt/{cardId}")
+    public BaseResponse<Boolean> setCardOvert(@PathVariable String cardId) throws BusinessException {
+        Assert.isTrue(UserContext.isAdmin(), "只有管理员才能执行此操作");
+        return BaseResponse.success(cardService.setCardOvert(cardId));
+    }
 }
