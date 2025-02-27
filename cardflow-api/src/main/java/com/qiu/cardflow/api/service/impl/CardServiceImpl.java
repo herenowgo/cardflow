@@ -9,6 +9,8 @@ import com.qiu.cardflow.api.service.ICardService;
 import com.qiu.cardflow.card.dto.anki.AnkiSyncResponse;
 import com.qiu.cardflow.card.dto.card.CardAddRequest;
 import com.qiu.cardflow.card.dto.card.CardDTO;
+import com.qiu.cardflow.card.dto.card.CardPageRequest;
+import com.qiu.cardflow.card.dto.card.CardPageRequestDTO;
 import com.qiu.cardflow.card.dto.card.CardUpdateRequest;
 import com.qiu.cardflow.card.dto.card.ReviewLogDTO;
 import com.qiu.cardflow.card.interfaces.ICardRPC;
@@ -105,6 +107,12 @@ public class CardServiceImpl implements ICardService {
     @Override
     public Boolean setCardOvert(String cardId) throws BusinessException {
         return cardRPC.setCardOvert(cardId);
+    }
+
+    @Override
+    public PageResult<CardDTO> getCardsWithPagination(CardPageRequest cardPageRequest) throws BusinessException {
+        
+        return cardRPC.getCardsWithPagination(cardPageRequest);
     }
 
 }

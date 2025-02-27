@@ -1,11 +1,12 @@
 package com.qiu.cardflow.card.interfaces;
 
-
 import java.util.List;
 
 import com.qiu.cardflow.card.dto.anki.AnkiSyncResponse;
 import com.qiu.cardflow.card.dto.card.CardAddRequest;
 import com.qiu.cardflow.card.dto.card.CardDTO;
+import com.qiu.cardflow.card.dto.card.CardPageRequest;
+import com.qiu.cardflow.card.dto.card.CardPageRequestDTO;
 import com.qiu.cardflow.card.dto.card.CardUpdateRequest;
 import com.qiu.cardflow.card.dto.card.ReviewLogDTO;
 import com.qiu.cardflow.common.interfaces.exception.BusinessException;
@@ -39,7 +40,7 @@ public interface ICardRPC extends RPC {
     // void saveReviewLog(ReviewLogDTO reviewLogDTO) throws BusinessException;
 
     void saveReviewLogs(List<ReviewLogDTO> reviewLogDTOs) throws BusinessException;
-    
+
     /**
      * 获取所有到期的卡片
      */
@@ -52,4 +53,7 @@ public interface ICardRPC extends RPC {
      * 仅管理员可执行此操作
      */
     Boolean setCardOvert(String cardId) throws BusinessException;
+
+    // 添加多条件分页查询接口
+    PageResult<CardDTO> getCardsWithPagination(CardPageRequest cardPageRequest) throws BusinessException;
 }

@@ -80,4 +80,13 @@ public interface CardRepository extends MongoRepository<Card, String> {
     @Query(value = "{ 'userId': ?0, 'isDeleted': false, 'fsrsCard.due': { $lt: ?1 }}")
     List<Card> findOverdueCardsByUserIdAndDate(Long userId, Date date);
 
+    /**
+     * 多条件分页查询卡片
+     * 
+     * @param criteria 查询条件
+     * @param pageable 分页参数
+     * @return 符合条件的卡片分页结果
+     */
+    @Query("{ $and: ?0 }")
+    Page<Card> findByMultipleCriteria(List<org.bson.Document> criteria, Pageable pageable);
 }

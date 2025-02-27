@@ -6,10 +6,12 @@ import org.springframework.data.domain.Page;
 
 import com.qiu.cardflow.card.dto.anki.AnkiSyncResponse;
 import com.qiu.cardflow.card.dto.card.CardAddRequest;
+import com.qiu.cardflow.card.dto.card.CardPageRequest;
 import com.qiu.cardflow.card.dto.card.CardUpdateRequest;
 import com.qiu.cardflow.card.model.entity.Card;
 import com.qiu.cardflow.card.model.entity.ReviewLog;
 import com.qiu.cardflow.common.interfaces.exception.BusinessException;
+import com.qiu.cardflow.common.interfaces.exception.PageResult;
 
 public interface ICardService {
 
@@ -50,5 +52,8 @@ public interface ICardService {
      * 仅管理员可执行此操作
      */
     Boolean setCardOvert(String cardId) throws BusinessException;
+
+    // 添加多条件分页查询接口
+    Page<Card> getCardsWithPagination(CardPageRequest cardPageRequest) throws BusinessException;
 
 }

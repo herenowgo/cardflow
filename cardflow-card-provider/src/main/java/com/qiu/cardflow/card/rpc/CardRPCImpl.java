@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.qiu.cardflow.card.dto.anki.AnkiSyncResponse;
 import com.qiu.cardflow.card.dto.card.CardAddRequest;
 import com.qiu.cardflow.card.dto.card.CardDTO;
+import com.qiu.cardflow.card.dto.card.CardPageRequest;
 import com.qiu.cardflow.card.dto.card.CardUpdateRequest;
 import com.qiu.cardflow.card.dto.card.ReviewLogDTO;
 import com.qiu.cardflow.card.interfaces.ICardRPC;
@@ -30,7 +31,6 @@ public class CardRPCImpl implements ICardRPC {
 
     private final ICardService cardService;
 
-
     @Override
     public Boolean createCard(CardAddRequest cardAddRequest) throws BusinessException {
         return cardService.createCard(cardAddRequest);
@@ -45,7 +45,6 @@ public class CardRPCImpl implements ICardRPC {
     public Boolean updateCardContent(CardUpdateRequest cardUpdateRequest) throws BusinessException {
         return cardService.updateCardContent(cardUpdateRequest);
     }
-
 
     @Override
     public List<String> saveCards(List<CardUpdateRequest> cardUpdateRequests) {
@@ -70,7 +69,8 @@ public class CardRPCImpl implements ICardRPC {
     }
 
     @Override
-    public PageResult<CardDTO> getUserGroupCardsWithPagination(String group, int page, int size) throws BusinessException {
+    public PageResult<CardDTO> getUserGroupCardsWithPagination(String group, int page, int size)
+            throws BusinessException {
         Page<Card> cardPage = cardService.getUserGroupCardsWithPagination(group, page, size);
         Page<CardDTO> cardDTOPage = cardPage.map(card -> BeanUtil.copyProperties(card, CardDTO.class));
         PageResult<CardDTO> pageResult = parsePage(cardDTOPage);
@@ -112,10 +112,11 @@ public class CardRPCImpl implements ICardRPC {
     }
 
     // @Override
-    // public void saveReviewLog(ReviewLogDTO reviewLogDTO) throws BusinessException {
-    //     ReviewLog reviewLog = BeanUtil.copyProperties(reviewLogDTO, ReviewLog.class);
-    //     reviewLog.setUserId(RPCContext.getUserId());
-    //     cardService.saveReviewLog(reviewLog);
+    // public void saveReviewLog(ReviewLogDTO reviewLogDTO) throws BusinessException
+    // {
+    // ReviewLog reviewLog = BeanUtil.copyProperties(reviewLogDTO, ReviewLog.class);
+    // reviewLog.setUserId(RPCContext.getUserId());
+    // cardService.saveReviewLog(reviewLog);
     // }
 
     @Override
@@ -139,6 +140,13 @@ public class CardRPCImpl implements ICardRPC {
     @Override
     public Boolean setCardOvert(String cardId) throws BusinessException {
         return cardService.setCardOvert(cardId);
+    }
+
+    @Override
+    public PageResult<CardDTO> getCardsWithPagination(CardPageRequest cardPageRequest) throws BusinessException {
+        Page<Card> cardPage = cardService.getCardsWithPagination(cardPageRequest);
+        Page<CardDTO> cardDTOPage = cardPage.map(card -> BeanUtil.copyProperties(card, CardDTO.class));
+        return parsePage(cardDTOPage);
     }
 
 }

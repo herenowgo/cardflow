@@ -3,12 +3,12 @@ package com.qiu.cardflow.card.dto.card;
 import java.io.Serializable;
 import java.util.List;
 
-import com.qiu.cardflow.api.common.PageRequest;
+import com.qiu.cardflow.common.interfaces.PageRequest;
 
 import lombok.Data;
 
 @Data
-public class CardPageRequest extends PageRequest implements Serializable{
+public class CardPageRequest extends PageRequest implements Serializable {
 
     private Boolean overt = false; // 是否公开
     private String question; // 模糊查找(问题/正面内容)的所有卡片

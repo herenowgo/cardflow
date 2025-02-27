@@ -4,7 +4,6 @@ import com.qiu.cardflow.api.common.BaseResponse;
 import com.qiu.cardflow.api.context.UserContext;
 import com.qiu.cardflow.api.service.ICardService;
 import com.qiu.cardflow.api.service.impl.CardServiceImpl;
-import com.qiu.cardflow.api.vo.CardPageRequest;
 import com.qiu.cardflow.card.dto.anki.AnkiCardIdsRequest;
 import com.qiu.cardflow.card.dto.anki.AnkiSyncResponse;
 import com.qiu.cardflow.card.dto.card.*;
@@ -97,10 +96,15 @@ public class CardController {
                         size));
     }
 
-    // 分页获取用户特定分组的卡片
+    /**
+     * 多条件分页获取卡片
+     * 
+     * @param cardPageRequest
+     * @return
+     */
     @PostMapping("/page")
     @Operation(summary = "多条件分页获取卡片", description = "多条件分页获取卡片")
-    public BaseResponse<PageResult<List<CardDTO>>> getCardsWithPagination(CardPageRequest cardPageRequest) {
+    public BaseResponse<PageResult<CardDTO>> getCardsWithPagination(@RequestBody CardPageRequest cardPageRequest) {
         return BaseResponse.success(
                 cardService.getCardsWithPagination(cardPageRequest));
     }

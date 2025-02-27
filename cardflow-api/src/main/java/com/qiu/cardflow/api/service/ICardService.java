@@ -2,10 +2,10 @@ package com.qiu.cardflow.api.service;
 
 import java.util.List;
 
-import com.qiu.cardflow.api.vo.CardPageRequest;
 import com.qiu.cardflow.card.dto.anki.AnkiSyncResponse;
 import com.qiu.cardflow.card.dto.card.CardAddRequest;
 import com.qiu.cardflow.card.dto.card.CardDTO;
+import com.qiu.cardflow.card.dto.card.CardPageRequest;
 import com.qiu.cardflow.card.dto.card.CardUpdateRequest;
 import com.qiu.cardflow.card.dto.card.ReviewLogDTO;
 import com.qiu.cardflow.common.interfaces.exception.BusinessException;
@@ -52,7 +52,7 @@ public interface ICardService {
      */
     Boolean setCardOvert(String cardId) throws BusinessException;
 
-    PageResult<List<CardDTO>> getCardsWithPagination(CardPageRequest cardPageRequest) throws BusinessException;
+    PageResult<CardDTO> getCardsWithPagination(CardPageRequest cardPageRequest) throws BusinessException;
 
     // Boolean
 }

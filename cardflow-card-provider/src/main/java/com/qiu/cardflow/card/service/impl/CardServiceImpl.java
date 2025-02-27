@@ -1,5 +1,7 @@
 package com.qiu.cardflow.card.service.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,6 +15,7 @@ import com.qiu.cardflow.card.dto.anki.AnkiInfo;
 import com.qiu.cardflow.card.dto.anki.AnkiNoteAddRequest;
 import com.qiu.cardflow.card.dto.anki.AnkiSyncResponse;
 import com.qiu.cardflow.card.dto.card.CardAddRequest;
+import com.qiu.cardflow.card.dto.card.CardPageRequest;
 import com.qiu.cardflow.card.dto.card.CardUpdateRequest;
 import com.qiu.cardflow.card.model.entity.Card;
 import com.qiu.cardflow.card.model.entity.ReviewLog;
@@ -26,9 +29,11 @@ import com.qiu.cardflow.rpc.starter.RPCContext;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CardServiceImpl implements ICardService {
 
     private final CardRepository cardRepository;
@@ -304,19 +309,70 @@ public class CardServiceImpl implements ICardService {
     public Boolean setCardOvert(String cardId) throws BusinessException {
         // 检查当前用户是否为管理员
         Assert.isTrue(RPCContext.isAdmin(), "只有管理员可以设置卡片为公开");
-        
+
         // 获取卡片
         Card card = cardRepository.findByIdAndIsDeletedFalse(cardId);
         Assert.notNull(card, "卡片不存在");
-        
+
         // 设置卡片为公开
-        if(card.getOvert() == null || card.getOvert() == false) {
+        if (card.getOvert() == null || card.getOvert() == false) {
             card.setOvert(true);
         } else {
             card.setOvert(false);
         }
         cardRepository.save(card);
-        
+
         return true;
+    }
+
+    @Override
+    public Page<Card> getCardsWithPagination(CardPageRequest cardPageRequest) throws BusinessException {
+        // 创建分页参数
+        Pageable pageable = PageRequest.of(
+                cardPageRequest.getCurrent().intValue(),
+                cardPageRequest.getPageSize().intValue());
+
+        // 构建查询条件
+        List<org.bson.Document> criteria = new ArrayList<>();
+
+        // 基础条件：未删除的卡片
+        criteria.add(new org.bson.Document("isDeleted", false));
+
+        // 处理公开属性
+        if (cardPageRequest.getOvert() != null && cardPageRequest.getOvert()) {
+            criteria.add(new org.bson.Document("overt", true));
+        } else {
+            // 非公开卡片只能查看自己的
+            criteria.add(new org.bson.Document("userId", RPCContext.getUserId()));
+        }
+
+        // 处理问题内容模糊查询
+        if (cardPageRequest.getQuestion() != null && !cardPageRequest.getQuestion().isEmpty())
+        {
+            criteria.add(new org.bson.Document("question",
+                    new org.bson.Document("$regex", cardPageRequest.getQuestion()).append("$options", "i")));
+        }
+
+        // 处理答案内容模糊查询
+        if (cardPageRequest.getAnswer() != null && !cardPageRequest.getAnswer().isEmpty()) {
+            criteria.add(new org.bson.Document("answer",
+                    new org.bson.Document("$regex", cardPageRequest.getAnswer()).append("$options", "i")));
+        }
+
+        // 处理标签查询
+        if (cardPageRequest.getTags() != null && !cardPageRequest.getTags().isEmpty()) {
+            criteria.add(new org.bson.Document("tags",
+                    new org.bson.Document("$all", cardPageRequest.getTags())));
+        }
+
+        // 处理分组查询
+        if (cardPageRequest.getGroup() != null && !cardPageRequest.getGroup().isEmpty()) {
+            criteria.add(new org.bson.Document("group", cardPageRequest.getGroup()));
+        }
+
+        // 执行查询
+        Page<Card> result = cardRepository.findByMultipleCriteria(criteria, pageable);
+
+        return result;
     }
 }
