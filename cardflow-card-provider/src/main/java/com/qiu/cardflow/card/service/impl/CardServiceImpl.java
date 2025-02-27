@@ -15,6 +15,7 @@ import com.qiu.cardflow.card.dto.anki.AnkiInfo;
 import com.qiu.cardflow.card.dto.anki.AnkiNoteAddRequest;
 import com.qiu.cardflow.card.dto.anki.AnkiSyncResponse;
 import com.qiu.cardflow.card.dto.card.CardAddRequest;
+import com.qiu.cardflow.card.dto.card.CardDTO;
 import com.qiu.cardflow.card.dto.card.CardPageRequest;
 import com.qiu.cardflow.card.dto.card.CardUpdateRequest;
 import com.qiu.cardflow.card.model.entity.Card;
@@ -306,7 +307,7 @@ public class CardServiceImpl implements ICardService {
     }
 
     @Override
-    public Boolean setCardOvert(String cardId) throws BusinessException {
+    public CardDTO setCardOvert(String cardId) throws BusinessException {
         // 检查当前用户是否为管理员
         Assert.isTrue(RPCContext.isAdmin(), "只有管理员可以设置卡片为公开");
 
@@ -322,7 +323,7 @@ public class CardServiceImpl implements ICardService {
         }
         cardRepository.save(card);
 
-        return true;
+        return BeanUtil.copyProperties(card, CardDTO.class);
     }
 
     @Override

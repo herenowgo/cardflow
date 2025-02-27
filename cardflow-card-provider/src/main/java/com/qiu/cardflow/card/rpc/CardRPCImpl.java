@@ -1,6 +1,12 @@
 package com.qiu.cardflow.card.rpc;
 
-import cn.hutool.core.bean.BeanUtil;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.data.domain.Page;
+import org.springframework.validation.annotation.Validated;
+
 import com.qiu.cardflow.card.dto.anki.AnkiSyncResponse;
 import com.qiu.cardflow.card.dto.card.CardAddRequest;
 import com.qiu.cardflow.card.dto.card.CardDTO;
@@ -14,14 +20,10 @@ import com.qiu.cardflow.card.service.ICardService;
 import com.qiu.cardflow.common.interfaces.exception.BusinessException;
 import com.qiu.cardflow.common.interfaces.exception.PageResult;
 import com.qiu.cardflow.rpc.starter.RPCContext;
+
+import cn.hutool.core.bean.BeanUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.DubboService;
-import org.springframework.data.domain.Page;
-import org.springframework.validation.annotation.Validated;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @DubboService
 @Slf4j
@@ -138,7 +140,7 @@ public class CardRPCImpl implements ICardRPC {
     }
 
     @Override
-    public Boolean setCardOvert(String cardId) throws BusinessException {
+    public CardDTO setCardOvert(String cardId) throws BusinessException {
         return cardService.setCardOvert(cardId);
     }
 

@@ -6,7 +6,6 @@ import com.qiu.cardflow.card.dto.anki.AnkiSyncResponse;
 import com.qiu.cardflow.card.dto.card.CardAddRequest;
 import com.qiu.cardflow.card.dto.card.CardDTO;
 import com.qiu.cardflow.card.dto.card.CardPageRequest;
-import com.qiu.cardflow.card.dto.card.CardPageRequestDTO;
 import com.qiu.cardflow.card.dto.card.CardUpdateRequest;
 import com.qiu.cardflow.card.dto.card.ReviewLogDTO;
 import com.qiu.cardflow.common.interfaces.exception.BusinessException;
@@ -52,7 +51,7 @@ public interface ICardRPC extends RPC {
      * 设置卡片为公开
      * 仅管理员可执行此操作
      */
-    Boolean setCardOvert(String cardId) throws BusinessException;
+    CardDTO setCardOvert(String cardId) throws BusinessException;
 
     // 添加多条件分页查询接口
     PageResult<CardDTO> getCardsWithPagination(CardPageRequest cardPageRequest) throws BusinessException;

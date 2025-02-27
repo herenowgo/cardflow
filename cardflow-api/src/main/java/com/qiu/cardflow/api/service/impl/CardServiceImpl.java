@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Service;
 
+import com.qiu.cardflow.api.context.UserContext;
 import com.qiu.cardflow.api.service.ICardService;
 import com.qiu.cardflow.card.dto.anki.AnkiSyncResponse;
 import com.qiu.cardflow.card.dto.card.CardAddRequest;
@@ -16,6 +17,8 @@ import com.qiu.cardflow.card.dto.card.ReviewLogDTO;
 import com.qiu.cardflow.card.interfaces.ICardRPC;
 import com.qiu.cardflow.common.interfaces.exception.BusinessException;
 import com.qiu.cardflow.common.interfaces.exception.PageResult;
+import com.qiu.cardflow.graph.dto.CardNodeDTO;
+import com.qiu.cardflow.graph.interfaces.IGraphRpc;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +30,9 @@ public class CardServiceImpl implements ICardService {
 
     @DubboReference
     private ICardRPC cardRPC;
+
+    @DubboReference
+    private IGraphRpc graphRPC;
 
     @Override
     public Boolean createCard(CardAddRequest cardAddRequest) throws BusinessException {
@@ -106,12 +112,16 @@ public class CardServiceImpl implements ICardService {
 
     @Override
     public Boolean setCardOvert(String cardId) throws BusinessException {
-        return cardRPC.setCardOvert(cardId);
+        CardDTO cardDTO = cardRPC.setCardOvert(cardId);
+        Long userId = UserContext.getUserId();
+        UserContext.setUserId(-1l);
+        graphRPC.addCard(CardNodeDTO.builder().cardId(cardDTO.getId()).tags(cardDTO.getTags()).build());
+        UserContext.setUserId(userId);
+        return true;
     }
 
     @Override
     public PageResult<CardDTO> getCardsWithPagination(CardPageRequest cardPageRequest) throws BusinessException {
-        
         return cardRPC.getCardsWithPagination(cardPageRequest);
     }
 

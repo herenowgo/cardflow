@@ -20,9 +20,10 @@ public class RpcContextAspect {
     @Before("rpcCall()")
     public void injectUserId() {
         Long userId = UserContext.getUserId();
+        String roleId = UserContext.getUserRole();
         if (userId != null) { // 添加userId非空判断，避免空指针异常
             RpcContext.getClientAttachment().setAttachment("user-id", userId);
-            RpcContext.getClientAttachment().setAttachment("user-role", userId);
+            RpcContext.getClientAttachment().setAttachment("user-role", roleId);
         } else {
         }
     }
