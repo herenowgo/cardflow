@@ -119,12 +119,12 @@ public class StudyResourceServiceImpl implements StudyResourceService {
         } else {
             // 4. 如果是文件，删除对象存储中的文件
             try {
-                if (resource.getObjectStorageFileName() != null) {
+                if (resource.getObjectStorageFileName() != null && resource.getIsPublic() == false && resource.getIsCopied() == false) {
                     objectStorage.deleteFile(resource.getObjectStorageFileName());
                 }
             } catch (Exception e) {
                 log.error("Delete file from storage failed: {}", resource.getPath(), e);
-                throw new RuntimeException("Delete file failed", e);
+                // throw new RuntimeException("Delete file failed", e);
             }
         }
 
@@ -506,13 +506,13 @@ public class StudyResourceServiceImpl implements StudyResourceService {
         Asserts.failIf(!Boolean.TRUE.equals(originResource.getIsPublic()), "只能收藏公开资源");
         Asserts.failIf(originResource.getIsDeleted(), "资源已删除");
         Asserts.failIf(originResource.getIsFolder(), "不能收藏文件夹");
-        
+
         // 3. 验证目标路径
         FileValidationUtil.validatePath(parentPath);
-        
+
         // 4. 检查同名文件是否存在
         checkNameExists(originResource.getName(), parentPath);
-        
+
         // 5. 创建资源副本
         Date now = new Date();
         StudyResource newResource = StudyResource.builder()
@@ -533,11 +533,12 @@ public class StudyResourceServiceImpl implements StudyResourceService {
                 .isPublic(false) // 收藏的资源默认不公开
                 .createTime(now)
                 .updateTime(now)
+                .isCopied(true)
                 .build();
-                
+
         // 6. 保存资源副本
         newResource = studyResourceRepository.save(newResource);
-        
+
         // 7. 转换为VO并返回
         StudyResourceVO vo = new StudyResourceVO();
         BeanUtils.copyProperties(newResource, vo);

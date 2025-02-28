@@ -69,6 +69,9 @@ public class StudyResource {
     @Schema(description = "是否公开（仅管理员可设置）")
     private Boolean isPublic;
 
+    @Schema(description = "是否是复制的")
+    private Boolean isCopied;
+
     @Schema(description = "创建时间")
     private Date createTime;
 
