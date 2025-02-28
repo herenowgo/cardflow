@@ -70,7 +70,7 @@ public interface CardRepository extends MongoRepository<Card, String> {
     @Query(value = "{ 'ankiInfo.cardId': { $in: ?0 }, 'isDeleted': false }")
     List<Card> findByAnkiInfoCardIdIn(List<Long> cardIds);
 
-        /**
+    /**
      * 获取指定用户在指定时间之前到期的卡片
      * 
      * @param userId 用户ID
