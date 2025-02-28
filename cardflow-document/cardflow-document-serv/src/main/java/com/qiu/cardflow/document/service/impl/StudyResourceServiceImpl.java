@@ -73,6 +73,7 @@ public class StudyResourceServiceImpl implements StudyResourceService {
                 .parentPath(parentPath)
                 .isFolder(false)
                 .isDeleted(false)
+                .isPublic(false) // 默认不公开
                 .createTime(new Date())
                 .updateTime(new Date())
                 .build();
@@ -94,6 +95,7 @@ public class StudyResourceServiceImpl implements StudyResourceService {
                 .parentPath(parentPath)
                 .isFolder(true)
                 .isDeleted(false)
+                .isPublic(false) // 默认不公开
                 .createTime(now)
                 .updateTime(now)
                 .build();
@@ -168,9 +170,11 @@ public class StudyResourceServiceImpl implements StudyResourceService {
         StudyResource resource = studyResourceRepository.findById(id)
                 .orElseThrow(() -> new ApiException("资源不存在"));
 
-        // 2. 检查访问权限
-        Asserts.failIf(!UserContext.getUserId().equals(resource.getUserId()) && !UserContext.isAdmin(),
-                "无权限访问该资源");
+        // 2. 检查访问权限 - 加入公开资源校验逻辑
+        boolean hasAccess = UserContext.getUserId().equals(resource.getUserId()) ||
+                UserContext.isAdmin() ||
+                Boolean.TRUE.equals(resource.getIsPublic());
+        Asserts.failIf(!hasAccess, "无权限访问该资源");
 
         // 3. 检查是否为文件夹
         Asserts.failIf(resource.getIsFolder(), "文件夹不支持预览");
@@ -328,7 +332,6 @@ public class StudyResourceServiceImpl implements StudyResourceService {
                 "Folder file count limit exceeded: " + DocumentConstant.MAX_FILES_PER_FOLDER);
     }
 
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateResource(Long userId, UpdateStudyResourceRequest request) {
@@ -336,20 +339,25 @@ public class StudyResourceServiceImpl implements StudyResourceService {
         StudyResource resource = studyResourceRepository.findById(request.getId())
                 .orElseThrow(() -> new ApiException("资源不存在"));
 
-        // 2. 验证资源所有权
-        if (!resource.getUserId().equals(userId)) {
-            throw new ApiException("无权限修改该资源");
+        // 2. 验证资源所有权或管理员权限
+        boolean hasAccess = resource.getUserId().equals(userId) || UserContext.isAdmin();
+        Asserts.failIf(!hasAccess, "无权限修改该资源");
+
+        // 3. 处理公开属性 - 只有管理员可以设置
+        if (request.getIsPublic() != null && !request.getIsPublic().equals(resource.getIsPublic())) {
+            Asserts.failIf(!UserContext.isAdmin(), "只有管理员可以设置资源是否公开");
+            resource.setIsPublic(request.getIsPublic());
         }
 
-        // 3. 更新允许修改的字段
+        // 4. 更新允许修改的字段 - 排除isPublic字段，已单独处理
         BeanUtil.copyProperties(request, resource, CopyOptions.create()
                 .setIgnoreNullValue(true)
-                .setIgnoreProperties("id")); // 忽略id字段,防止覆盖
+                .setIgnoreProperties("id", "isPublic")); // 忽略id和isPublic字段
 
-        // 4. 更新时间
+        // 5. 更新时间
         resource.setUpdateTime(new Date());
 
-        // 5. 保存更新
+        // 6. 保存更新
         studyResourceRepository.save(resource);
     }
 
@@ -366,6 +374,12 @@ public class StudyResourceServiceImpl implements StudyResourceService {
         // 3. 检查同名文件
         checkNameExists(request.getName(), request.getParentPath());
 
+        // 处理公开属性 - 只有管理员可以设置
+        Boolean isPublic = request.getIsPublic();
+        if (Boolean.TRUE.equals(isPublic)) {
+            Asserts.failIf(!UserContext.isAdmin(), "只有管理员可以创建公开资源");
+        }
+
         // 4. 创建资源对象
         Date now = new Date();
         StudyResource resource = StudyResource.builder()
@@ -380,6 +394,7 @@ public class StudyResourceServiceImpl implements StudyResourceService {
                 .resourceUrl(request.getResourceUrl())
                 .isFolder(false)
                 .isDeleted(false)
+                .isPublic(isPublic) // 设置公开属性
                 .createTime(now)
                 .updateTime(now)
                 .build();
@@ -402,9 +417,11 @@ public class StudyResourceServiceImpl implements StudyResourceService {
         // 2. 检查资源是否已删除
         Asserts.failIf(resource.getIsDeleted(), "资源已删除");
 
-        // 3. 检查访问权限
-        Asserts.failIf(!UserContext.getUserId().equals(resource.getUserId()) && !UserContext.isAdmin(),
-                "无权限访问该资源");
+        // 3. 检查访问权限 - 加入公开资源校验逻辑
+        boolean hasAccess = UserContext.getUserId().equals(resource.getUserId()) ||
+                UserContext.isAdmin() ||
+                Boolean.TRUE.equals(resource.getIsPublic());
+        Asserts.failIf(!hasAccess, "无权限访问该资源");
 
         // 4. 转换为VO并返回
         StudyResourceVO vo = new StudyResourceVO();
@@ -443,5 +460,87 @@ public class StudyResourceServiceImpl implements StudyResourceService {
                 .build();
 
         return objectStorage.uploadFile(fileDTO);
+    }
+
+    @Override
+    public List<StudyResourceVO> getPublicResources() {
+        // 获取所有公开且未删除的非文件夹资源
+        List<StudyResource> resources = studyResourceRepository.findByIsPublicTrueAndIsDeletedFalseAndIsFolderFalse();
+
+        // 转换为VO并返回
+        return resources.stream()
+                .map(resource -> {
+                    StudyResourceVO vo = new StudyResourceVO();
+                    BeanUtils.copyProperties(resource, vo);
+                    return vo;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public StudyResourceVO getPublicResourceById(String id) {
+        // 1. 查找资源
+        StudyResource resource = studyResourceRepository.findById(id)
+                .orElseThrow(() -> new ApiException("资源不存在"));
+
+        // 2. 检查资源是否已删除
+        Asserts.failIf(resource.getIsDeleted(), "资源已删除");
+
+        // 3. 检查资源是否公开
+        Asserts.failIf(!Boolean.TRUE.equals(resource.getIsPublic()), "该资源不是公开资源");
+
+        // 4. 转换为VO并返回
+        StudyResourceVO vo = new StudyResourceVO();
+        BeanUtils.copyProperties(resource, vo);
+        return vo;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public StudyResourceVO favoritePublicResource(Long userId, String resourceId, String parentPath) throws Exception {
+        // 1. 获取要收藏的资源
+        StudyResource originResource = studyResourceRepository.findById(resourceId)
+                .orElseThrow(() -> new ApiException("资源不存在"));
+
+        // 2. 验证是否为公开资源
+        Asserts.failIf(!Boolean.TRUE.equals(originResource.getIsPublic()), "只能收藏公开资源");
+        Asserts.failIf(originResource.getIsDeleted(), "资源已删除");
+        Asserts.failIf(originResource.getIsFolder(), "不能收藏文件夹");
+        
+        // 3. 验证目标路径
+        FileValidationUtil.validatePath(parentPath);
+        
+        // 4. 检查同名文件是否存在
+        checkNameExists(originResource.getName(), parentPath);
+        
+        // 5. 创建资源副本
+        Date now = new Date();
+        StudyResource newResource = StudyResource.builder()
+                .userId(userId)
+                .name(originResource.getName())
+                .resourceType(originResource.getResourceType())
+                .parentPath(parentPath)
+                .coverUrl(originResource.getCoverUrl())
+                .description(originResource.getDescription())
+                .content(originResource.getContent())
+                .note("") // 收藏的资源不复制原有笔记
+                .resourceUrl(originResource.getResourceUrl())
+                .objectStorageFileName(originResource.getObjectStorageFileName()) // 共享原始文件
+                .size(originResource.getSize())
+                .structuredTags(originResource.getStructuredTags())
+                .isFolder(false)
+                .isDeleted(false)
+                .isPublic(false) // 收藏的资源默认不公开
+                .createTime(now)
+                .updateTime(now)
+                .build();
+                
+        // 6. 保存资源副本
+        newResource = studyResourceRepository.save(newResource);
+        
+        // 7. 转换为VO并返回
+        StudyResourceVO vo = new StudyResourceVO();
+        BeanUtils.copyProperties(newResource, vo);
+        return vo;
     }
 }

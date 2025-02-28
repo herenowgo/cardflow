@@ -90,4 +90,30 @@ public interface StudyResourceService {
      * @throws Exception 如果上传失败或文件格式不支持
      */
     String uploadCover(MultipartFile file) throws Exception;
+
+    /**
+     * 获取公开的资源列表
+     * 
+     * @return 公开资源列表
+     */
+    List<StudyResourceVO> getPublicResources();
+    
+    /**
+     * 获取公开资源详情
+     * 
+     * @param id 资源ID
+     * @return 资源详情
+     */
+    StudyResourceVO getPublicResourceById(String id);
+
+    /**
+     * 收藏公开资源到用户个人空间
+     * 
+     * @param userId 用户ID
+     * @param resourceId 要收藏的公开资源ID
+     * @param parentPath 收藏到的目标路径
+     * @return 收藏后的资源信息
+     * @throws Exception 如果资源不存在或不是公开资源
+     */
+    StudyResourceVO favoritePublicResource(Long userId, String resourceId, String parentPath) throws Exception;
 }

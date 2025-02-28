@@ -65,6 +65,9 @@ public class StudyResource {
 
     @Schema(description = "是否已删除")
     private Boolean isDeleted;
+    
+    @Schema(description = "是否公开（仅管理员可设置）")
+    private Boolean isPublic;
 
     @Schema(description = "创建时间")
     private Date createTime;

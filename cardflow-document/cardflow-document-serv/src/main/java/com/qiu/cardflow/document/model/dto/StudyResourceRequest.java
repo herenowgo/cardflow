@@ -37,4 +37,7 @@ public class StudyResourceRequest {
 
     @Schema(description = "在线资源URL")
     private String resourceUrl;
+
+    @Schema(description = "是否公开（仅管理员可设置）")
+    private Boolean isPublic = false;
 }

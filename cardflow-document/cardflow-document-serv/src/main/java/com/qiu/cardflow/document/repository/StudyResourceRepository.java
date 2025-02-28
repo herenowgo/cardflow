@@ -60,4 +60,14 @@ public interface StudyResourceRepository extends MongoRepository<StudyResource, 
          */
         List<StudyResource> findByUserIdAndIsDeletedTrueAndDeleteTimeGreaterThan(
                         Long userId, Date time);
+
+        /**
+         * 查询所有公开且未删除的非文件夹资源
+         */
+        List<StudyResource> findByIsPublicTrueAndIsDeletedFalseAndIsFolderFalse();
+    
+        /**
+         * 根据标签查询公开资源
+         */
+        List<StudyResource> findByIsPublicTrueAndIsDeletedFalseAndStructuredTagsContaining(String tag);
 }

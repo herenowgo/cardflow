@@ -25,4 +25,7 @@ public class StudyResourceVO {
     private String resourceUrl; // 在线资源URL
     @Schema(description = "结构化标签")
     private List<String> structuredTags;
+    
+    @Schema(description = "是否公开")
+    private Boolean isPublic;
 }

@@ -23,4 +23,7 @@ public class UpdateStudyResourceRequest {
     private String resourceUrl; // 在线资源URL
     @Schema(description = "结构化标签")
     private List<String> structuredTags;
+
+    @Schema(description = "是否公开（仅管理员可设置）")
+    private Boolean isPublic;
 }

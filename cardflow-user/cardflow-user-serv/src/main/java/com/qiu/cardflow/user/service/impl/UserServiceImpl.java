@@ -118,7 +118,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             Asserts.fail("用户不存在或密码错误");
         }
         // 登录
-        StpUtil.login(user.getId(), SaLoginConfig.setExtra(AuthConstant.ROLE, user.getUserRole()));
+        StpUtil.login(user.getId(), SaLoginConfig.setExtra(AuthConstant.ROLE, user.getUserRole()).setTimeout(2592000));
 
 
 //        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);

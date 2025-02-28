@@ -25,6 +25,7 @@ import com.qiu.cardflow.document.model.vo.FileListVO;
 import com.qiu.cardflow.document.model.vo.StudyResourceVO;
 import com.qiu.cardflow.document.service.StudyResourceService;
 
+import cn.hutool.core.lang.Assert;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -118,5 +119,46 @@ public class StudyResourceController {
                         throws Exception {
                 String coverUrl = studyResourceService.uploadCover(file);
                 return BaseResponse.success(coverUrl);
+        }
+
+        @Operation(summary = "获取所有公开资源", description = "获取所有被设置为公开的资源列表")
+        @GetMapping("/public")
+        public BaseResponse<List<StudyResourceVO>> getPublicResources() {
+                return BaseResponse.success(studyResourceService.getPublicResources());
+        }
+
+        @Operation(summary = "获取公开资源详情", description = "通过ID获取指定的公开资源详情")
+        @GetMapping("/public/{id}")
+        public BaseResponse<StudyResourceVO> getPublicResourceDetail(
+                        @Parameter(description = "资源ID", required = true) @PathVariable String id) {
+                return BaseResponse.success(studyResourceService.getPublicResourceById(id));
+        }
+
+        @Operation(summary = "设置资源公开状态", description = "设置资源是否公开，仅管理员可操作")
+        @PutMapping("/{id}/public")
+        public BaseResponse<Void> setResourcePublicStatus(
+                        @Parameter(description = "资源ID", required = true) @PathVariable String id,
+                        @Parameter(description = "是否公开", required = true) @RequestParam Boolean isPublic) {
+                // 检查管理员权限
+                Assert.isTrue(UserContext.isAdmin(), "只有管理员可以设置资源公开状态");
+
+                // 更新资源公开状态
+                UpdateStudyResourceRequest request = new UpdateStudyResourceRequest();
+                request.setId(id);
+                request.setIsPublic(isPublic);
+                studyResourceService.updateResource(UserContext.getUserId(), request);
+
+                return BaseResponse.success(null);
+        }
+
+        @Operation(summary = "收藏公开资源", description = "将公开资源收藏到用户个人空间")
+        @PostMapping("/public/{id}/favorite")
+        public BaseResponse<StudyResourceVO> favoritePublicResource(
+                        @Parameter(description = "资源ID", required = true) @PathVariable String id,
+                        @Parameter(description = "目标路径", schema = @Schema(defaultValue = "/"), example = "/收藏/") @RequestParam(required = false, defaultValue = "/") String targetPath)
+                        throws Exception {
+                StudyResourceVO resource = studyResourceService.favoritePublicResource(UserContext.getUserId(), id,
+                                targetPath);
+                return BaseResponse.success(resource);
         }
 }
