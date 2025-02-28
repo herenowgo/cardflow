@@ -25,7 +25,7 @@ public interface IGraphService {
     /**
      * 获取用户的知识标签图谱
      */
-    GraphDTO getTagsGraph();
+    GraphDTO getTagsGraph(Boolean overt);
 
     /**
      * 根据知识点标签获取卡片

@@ -1,5 +1,6 @@
 package com.qiu.cardflow.api.service.impl;
 
+import com.qiu.cardflow.api.context.UserContext;
 import com.qiu.cardflow.api.service.IGraphService;
 import com.qiu.cardflow.card.dto.card.CardDTO;
 import com.qiu.cardflow.card.interfaces.ICardRPC;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
+import org.apache.catalina.startup.UserConfig;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +21,7 @@ public class GraphServiceImpl implements IGraphService {
 
     @DubboReference(validation = "true")
     private IGraphRpc graphRpc;
-    
+
     @DubboReference(validation = "true")
     private ICardRPC cardRpc;
 
@@ -41,13 +43,22 @@ public class GraphServiceImpl implements IGraphService {
     }
 
     @Override
-    public GraphDTO getTagsGraph() {
-        return graphRpc.getTagsGraph();
+    public GraphDTO getTagsGraph(Boolean overt) {
+        if (overt == null || !overt) {
+            return graphRpc.getTagsGraph();
+
+        }
+        Long userId = UserContext.getUserId();
+        UserContext.setUserId(-1l);
+        GraphDTO res = graphRpc.getTagsGraph();
+        UserContext.setUserId(userId);
+        return res;
     }
 
     @Override
     public List<CardDTO> getCardsByTags(List<String> tags) {
-        List<String> cardIdList = graphRpc.getCardsByTags(tags);;
+        List<String> cardIdList = graphRpc.getCardsByTags(tags);
+        ;
         return cardRpc.getCardsByIds(cardIdList);
     }
 }

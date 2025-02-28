@@ -48,8 +48,8 @@ public class GraphController {
 
     @GetMapping("/tags")
     @Operation(summary = "获取用户的知识标签图谱")
-    public BaseResponse<GraphDTO> getTagsGraph() {
-        GraphDTO graphDTO = graphService.getTagsGraph();
+    public BaseResponse<GraphDTO> getTagsGraph(@RequestParam(required = false) Boolean overt) {
+        GraphDTO graphDTO = graphService.getTagsGraph(overt);
         return BaseResponse.success(graphDTO);
     }
 
