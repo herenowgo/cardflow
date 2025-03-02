@@ -10,7 +10,6 @@ import com.qiu.cardflow.card.dto.card.*;
 import com.qiu.cardflow.common.interfaces.exception.Assert;
 import com.qiu.cardflow.common.interfaces.exception.BusinessException;
 import com.qiu.cardflow.common.interfaces.exception.PageResult;
-import com.qiu.cardflow.common.interfaces.exception.Result;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;

@@ -12,7 +12,7 @@
     <artifactId>cardflow-eventStream</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>codeflow-eventStream-api</module>
+        <module>cardflow-eventStream-api</module>
         <module>cardflow-eventStream-serv</module>
     </modules>
 

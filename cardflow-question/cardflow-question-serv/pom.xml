@@ -20,7 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>com.qiu.cardflow</groupId>
-            <artifactId>codeflow-eventStream-api</artifactId>
+            <artifactId>cardflow-eventStream-api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>

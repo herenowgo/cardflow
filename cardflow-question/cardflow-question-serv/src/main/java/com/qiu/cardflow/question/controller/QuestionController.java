@@ -33,7 +33,6 @@ public class QuestionController {
     @Resource
     private QuestionService questionService;
 
-
     private final static Gson GSON = new Gson();
 
     // region 增删改查
@@ -46,7 +45,8 @@ public class QuestionController {
      * @return
      */
     @PostMapping("/add")
-    public BaseResponse<Long> addQuestion(@RequestBody QuestionAddRequest questionAddRequest, HttpServletRequest request) {
+    public BaseResponse<Long> addQuestion(@RequestBody QuestionAddRequest questionAddRequest,
+            HttpServletRequest request) {
         Asserts.failIf(questionAddRequest == null, "请求参数错误");
         Question question = new Question();
         BeanUtils.copyProperties(questionAddRequest, question);
@@ -174,18 +174,21 @@ public class QuestionController {
      */
     @PostMapping("/list/page/vo")
     public BaseResponse<Page<QuestionVO>> listQuestionVOByPage(@RequestBody QuestionQueryRequest questionQueryRequest,
-                                                               HttpServletRequest request) {
+            HttpServletRequest request) {
         Asserts.failIf(questionQueryRequest == null, "请求参数错误");
         long current = questionQueryRequest.getCurrent();
         long size = questionQueryRequest.getPageSize();
         // 限制爬虫
         Asserts.failIf(size > 20, "页面大小超出限制");
         Page<Question> questionPage;
-//        if (StringUtils.isAllBlank(questionQueryRequest.getTitle(), questionQueryRequest.getAnswer(), questionQueryRequest.getContent()) && CollectionUtils.isEmpty(questionQueryRequest.getTags())) {
-//            questionPage = questionService.simplePageUseCache(current, size);
-//        } else {
-        questionPage = questionService.page(new Page<>(current, size), questionService.getQueryWrapper(questionQueryRequest));
-//        }
+        // if (StringUtils.isAllBlank(questionQueryRequest.getTitle(),
+        // questionQueryRequest.getAnswer(), questionQueryRequest.getContent()) &&
+        // CollectionUtils.isEmpty(questionQueryRequest.getTags())) {
+        // questionPage = questionService.simplePageUseCache(current, size);
+        // } else {
+        questionPage = questionService.page(new Page<>(current, size),
+                questionService.getQueryWrapper(questionQueryRequest));
+        // }
 
         return BaseResponse.success(questionService.getQuestionVOPage(questionPage, request));
     }
@@ -202,7 +205,8 @@ public class QuestionController {
         long current = questionQueryRequest.getCurrent();
         long size = questionQueryRequest.getPageSize();
         Page<Question> questionPage;
-        questionPage = questionService.page(new Page<>(current, size), questionService.getQueryWrapper(questionQueryRequest));
+        questionPage = questionService.page(new Page<>(current, size),
+                questionService.getQueryWrapper(questionQueryRequest));
 
         return BaseResponse.success(questionPage);
     }
@@ -216,7 +220,7 @@ public class QuestionController {
      */
     @PostMapping("/my/list/page/vo")
     public BaseResponse<Page<QuestionVO>> listMyQuestionVOByPage(@RequestBody QuestionQueryRequest questionQueryRequest,
-                                                                 HttpServletRequest request) {
+            HttpServletRequest request) {
         Asserts.failIf(questionQueryRequest == null, "请求参数错误");
         questionQueryRequest.setUserId(UserContext.getUserId());
         long current = questionQueryRequest.getCurrent();
@@ -230,7 +234,6 @@ public class QuestionController {
 
     // endregion
 
-
     /**
      * 编辑（用户）
      *
@@ -240,7 +243,8 @@ public class QuestionController {
      */
     @PostMapping("/edit")
     @CacheEvict(value = QuestionConstant.CACHE_QUESTION_SIMPLE_PAGE, allEntries = true)
-    public BaseResponse<Boolean> editQuestion(@RequestBody QuestionEditRequest questionEditRequest, HttpServletRequest request) {
+    public BaseResponse<Boolean> editQuestion(@RequestBody QuestionEditRequest questionEditRequest,
+            HttpServletRequest request) {
         Asserts.failIf(questionEditRequest == null || questionEditRequest.getId() <= 0, "请求参数错误");
         Question question = new Question();
         BeanUtils.copyProperties(questionEditRequest, question);
@@ -267,7 +271,6 @@ public class QuestionController {
         boolean result = questionService.updateById(question);
         return BaseResponse.success(result);
     }
-
 
     /**
      * 获取最热门的50个题目

@@ -1,8 +1,18 @@
 package com.qiu.cardflow.question.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -41,19 +51,11 @@ import com.qiu.cardflow.question.utils.SqlUtils;
 import com.qiu.codeflow.eventStream.dto.EventMessage;
 import com.qiu.codeflow.eventStream.dto.EventType;
 import com.qiu.codeflow.eventStream.util.EventMessageUtil;
-import jakarta.annotation.Resource;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.cloud.stream.function.StreamBridge;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
+import jakarta.annotation.Resource;
 
 /**
  * @author 10692
@@ -79,7 +81,6 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     // 自定义线程池
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
-
     /**
      * 提交题目
      *
@@ -98,7 +99,6 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         // 获取题目相关信息
         Question question = questionService.getById(questionId);
         Asserts.failIf(question == null, ResultCode.FAILED);
-
 
         QuestionSubmit questionSubmit = QuestionSubmit.builder()
                 .userId(userId)
@@ -119,10 +119,8 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         // 异步执行判题服务
         streamBridge.send(EventConstant.QUESTION_SUBMIT, questionSubmitId + "," + requestId);
 
-
         return new QuestionSubmitResponse(requestId, questionSubmitId);
     }
-
 
     /**
      * 获取查询包装类
@@ -155,7 +153,6 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         return queryWrapper;
     }
 
-
     @Override
     public QuestionSubmitVO getQuestionSubmitVO(QuestionSubmit questionSubmit) {
         QuestionSubmitVO questionSubmitVO = QuestionSubmitVO.objToVo(questionSubmit);
@@ -169,11 +166,13 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     @Override
     public Page<QuestionSubmitVO> getQuestionSubmitVOPage(Page<QuestionSubmit> questionSubmitPage) {
         List<QuestionSubmit> questionSubmitList = questionSubmitPage.getRecords();
-        Page<QuestionSubmitVO> questionSubmitVOPage = new Page<>(questionSubmitPage.getCurrent(), questionSubmitPage.getSize(), questionSubmitPage.getTotal());
+        Page<QuestionSubmitVO> questionSubmitVOPage = new Page<>(questionSubmitPage.getCurrent(),
+                questionSubmitPage.getSize(), questionSubmitPage.getTotal());
         if (CollectionUtils.isEmpty(questionSubmitList)) {
             return questionSubmitVOPage;
         }
-        List<QuestionSubmitVO> questionSubmitVOList = questionSubmitList.stream().map(this::getQuestionSubmitVO).collect(Collectors.toList());
+        List<QuestionSubmitVO> questionSubmitVOList = questionSubmitList.stream().map(this::getQuestionSubmitVO)
+                .collect(Collectors.toList());
         questionSubmitVOPage.setRecords(questionSubmitVOList);
         return questionSubmitVOPage;
     }
@@ -204,9 +203,9 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         LambdaQueryWrapper<QuestionSubmit> wrapper = Wrappers.lambdaQuery(QuestionSubmit.class)
                 .eq(QuestionSubmit::getUserId, userId)
                 .eq(QuestionSubmit::getQuestionId, questionId)
-                .select(QuestionSubmit::getStatus, QuestionSubmit::getId, QuestionSubmit::getLanguage, QuestionSubmit::getJudgeInfo, QuestionSubmit::getCreateTime)
+                .select(QuestionSubmit::getStatus, QuestionSubmit::getId, QuestionSubmit::getLanguage,
+                        QuestionSubmit::getJudgeInfo, QuestionSubmit::getCreateTime)
                 .orderByDesc(QuestionSubmit::getCreateTime);
-
 
         // 从数据库中获取原始的分页数据
         Page<QuestionSubmit> questionSubmitPage = page(new Page<>(current, size), wrapper);
@@ -262,7 +261,6 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
             streamBridge.send("eventMessage-out-0", eventMessage);
         });
 
-
         return requestId;
     }
 
@@ -270,7 +268,8 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     public List<QuestionSubmitWithTagVO> listQuestionSubmit(Integer number) {
 
         LambdaQueryWrapper<QuestionSubmit> lambdaQueryWrapper = Wrappers.lambdaQuery(QuestionSubmit.class)
-                .select(QuestionSubmit::getLanguage, QuestionSubmit::getCreateTime, QuestionSubmit::getJudgeInfo, QuestionSubmit::getStatus, QuestionSubmit::getQuestionId)
+                .select(QuestionSubmit::getLanguage, QuestionSubmit::getCreateTime, QuestionSubmit::getJudgeInfo,
+                        QuestionSubmit::getStatus, QuestionSubmit::getQuestionId)
                 .eq(QuestionSubmit::getUserId, UserContext.getUserId())
                 .orderByDesc(QuestionSubmit::getCreateTime)
                 .last("limit " + number);
@@ -286,7 +285,6 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         Map<Long, String> idTagMap = questions.stream()
                 .collect(Collectors.toMap(Question::getId, Question::getTags));
 
-
         List<QuestionSubmitWithTagVO> voList = list.stream()
                 .map(
                         questionSubmit -> {
@@ -294,8 +292,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
                             BeanUtil.copyProperties(questionSubmit, questionSubmitWithTagVO);
                             questionSubmitWithTagVO.setTags(idTagMap.get(questionSubmit.getQuestionId()));
                             return questionSubmitWithTagVO;
-                        }
-                )
+                        })
                 .toList();
 
         return voList;
