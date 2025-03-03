@@ -19,9 +19,9 @@ import com.qiu.cardflow.card.dto.card.ReviewLogDTO;
 import com.qiu.cardflow.card.interfaces.ICardRPC;
 import com.qiu.cardflow.common.interfaces.exception.BusinessException;
 import com.qiu.cardflow.common.interfaces.exception.PageResult;
-import com.qiu.cardflow.common.interfaces.message.MessageWithUserId;
 import com.qiu.cardflow.graph.dto.CardNodeDTO;
 import com.qiu.cardflow.graph.interfaces.IGraphRpc;
+import com.qiu.cardflow.graph.message.MessageWithUserId;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

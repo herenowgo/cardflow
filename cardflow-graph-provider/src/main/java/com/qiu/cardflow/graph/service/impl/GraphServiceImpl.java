@@ -11,12 +11,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import com.qiu.cardflow.common.interfaces.exception.BusinessException;
-import com.qiu.cardflow.common.interfaces.message.MessageWithUserId;
 import com.qiu.cardflow.graph.constants.NodeType;
 import com.qiu.cardflow.graph.dto.CardNodeDTO;
 import com.qiu.cardflow.graph.dto.EdgeDTO;
 import com.qiu.cardflow.graph.dto.GraphDTO;
 import com.qiu.cardflow.graph.dto.NodeDTO;
+import com.qiu.cardflow.graph.message.MessageWithUserId;
 import com.qiu.cardflow.graph.model.entity.CardNode;
 import com.qiu.cardflow.graph.model.entity.TagNode;
 import com.qiu.cardflow.graph.model.entity.UserNode;

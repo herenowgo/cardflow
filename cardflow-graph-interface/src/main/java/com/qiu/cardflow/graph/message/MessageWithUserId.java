@@ -1,4 +1,4 @@
-package com.qiu.cardflow.common.interfaces.message;
+package com.qiu.cardflow.graph.message;
 
 import java.util.List;
 
