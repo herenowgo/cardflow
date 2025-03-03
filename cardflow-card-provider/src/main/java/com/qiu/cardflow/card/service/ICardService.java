@@ -16,7 +16,7 @@ import com.qiu.cardflow.common.interfaces.exception.PageResult;
 
 public interface ICardService {
 
-    Boolean createCard(CardAddRequest cardAddRequest) throws BusinessException;
+    String createCard(CardAddRequest cardAddRequest) throws BusinessException;
 
     Boolean deleteCard(String cardId) throws BusinessException;
 

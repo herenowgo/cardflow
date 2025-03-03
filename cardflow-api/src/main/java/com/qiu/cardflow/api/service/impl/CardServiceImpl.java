@@ -1,10 +1,13 @@
 package com.qiu.cardflow.api.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 
+import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import com.qiu.cardflow.api.context.UserContext;
 import com.qiu.cardflow.api.service.ICardService;
 import com.qiu.cardflow.card.dto.anki.AnkiSyncResponse;
@@ -16,6 +19,7 @@ import com.qiu.cardflow.card.dto.card.ReviewLogDTO;
 import com.qiu.cardflow.card.interfaces.ICardRPC;
 import com.qiu.cardflow.common.interfaces.exception.BusinessException;
 import com.qiu.cardflow.common.interfaces.exception.PageResult;
+import com.qiu.cardflow.common.interfaces.message.MessageWithUserId;
 import com.qiu.cardflow.graph.dto.CardNodeDTO;
 import com.qiu.cardflow.graph.interfaces.IGraphRpc;
 
@@ -33,14 +37,27 @@ public class CardServiceImpl implements ICardService {
     @DubboReference
     private IGraphRpc graphRPC;
 
+    private final StreamBridge streamBridge;
+
     @Override
     public Boolean createCard(CardAddRequest cardAddRequest) throws BusinessException {
-        return cardRPC.createCard(cardAddRequest);
+
+        String cardId = cardRPC.createCard(cardAddRequest);
+        CardNodeDTO cardNoteDTO = CardNodeDTO.builder()
+                .cardId(cardId)
+                .tags(cardAddRequest.getTags())
+                .build();
+
+        streamBridge.send("cardNodeGenerate-out-0",
+                MessageWithUserId.builder().userId(UserContext.getUserId()).data(List.of(cardNoteDTO)).build());
+        return true;
     }
 
     @Override
     public Boolean deleteCard(String cardId) throws BusinessException {
-        return cardRPC.deleteCard(cardId);
+        cardRPC.deleteCard(cardId);
+        graphRPC.deleteCard(cardId);
+        return true;
     }
 
     @Override
@@ -106,7 +123,30 @@ public class CardServiceImpl implements ICardService {
 
     @Override
     public List<String> saveCards(List<CardUpdateRequest> cardUpdateRequests) {
-        return cardRPC.saveCards(cardUpdateRequests);
+        List<String> savedCardIds = cardRPC.saveCards(cardUpdateRequests);
+        List<Integer> newCardIndexs = new ArrayList<>();
+        for (int i = 0; i < cardUpdateRequests.size(); i++) {
+            if (StrUtil.isBlank(cardUpdateRequests.get(i).getId())) {
+                newCardIndexs.add(i);
+            }
+        }
+        if (newCardIndexs.isEmpty()) {
+            return savedCardIds;
+        }
+        List<CardNodeDTO> newCardNodeList = new ArrayList<>();
+        for (int index : newCardIndexs) {
+            String cardId = savedCardIds.get(index);
+            CardNodeDTO cardNodeDTO = CardNodeDTO.builder()
+                    .cardId(cardId)
+                    .tags(cardUpdateRequests.get(index).getTags())
+                    .build();
+            newCardNodeList.add(cardNodeDTO);
+        }
+
+        streamBridge.send("cardNodeGenerate-out-0",
+                MessageWithUserId.builder().userId(UserContext.getUserId()).data(newCardNodeList).build());
+
+        return savedCardIds;
     }
 
     @Override

@@ -127,7 +127,7 @@ public class CardServiceImpl implements ICardService {
     }
 
     // 创建新卡片
-    public Boolean createCard(CardAddRequest cardAddRequest) {
+    public String createCard(CardAddRequest cardAddRequest) {
         Card card = new Card();
         BeanUtil.copyProperties(cardAddRequest, card);
         // 判断是系统的新卡还是anki的新卡
@@ -148,8 +148,7 @@ public class CardServiceImpl implements ICardService {
             groupServiceImpl.addGroup(card.getGroup());
         }
 
-        cardRepository.save(card);
-        return true;
+        return cardRepository.save(card).getId();
     }
 
     // 逻辑删除卡片

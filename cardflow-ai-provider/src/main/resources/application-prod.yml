@@ -1,0 +1,48 @@
+dubbo:
+  provider:
+    retries: 0
+    timeout: 5000
+  #  filter: validationExceptionFilter
+  #  validation: true
+#  consumer:
+#    validation: true
+  application:
+    logger: slf4j
+    name: cardflow-ai
+  registry:
+    address: nacos://${NACOS_CARDFLOW_ADDRESS}
+    parameters:
+      namespace: cardflow
+      password: ${NACOS_CARDFLOW_PASSWORD}
+      username: cardflow
+  protocol:
+    # name: tri
+    port: 50099
+spring:
+  cloud:
+    stream:
+      bindings:
+        eventMessage-out-0:
+          destination: eventMessage-queue
+          group: prod
+          content-type: application/json
+    nacos:
+      config:
+        import-check:
+          enabled: false
+        # 当前服务启动后去nacos中读取配置文件的后缀
+        file-extension: yml
+        # 读取配置的nacos地址
+        server-addr: ${NACOS_CARDFLOW_ADDRESS}
+        # 读取配置的nacos的名空间
+        namespace: cardflow-config
+        password: ${NACOS_CARDFLOW_PASSWORD}
+        username: ${NACOS_CARDFLOW_USERNAME}
+  config:
+    import:
+      - optional:nacos:${spring.application.name}.yml
+      - optional:nacos:SpringBootRabbitMQ.yml
+
+  application:
+    name: cardflow-ai
+

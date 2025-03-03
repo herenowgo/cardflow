@@ -32,6 +32,11 @@
             <artifactId>cardflow-graph-interface</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+                <!-- Spring Cloud Stream -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

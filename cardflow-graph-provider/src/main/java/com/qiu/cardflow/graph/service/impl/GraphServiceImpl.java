@@ -1,6 +1,17 @@
 package com.qiu.cardflow.graph.service.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+
 import com.qiu.cardflow.common.interfaces.exception.BusinessException;
+import com.qiu.cardflow.common.interfaces.message.MessageWithUserId;
 import com.qiu.cardflow.graph.constants.NodeType;
 import com.qiu.cardflow.graph.dto.CardNodeDTO;
 import com.qiu.cardflow.graph.dto.EdgeDTO;
@@ -10,20 +21,11 @@ import com.qiu.cardflow.graph.model.entity.CardNode;
 import com.qiu.cardflow.graph.model.entity.TagNode;
 import com.qiu.cardflow.graph.model.entity.UserNode;
 import com.qiu.cardflow.graph.repository.CardNodeRepository;
-import com.qiu.cardflow.graph.repository.TagNodeRepository;
-import com.qiu.cardflow.graph.repository.UserNodeRepository;
 import com.qiu.cardflow.graph.service.IGraphService;
 import com.qiu.cardflow.rpc.starter.RPCContext;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -31,8 +33,16 @@ import java.util.Map;
 @Validated
 public class GraphServiceImpl implements IGraphService {
     private final CardNodeRepository cardNodeRepository;
-    private final TagNodeRepository tagNodeRepository;
-    private final UserNodeRepository userNodeRepository;
+    
+    @Bean("cardNodeGenerate")
+    public Consumer<MessageWithUserId> processCardNodeGenerate() {
+        return (message) -> {
+            Long userId = message.getUserId();
+            List<CardNodeDTO> cardDTOList = message.getData();
+
+            addCards(cardDTOList, userId);
+        };
+    }
 
     @Override
     public boolean addCard(CardNodeDTO cardDTO) {
@@ -52,6 +62,25 @@ public class GraphServiceImpl implements IGraphService {
         cardNodeRepository.save(cardNode);
         return true;
 
+    }
+
+    @Override
+    public boolean addCards(List<CardNodeDTO> cardDTOList, Long userId) {
+        List<CardNode> cardNodeList = cardDTOList.stream()
+                .map((dto) -> {
+                    UserNode userNode = new UserNode(userId);
+                    List<TagNode> tagNodeList = dto.getTags().stream()
+                            .map(TagNode::new)
+                            .toList();
+
+                    return CardNode.builder()
+                            .userNode(userNode)
+                            .cardId(dto.getCardId())
+                            .tagNodeList(tagNodeList)
+                            .build();
+                }).toList();
+
+        return cardNodeRepository.saveAll(cardNodeList).size() == cardDTOList.size();
     }
 
     @Override
@@ -147,4 +176,5 @@ public class GraphServiceImpl implements IGraphService {
             throw new BusinessException("根据标签查询卡片失败");
         }
     }
+
 }

@@ -34,7 +34,7 @@ public class CardRPCImpl implements ICardRPC {
     private final ICardService cardService;
 
     @Override
-    public Boolean createCard(CardAddRequest cardAddRequest) throws BusinessException {
+    public String createCard(CardAddRequest cardAddRequest) throws BusinessException {
         return cardService.createCard(cardAddRequest);
     }
 

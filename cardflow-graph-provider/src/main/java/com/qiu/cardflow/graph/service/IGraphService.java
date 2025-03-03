@@ -12,6 +12,11 @@ public interface IGraphService {
     boolean addCard(CardNodeDTO cardDTO);
 
     /**
+     * 批量添加卡片节点及其关系
+     */
+    boolean addCards(List<CardNodeDTO> cardDTOList, Long userId);
+
+    /**
      * 删除卡片节点及其关系
      */
     boolean removeCard(String cardId);
