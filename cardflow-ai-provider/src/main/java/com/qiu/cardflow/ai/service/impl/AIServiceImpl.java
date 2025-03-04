@@ -136,8 +136,10 @@ public class AIServiceImpl implements IAIService {
     @Override
     public String structuredOutput(StructuredOutputRequestDTO structuredOutputRequestDTO) {
         TargetType targetType = structuredOutputRequestDTO.getTargetType();
-        String userPrompt = structuredOutputRequestDTO.getUserPrompt();
-        String systemPrompt = structuredOutputRequestDTO.getSystemPrompt();
+        String userPromptOriginal = structuredOutputRequestDTO.getUserPrompt();
+        String userPrompt = userPromptOriginal.replaceAll("\\{", "\\\\{").replaceAll("\\}", "\\\\}");
+        String systemPromptOriginal = structuredOutputRequestDTO.getSystemPrompt();
+        String systemPrompt = systemPromptOriginal.replaceAll("\\{", "\\\\{").replaceAll("\\}", "\\\\}");
         String model = structuredOutputRequestDTO.getModel();
         String userId = structuredOutputRequestDTO.getUserId();
         String conversationId = structuredOutputRequestDTO.getConversationId();
