@@ -21,9 +21,9 @@ public class HeartbeatService {
     private final EventStreamService eventStreamService;
 
     /**
-     * 每30秒向所有活跃连接发送一次心跳消息
+     * 每300秒向所有活跃连接发送一次心跳消息
      */
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 300000)
     public void sendHeartbeat() {
         log.debug("Sending heartbeat to all active connections");
 
