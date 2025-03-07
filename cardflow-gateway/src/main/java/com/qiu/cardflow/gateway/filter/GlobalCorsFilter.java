@@ -18,7 +18,9 @@ public class GlobalCorsFilter {
     public CorsWebFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         config.addAllowedMethod("*");
-        config.addAllowedOrigin("https://www.cardflow.site");
+        config.addAllowedOriginPattern("https://cardflow.site"); // 允许主域名
+        config.addAllowedOriginPattern("https://*.cardflow.site"); // 允许所有子域名
+        config.addAllowedOriginPattern("http://localhost:*"); // 允许本地开发环境
         config.addAllowedHeader("*");
         config.setAllowCredentials(true);
         config.addExposedHeader("*");
