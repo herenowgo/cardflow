@@ -380,12 +380,19 @@ public class CardServiceImpl implements ICardService {
     public Boolean deleteCardsByGroup(String groupName) throws BusinessException {
         Long userId = RPCContext.getUserId();
         // 查找当前用户指定牌组的所有卡片
-        List<Card> cards = cardRepository.findByUserIdAndGroup(userId, groupName);
+        List<Card> cards = cardRepository.findByUserIdAndGroupAndIsDeletedFalse(userId, groupName);
         if (cards.isEmpty()) {
             return true;
         }
-        // 删除找到的卡片
-        cardRepository.deleteAll(cards);
+
+        // 逻辑删除找到的卡片
+        Long currentTime = Card.getCurrentUnixTime();
+        cards.forEach(card -> {
+            card.setIsDeleted(true);
+            card.setDeleteTime(currentTime);
+        });
+
+        cardRepository.saveAll(cards);
         return true;
     }
 }
