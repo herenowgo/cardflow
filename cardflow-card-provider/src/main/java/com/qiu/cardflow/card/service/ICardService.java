@@ -57,4 +57,5 @@ public interface ICardService {
     // 添加多条件分页查询接口
     Page<Card> getCardsWithPagination(CardPageRequest cardPageRequest) throws BusinessException;
 
+    Boolean deleteCardsByGroup(String groupName) throws BusinessException;
 }

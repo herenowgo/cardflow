@@ -375,4 +375,17 @@ public class CardServiceImpl implements ICardService {
 
         return result;
     }
+
+    @Override
+    public Boolean deleteCardsByGroup(String groupName) throws BusinessException {
+        Long userId = RPCContext.getUserId();
+        // 查找当前用户指定牌组的所有卡片
+        List<Card> cards = cardRepository.findByUserIdAndGroup(userId, groupName);
+        if (cards.isEmpty()) {
+            return true;
+        }
+        // 删除找到的卡片
+        cardRepository.deleteAll(cards);
+        return true;
+    }
 }

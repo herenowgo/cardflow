@@ -15,6 +15,7 @@ import com.qiu.cardflow.common.interfaces.exception.RPC;
 public interface ICardRPC extends RPC {
     /**
      * 创建卡片
+     *
      * @param cardDTO
      * @return 卡片ID
      * @throws BusinessException
@@ -22,6 +23,8 @@ public interface ICardRPC extends RPC {
     String createCard(CardAddRequest cardDTO) throws BusinessException;
 
     Boolean deleteCard(String cardId) throws BusinessException;
+
+    Boolean deleteCardsByGroup(String groupName) throws BusinessException;
 
     Boolean updateCardContent(CardUpdateRequest cardUpdateRequest) throws BusinessException;
 

@@ -44,6 +44,11 @@ public class CardRPCImpl implements ICardRPC {
     }
 
     @Override
+    public Boolean deleteCardsByGroup(String groupName) throws BusinessException {
+        return cardService.deleteCardsByGroup(groupName);
+    }
+
+    @Override
     public Boolean updateCardContent(CardUpdateRequest cardUpdateRequest) throws BusinessException {
         return cardService.updateCardContent(cardUpdateRequest);
     }

@@ -41,6 +41,13 @@ public class CardController {
         return BaseResponse.success(cardService.deleteCard(cardId));
     }
 
+    // 删除指定牌组中的所有卡片
+    @DeleteMapping("/group/{groupName}")
+    @Operation(summary = "删除指定牌组中的所有卡片", description = "根据牌组名称删除牌组内的所有卡片")
+    public BaseResponse<Boolean> deleteCardsByGroup(@PathVariable String groupName) {
+        return BaseResponse.success(cardService.deleteCardsByGroup(groupName));
+    }
+
     // 更新卡片
     @PutMapping
     @Operation(summary = "更新卡片", description = "更新卡片内容")

@@ -54,5 +54,7 @@ public interface ICardService {
 
     PageResult<CardDTO> getCardsWithPagination(CardPageRequest cardPageRequest) throws BusinessException;
 
+    Boolean deleteCardsByGroup(String groupName);
+
     // Boolean
 }

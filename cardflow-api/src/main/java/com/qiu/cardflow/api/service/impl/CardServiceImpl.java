@@ -164,4 +164,20 @@ public class CardServiceImpl implements ICardService {
         return cardRPC.getCardsWithPagination(cardPageRequest);
     }
 
+    @Override
+    public Boolean deleteCardsByGroup(String groupName) {
+        //创建一个新线程删除知识图谱中对应的卡片
+        new Thread(() -> {
+            try {
+                List<CardDTO> userGroupCards = cardRPC.getUserGroupCards(groupName);
+                for (CardDTO card : userGroupCards) {
+                    graphRPC.deleteCard(card.getId());
+                }
+            } catch (Exception e) {
+                log.error("Error deleting cards from graph service for group: {}", groupName, e);
+            }
+        }).start();
+        return cardRPC.deleteCardsByGroup(groupName);
+    }
+
 }
