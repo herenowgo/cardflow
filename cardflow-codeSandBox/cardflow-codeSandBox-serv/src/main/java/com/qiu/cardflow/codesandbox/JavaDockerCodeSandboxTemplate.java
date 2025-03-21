@@ -10,6 +10,8 @@ import com.github.dockerjava.api.model.Volume;
 import com.github.dockerjava.core.command.ExecStartResultCallback;
 import com.qiu.cardflow.codesandbox.model.ExecuteCodeRequest;
 import com.qiu.cardflow.codesandbox.model.ExecuteCodeResponse;
+import com.qiu.cardflow.codesandbox.pool.ContainerInstance;
+import com.qiu.cardflow.codesandbox.pool.JavaContainerPool;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -28,8 +30,11 @@ public class JavaDockerCodeSandboxTemplate implements CodeSandbox {
 
     private final DockerClient dockerClient;
 
-    public JavaDockerCodeSandboxTemplate(DockerClient dockerClient) {
+    private final JavaContainerPool javaContainerPool;
+
+    public JavaDockerCodeSandboxTemplate(DockerClient dockerClient, JavaContainerPool javaContainerPool) {
         this.dockerClient = dockerClient;
+        this.javaContainerPool = javaContainerPool;
     }
 
     /**
@@ -42,25 +47,29 @@ public class JavaDockerCodeSandboxTemplate implements CodeSandbox {
     public ExecuteCodeResponse executeCode(ExecuteCodeRequest executeCodeRequest) throws IOException, InterruptedException {
         File userCodeFile = null;
         ExecuteCodeResponse executeCodeResponse = new ExecuteCodeResponse();
+        ContainerInstance containerInstance = null;
         try {
             userCodeFile = saveCodeToFile(executeCodeRequest.getCode());
 
-            String containerId = startUpOrGetContainer(dockerClient, userCodeFile);
+            containerInstance = javaContainerPool.borrowContainer();
+//            String containerId = startUpOrGetContainer(dockerClient, userCodeFile);
 
-            compileCode(dockerClient, containerId, executeCodeResponse);
+            compileCode(containerInstance.getDockerClient(), containerInstance.getContainerId(), userCodeFile.getParentFile().getName(), executeCodeResponse);
 
             if (!executeCodeResponse.getCompileErrorOutput().isEmpty()) {
                 return executeCodeResponse;
             }
 
-            runCode(dockerClient, containerId, executeCodeRequest.getInputList(), 3L, TimeUnit.SECONDS, executeCodeResponse);
+            runCode(containerInstance.getDockerClient(), containerInstance.getContainerId(), userCodeFile.getParentFile().getName(), executeCodeRequest.getInputList(), 3L, TimeUnit.SECONDS, executeCodeResponse);
             return executeCodeResponse;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         } finally {
-            deleteFile(userCodeFile);
+            if (userCodeFile != null) {
+                deleteFile(userCodeFile);
+            }
+            javaContainerPool.returnContainer(containerInstance);
         }
-
-
-//        return null;
     }
 
 
@@ -80,7 +89,7 @@ public class JavaDockerCodeSandboxTemplate implements CodeSandbox {
         return true;
     }
 
-    protected void runCode(DockerClient dockerClient, String containerId, List<String> inputList, long time, TimeUnit timeUnit, ExecuteCodeResponse executeCodeResponse) throws IOException, InterruptedException {
+    protected void runCode(DockerClient dockerClient, String containerId, String temporaryDirectoryName, List<String> inputList, long time, TimeUnit timeUnit, ExecuteCodeResponse executeCodeResponse) throws IOException, InterruptedException {
 
         List<String> runOutput = executeCodeResponse.getRunOutput();
         List<String> runErrorOutput = executeCodeResponse.getRunErrorOutput();
@@ -97,7 +106,7 @@ public class JavaDockerCodeSandboxTemplate implements CodeSandbox {
 
                 // 创建新的 exec 命令
                 ExecCreateCmdResponse runCmdResponse = dockerClient.execCreateCmd(containerId)
-                        .withCmd("/bin/sh", "-c", "java -cp /app Main")
+                        .withCmd("/bin/sh", "-c", "java -cp /app/" + temporaryDirectoryName + " Main")
                         .withAttachStdin(true)
                         .withAttachStdout(true)
                         .withAttachStderr(true)
@@ -149,7 +158,8 @@ public class JavaDockerCodeSandboxTemplate implements CodeSandbox {
         }
 
         // 把用户的代码隔离存放
-        String userCodeParentPath = globalCodePathName + File.separator + UUID.randomUUID();
+        String uuid = UUID.randomUUID().toString();
+        String userCodeParentPath = globalCodePathName + File.separator + uuid;
         String userCodePath = userCodeParentPath + File.separator + GLOBAL_JAVA_CLASS_NAME;
         File userCodeFile = FileUtil.writeString(code, userCodePath, StandardCharsets.UTF_8);
         return userCodeFile;
@@ -195,10 +205,10 @@ public class JavaDockerCodeSandboxTemplate implements CodeSandbox {
     }
 
 
-    public void compileCode(DockerClient dockerClient, String containerId, ExecuteCodeResponse executeCodeResponse) throws InterruptedException, IOException {
+    public void compileCode(DockerClient dockerClient, String containerId, String temporaryDirectoryName, ExecuteCodeResponse executeCodeResponse) throws InterruptedException, IOException {
         // Step 1: 执行 Java 编译命令 (javac)
         ExecCreateCmdResponse compileCmdResponse = dockerClient.execCreateCmd(containerId)
-                .withCmd("/bin/sh", "-c", "javac /app/Main.java") // 编译 Java 文件
+                .withCmd("/bin/sh", "-c", "javac /app/" + temporaryDirectoryName + "/Main.java") // 编译 Java 文件
                 .withAttachStdin(true)
                 .withAttachStdout(true)
                 .withAttachStderr(true)

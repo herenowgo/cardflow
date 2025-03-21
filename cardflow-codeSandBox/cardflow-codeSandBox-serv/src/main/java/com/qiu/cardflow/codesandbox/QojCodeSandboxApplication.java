@@ -19,15 +19,24 @@ public class QojCodeSandboxApplication {
 
     @Bean
     DockerClient getDockerClient() {
-        DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
-                .withDockerHost("unix:///var/run/docker.sock")
-                .build();
+        DefaultDockerClientConfig.Builder configBuilder = DefaultDockerClientConfig.createDefaultConfigBuilder();
+    
+    String osName = System.getProperty("os.name").toLowerCase();
+    if (osName.contains("win")) {
+        // Windows环境
+        configBuilder.withDockerHost("tcp://localhost:2375");
+    } else {
+        // Linux/Mac环境
+        configBuilder.withDockerHost("unix:///var/run/docker.sock");
+    }
+    
+    DockerClientConfig config = configBuilder.build();
 
-        DockerHttpClient httpClient = new ApacheDockerHttpClient.Builder()
-                .dockerHost(config.getDockerHost())
-                .sslConfig(config.getSSLConfig())
-                .build();
+    DockerHttpClient httpClient = new ApacheDockerHttpClient.Builder()
+            .dockerHost(config.getDockerHost())
+            .sslConfig(config.getSSLConfig())
+            .build();
 
-        return DockerClientImpl.getInstance(config, httpClient);
+    return DockerClientImpl.getInstance(config, httpClient);
     }
 }
