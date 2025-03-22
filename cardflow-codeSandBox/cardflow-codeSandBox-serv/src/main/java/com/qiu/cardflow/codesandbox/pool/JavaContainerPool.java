@@ -1,46 +1,61 @@
 package com.qiu.cardflow.codesandbox.pool;
 
-import cn.hutool.core.io.FileUtil;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.InspectContainerResponse;
-import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Volume;
+import com.qiu.cardflow.codesandbox.constant.ProgrammingLanguage;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.annotation.Resource;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.pool2.BasePooledObjectFactory;
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.util.Arrays;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 @Slf4j
 @Component
-
+@ConfigurationProperties(prefix = "docker.pool.java")
 public class JavaContainerPool implements ContainerPool {
+
 
     @Resource
     private DockerClient dockerClient;
 
     private GenericObjectPool<ContainerInstance> containerPool;
 
-    // 使用ConcurrentHashMap存储容器实例和其挂载目录的映射
-    private final ConcurrentHashMap<String, String> containerToHostDirectoryMap = new ConcurrentHashMap<>();
-
     private static final String IMAGE_NAME = "openjdk:8-alpine";
 
-    private static final String GLOBAL_CODE_DIR_NAME = "tmpCode";
+    @Setter
+    private Integer maxTotal;
 
+    @Setter
+    private Integer maxIdle;
+
+    @Setter
+    private Integer minIdle;
+
+    @Setter
+    private Long cpuCount;
+
+    @Setter
+    private Long memoryLimitByte;
+
+    /**
+     * docker容器资源是系统的核心资源，所以根据fail-fast原则，在Spring上下文可用之前需要保证必要的容器全部初始化完成
+     *
+     * @throws Exception
+     */
     @PostConstruct
     private void init() throws Exception {
         // 检查镜像是否存在，不存在则拉取
@@ -66,9 +81,9 @@ public class JavaContainerPool implements ContainerPool {
         }
 
         GenericObjectPoolConfig<ContainerInstance> config = new GenericObjectPoolConfig<>();
-        config.setMaxTotal(3); // 最大容器数
-        config.setMaxIdle(3);   // 最大空闲容器数
-        config.setMinIdle(2);   // 最小空闲容器数
+        config.setMaxTotal(maxTotal); // 最大容器数
+        config.setMaxIdle(maxIdle);   // 最大空闲容器数
+        config.setMinIdle(minIdle);   // 最小空闲容器数
         config.setTestOnBorrow(true); // 借用容器时测试是否可用
         config.setTestOnReturn(true); // 归还容器时测试是否可用
 
@@ -83,10 +98,13 @@ public class JavaContainerPool implements ContainerPool {
     }
 
     @Override
+    public ProgrammingLanguage getProgrammingLanguage() {
+        return ProgrammingLanguage.JAVA;
+    }
+
+    @Override
     public ContainerInstance borrowContainer() throws Exception {
-        ContainerInstance containerInstance = containerPool.borrowObject();
-//        setHostDirectory(containerInstance.getContainerId(), hostDirectory);
-        return containerInstance;
+        return containerPool.borrowObject();
     }
 
     @Override
@@ -94,56 +112,31 @@ public class JavaContainerPool implements ContainerPool {
         containerPool.returnObject(container);
     }
 
-    private void invalidateContainer(ContainerInstance container) {
-        try {
-            containerPool.invalidateObject(container);
-        } catch (Exception e) {
-            log.error("无效化容器失败: {}", container.getContainerId(), e);
-        }
-    }
-
     @PreDestroy
-    private void destroy() throws Exception {
+    private void destroy() {
         containerPool.close();
         log.info("Docker容器池已关闭");
     }
 
-    private void setHostDirectory(String containerId, String hostDirectory) {
-        containerToHostDirectoryMap.put(containerId, hostDirectory);
-
-
-    }
-
-    private String getHostDirectory(String containerId) {
-        return containerToHostDirectoryMap.get(containerId);
-    }
-
-    private void removeHostDirectory(String containerId) {
-        containerToHostDirectoryMap.remove(containerId);
-    }
 
     private class DockerContainerFactory extends BasePooledObjectFactory<ContainerInstance> {
 
         @Override
-        public ContainerInstance create() throws Exception {
+        public ContainerInstance create() {
             // 创建容器
             CreateContainerCmd containerCmd = dockerClient.createContainerCmd(IMAGE_NAME);
             HostConfig hostConfig = new HostConfig();
-            hostConfig.withMemory(50 * 1000 * 1000L);
+            hostConfig.withMemory(memoryLimitByte);
             hostConfig.withMemorySwap(0L);
-            hostConfig.withCpuCount(1L);
+            hostConfig.withCpuCount(cpuCount);
 
-            String userDir = System.getProperty("user.dir");
-            String globalCodePathName = userDir + File.separator + GLOBAL_CODE_DIR_NAME;
-            // 判断全局代码目录是否存在，没有则新建
-            if (!FileUtil.exist(globalCodePathName)) {
-                FileUtil.mkdir(globalCodePathName);
-            }
-            hostConfig.setBinds(new Bind(globalCodePathName, new Volume("/app")));
+            // 创建一个匿名卷来保存代码文件
+            Volume volume = new Volume("/app");
             CreateContainerResponse createContainerResponse = containerCmd
                     .withHostConfig(hostConfig)
                     .withNetworkDisabled(true)
-                    .withReadonlyRootfs(true)
+                    .withReadonlyRootfs(true) // 设置只读根文件系统
+                    .withVolumes(volume)// 添加一个匿名卷，这个卷会是可写的
                     .withAttachStdin(true)
                     .withAttachStderr(true)
                     .withAttachStdout(true)
@@ -154,8 +147,11 @@ public class JavaContainerPool implements ContainerPool {
 
             // 启动容器
             dockerClient.startContainerCmd(containerId).exec();
-            log.info("创建并启动了新容器: {}", containerId);
 
+            // 在容器中创建"/app"目录
+
+
+            log.info("创建并启动了新容器: {}", containerId);
             return new ContainerInstance(containerId, dockerClient);
         }
 
@@ -165,18 +161,19 @@ public class JavaContainerPool implements ContainerPool {
         }
 
         @Override
-        public void destroyObject(PooledObject<ContainerInstance> p) throws Exception {
+        public void destroyObject(PooledObject<ContainerInstance> p) {
             ContainerInstance container = p.getObject();
             String containerId = container.getContainerId();
 
-            log.info("销毁容器: {}", containerId);
-            // 停止并删除容器
+            // 停止并删除容器(包括相关的匿名卷)
             dockerClient.stopContainerCmd(containerId).exec();
-            dockerClient.removeContainerCmd(containerId).exec();
+            dockerClient.removeContainerCmd(containerId)
+                    .withRemoveVolumes(true)
+                    .exec();
 
-            // 移除挂载路径记录
-            removeHostDirectory(containerId);
+            log.info("销毁容器: {}", containerId);
         }
+
 
         @Override
         public boolean validateObject(PooledObject<ContainerInstance> p) {
@@ -190,4 +187,5 @@ public class JavaContainerPool implements ContainerPool {
             }
         }
     }
+
 }

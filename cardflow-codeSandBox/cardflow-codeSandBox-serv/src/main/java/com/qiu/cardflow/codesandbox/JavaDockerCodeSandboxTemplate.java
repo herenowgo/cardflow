@@ -27,13 +27,9 @@ public class JavaDockerCodeSandboxTemplate implements CodeSandbox {
 
     private static final String GLOBAL_JAVA_CLASS_NAME = "Main.java";
 
-
-    private final DockerClient dockerClient;
-
     private final JavaContainerPool javaContainerPool;
 
-    public JavaDockerCodeSandboxTemplate(DockerClient dockerClient, JavaContainerPool javaContainerPool) {
-        this.dockerClient = dockerClient;
+    public JavaDockerCodeSandboxTemplate(JavaContainerPool javaContainerPool) {
         this.javaContainerPool = javaContainerPool;
     }
 

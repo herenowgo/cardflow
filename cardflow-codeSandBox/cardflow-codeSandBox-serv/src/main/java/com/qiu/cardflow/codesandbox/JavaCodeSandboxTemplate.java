@@ -45,7 +45,6 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
         ExecuteCodeResponse outputResponse = getOutputResponse(executeMessageList);
 
 //        5. 文件清理
-
         boolean b = deleteFile(userCodeFile);
         if (!b) {
             log.error("deleteFile error, userCodeFilePath = {}", userCodeFile.getAbsolutePath());
@@ -108,8 +107,8 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
 
         List<ExecuteMessage> executeMessageList = new ArrayList<>();
         for (String inputArgs : inputList) {
-//            String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s Main %s", userCodeParentPath, inputArgs);
-            String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s Main", userCodeParentPath);
+//            String runCmd = String.format("java -Xmx50m -Dfile.encoding=UTF-8 -cp %s Main %s", userCodeParentPath, inputArgs);
+            String runCmd = String.format("java -Xmx50m -Dfile.encoding=UTF-8 -cp %s Main", userCodeParentPath);
             try {
                 Process runProcess = Runtime.getRuntime().exec(runCmd);
                 // 超时控制

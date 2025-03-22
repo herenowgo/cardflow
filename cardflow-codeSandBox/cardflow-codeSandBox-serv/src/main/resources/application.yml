@@ -2,3 +2,11 @@ spring:
   profiles:
     active:
     - dev
+docker:
+  pool:
+    java:
+      maxTotal: 3
+      maxIdle: 2
+      minIdle: 2
+      cpuCount: 1
+      memoryLimitByte: 50000000

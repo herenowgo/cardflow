@@ -11,32 +11,32 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication(scanBasePackages = "com.qiu.cardflow")
-public class QojCodeSandboxApplication {
+public class CodeSandboxApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(QojCodeSandboxApplication.class, args);
+        SpringApplication.run(CodeSandboxApplication.class, args);
     }
 
     @Bean
     DockerClient getDockerClient() {
         DefaultDockerClientConfig.Builder configBuilder = DefaultDockerClientConfig.createDefaultConfigBuilder();
-    
-    String osName = System.getProperty("os.name").toLowerCase();
-    if (osName.contains("win")) {
-        // Windows环境
-        configBuilder.withDockerHost("tcp://localhost:2375");
-    } else {
-        // Linux/Mac环境
-        configBuilder.withDockerHost("unix:///var/run/docker.sock");
-    }
-    
-    DockerClientConfig config = configBuilder.build();
 
-    DockerHttpClient httpClient = new ApacheDockerHttpClient.Builder()
-            .dockerHost(config.getDockerHost())
-            .sslConfig(config.getSSLConfig())
-            .build();
+        String osName = System.getProperty("os.name").toLowerCase();
+        if (osName.contains("win")) {
+            // Windows环境
+            configBuilder.withDockerHost("tcp://localhost:2375");
+        } else {
+            // Linux/Mac环境
+            configBuilder.withDockerHost("unix:///var/run/docker.sock");
+        }
 
-    return DockerClientImpl.getInstance(config, httpClient);
+        DockerClientConfig config = configBuilder.build();
+
+        DockerHttpClient httpClient = new ApacheDockerHttpClient.Builder()
+                .dockerHost(config.getDockerHost())
+                .sslConfig(config.getSSLConfig())
+                .build();
+
+        return DockerClientImpl.getInstance(config, httpClient);
     }
 }

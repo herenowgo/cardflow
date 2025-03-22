@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -77,6 +78,9 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
 
     @Resource
     private CodeSandBoxService codeSandBoxService;
+
+    @Resource
+    private RabbitTemplate rabbitTemplate;
 
     // 自定义线程池
     private final ExecutorService executorService = Executors.newCachedThreadPool();
@@ -241,6 +245,8 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
             executeCodeRequest.setCode(code);
             executeCodeRequest.setInputList(List.of(testCase));
             ExecuteCodeResponse executeCodeResponse = null;
+
+            rabbitTemplate.convertAndSend("codesandbox.exchange", "toEventStream", executeCodeRequest);
             try {
                 executeCodeResponse = codeSandBoxService.executeCode(executeCodeRequest);
             } catch (Exception e) {
@@ -250,7 +256,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
             ExecuteCodeResponseVO executeCodeResponseVO = new ExecuteCodeResponseVO();
             BeanUtil.copyProperties(executeCodeResponse, executeCodeResponseVO);
 
-            executeCodeResponseVO.setTestCase(testCase);
+//            executeCodeResponseVO.setTestCase(testCase);
 
             EventMessage eventMessage = EventMessage.builder()
                     .data(executeCodeResponseVO)
