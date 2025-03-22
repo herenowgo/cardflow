@@ -41,12 +41,10 @@ public class QuestionController {
      * 创建
      *
      * @param questionAddRequest
-     * @param request
      * @return
      */
     @PostMapping("/add")
-    public BaseResponse<Long> addQuestion(@RequestBody QuestionAddRequest questionAddRequest,
-            HttpServletRequest request) {
+    public BaseResponse<Long> addQuestion(@RequestBody QuestionAddRequest questionAddRequest) {
         Asserts.failIf(questionAddRequest == null, "请求参数错误");
         Question question = new Question();
         BeanUtils.copyProperties(questionAddRequest, question);
@@ -174,7 +172,7 @@ public class QuestionController {
      */
     @PostMapping("/list/page/vo")
     public BaseResponse<Page<QuestionVO>> listQuestionVOByPage(@RequestBody QuestionQueryRequest questionQueryRequest,
-            HttpServletRequest request) {
+                                                               HttpServletRequest request) {
         Asserts.failIf(questionQueryRequest == null, "请求参数错误");
         long current = questionQueryRequest.getCurrent();
         long size = questionQueryRequest.getPageSize();
@@ -220,7 +218,7 @@ public class QuestionController {
      */
     @PostMapping("/my/list/page/vo")
     public BaseResponse<Page<QuestionVO>> listMyQuestionVOByPage(@RequestBody QuestionQueryRequest questionQueryRequest,
-            HttpServletRequest request) {
+                                                                 HttpServletRequest request) {
         Asserts.failIf(questionQueryRequest == null, "请求参数错误");
         questionQueryRequest.setUserId(UserContext.getUserId());
         long current = questionQueryRequest.getCurrent();
@@ -238,13 +236,11 @@ public class QuestionController {
      * 编辑（用户）
      *
      * @param questionEditRequest
-     * @param request
      * @return
      */
     @PostMapping("/edit")
     @CacheEvict(value = QuestionConstant.CACHE_QUESTION_SIMPLE_PAGE, allEntries = true)
-    public BaseResponse<Boolean> editQuestion(@RequestBody QuestionEditRequest questionEditRequest,
-            HttpServletRequest request) {
+    public BaseResponse<Boolean> editQuestion(@RequestBody QuestionEditRequest questionEditRequest) {
         Asserts.failIf(questionEditRequest == null || questionEditRequest.getId() <= 0, "请求参数错误");
         Question question = new Question();
         BeanUtils.copyProperties(questionEditRequest, question);

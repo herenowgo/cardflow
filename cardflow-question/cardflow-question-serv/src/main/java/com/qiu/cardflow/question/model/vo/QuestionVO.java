@@ -1,6 +1,8 @@
 package com.qiu.cardflow.question.model.vo;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.qiu.cardflow.question.model.dto.question.JudgeCase;
 import com.qiu.cardflow.question.model.dto.question.JudgeConfig;
 import com.qiu.cardflow.question.model.entity.Question;
 import com.qiu.cardflow.user.dto.UserVO;
@@ -50,6 +52,8 @@ public class QuestionVO implements Serializable {
      * 题目通过数
      */
     private Integer acceptedNum;
+
+    private JudgeCase judgeCase;
 
     /**
      * 判题配置（json 对象）
@@ -129,6 +133,11 @@ public class QuestionVO implements Serializable {
         questionVO.setTags(JSONUtil.toList(tagList, String.class));
         String judgeConfigStr = question.getJudgeConfig();
         questionVO.setJudgeConfig(JSONUtil.toBean(judgeConfigStr, JudgeConfig.class));
+        String judgeCaseStr = question.getJudgeCase();
+        if (StrUtil.isNotBlank(judgeCaseStr)) {
+            List<JudgeCase> judgeCaseList = JSONUtil.toList(judgeCaseStr, JudgeCase.class);
+            questionVO.setJudgeCase(judgeCaseList.get(0));
+        }
         return questionVO;
     }
 }
