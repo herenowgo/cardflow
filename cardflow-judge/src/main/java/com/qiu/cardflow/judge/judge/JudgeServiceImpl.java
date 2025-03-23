@@ -14,9 +14,12 @@ import com.qiu.cardflow.judge.model.entity.QuestionSubmit;
 import com.qiu.cardflow.judge.model.enums.QuestionSubmitStatusEnum;
 import com.qiu.cardflow.judge.service.QuestionService;
 import com.qiu.cardflow.judge.service.QuestionSubmitService;
+import com.qiu.cardflow.redis.starter.key.EventStreamKeyBuilder;
 import com.qiu.codeflow.eventStream.dto.EventMessage;
 import com.qiu.codeflow.eventStream.dto.EventType;
+import com.qiu.codeflow.eventStream.message.EventStreamMessageConstant;
 import jakarta.annotation.Resource;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -45,7 +48,13 @@ public class JudgeServiceImpl implements JudgeService {
     private CodeSandBoxService codeSandBoxService;
 
     @Resource
+    private RabbitTemplate rabbitTemplate;
+
+    @Resource
     private StreamBridge streamBridge;
+
+    @Resource
+    private EventStreamKeyBuilder eventStreamKeyBuilder;
 
     @Value("${codesandbox.type:example}")
     private String type;
@@ -131,7 +140,13 @@ public class JudgeServiceImpl implements JudgeService {
                 .requestId(requestId)
                 .data(judgeInfo)
                 .build();
-        streamBridge.send("eventStream-out-0", eventMessage);
+        // 发送消息到消息队列
+        String userToEventStreamKey = eventStreamKeyBuilder.buildUserToEventStreamKey(questionSubmit.getUserId().toString());
+        String routingKey = stringRedisTemplate.opsForValue().get(userToEventStreamKey);
+        if (routingKey != null) {
+            rabbitTemplate.convertAndSend(EventStreamMessageConstant.EVENT_STREAM_EXCHANGE, routingKey, eventMessage);
+        }
+//        streamBridge.send("eventStream-out-0", eventMessage);
         return true;
     }
 

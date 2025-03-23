@@ -6,5 +6,6 @@ public enum EventType {
     CARD_SUGGEST,
     CARDS_GENERATE,
     ANSWER,
-    JUDGE_RESULT;
+    JUDGE_RESULT,
+    HEARTBEAT;
 }

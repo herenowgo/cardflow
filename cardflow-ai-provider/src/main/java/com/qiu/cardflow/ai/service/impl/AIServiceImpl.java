@@ -9,17 +9,19 @@ import com.qiu.cardflow.ai.structured.TargetType;
 import com.qiu.cardflow.ai.util.ChatClientRequestSpecBuilder;
 import com.qiu.cardflow.common.interfaces.exception.Assert;
 import com.qiu.cardflow.redis.starter.key.AICacheKeyBuilder;
+import com.qiu.cardflow.redis.starter.key.EventStreamKeyBuilder;
 import com.qiu.cardflow.rpc.starter.RPCContext;
 import com.qiu.codeflow.eventStream.dto.EventMessage;
 import com.qiu.codeflow.eventStream.dto.EventType;
+import com.qiu.codeflow.eventStream.message.EventStreamMessageConstant;
 import com.qiu.codeflow.eventStream.util.EventMessageUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.prompt.ChatOptions;
-import org.springframework.cloud.stream.function.StreamBridge;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -53,13 +55,16 @@ public class AIServiceImpl implements IAIService {
             "  return 0 -- 拒绝调用\n" + //
             "end";
 
-    private final StreamBridge streamBridge;
+//    private final StreamBridge streamBridge;
 
+    private final RabbitTemplate rabbitTemplate;
     private final AIModelFactory aiModelFactory;
 
     private final AICacheKeyBuilder aiCacheKeyBuilder;
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final StringRedisTemplate redisTemplate;
+
+    private final EventStreamKeyBuilder eventStreamKeyBuilder;
 
     // 用于存储会话记录
     private final InMemoryChatMemory chatMemory = new InMemoryChatMemory();
@@ -101,24 +106,26 @@ public class AIServiceImpl implements IAIService {
                 .withChatHistoryWindowSize(chatHistoryWindowSize)
                 .withConversationId(conversationId)
                 .build(chatClient);
-
+        String userToEventStreamKey = eventStreamKeyBuilder.buildUserToEventStreamKey(userId);
+        String routingKey = redisTemplate.opsForValue().get(userToEventStreamKey);
         try {
+
             Flux<String> result = chatClientRequestSpec.stream().content();
             result
                     .bufferTimeout(maxSize, Duration.ofMillis(maxMills))
                     .index()
                     .doOnNext(message -> {
                         sendToQueue(message.getT2(), requestId, eventType, userId,
-                                Math.toIntExact(message.getT1()) + 1);
+                                Math.toIntExact(message.getT1()) + 1, routingKey);
                     })
-                    .doOnComplete(() -> sendEndMessageToQueue(null, requestId, eventType, userId))
+                    .doOnComplete(() -> sendEndMessageToQueue(null, requestId, eventType, userId, routingKey))
                     .doOnError((e) -> {
                         log.error("AI模型调用失败", e);
-                        sendEndMessageToQueue("该AI模型暂时不可用，请切换模型或稍后再试", requestId, eventType, userId);
+                        sendEndMessageToQueue("该AI模型暂时不可用，请切换模型或稍后再试", requestId, eventType, userId, routingKey);
                     })
                     .subscribe();
         } catch (Exception e) {
-            sendEndMessageToQueue("该AI模型暂时不可用，请切换模型或稍后再试", requestId, eventType, userId);
+            sendEndMessageToQueue("该AI模型暂时不可用，请切换模型或稍后再试", requestId, eventType, userId, routingKey);
             throw new RuntimeException(e);
         }
 
@@ -150,6 +157,8 @@ public class AIServiceImpl implements IAIService {
         AIModelInstance aiModelInstance = aiModelFactory.getAIModelInstance(model);
         ChatClient chatClient = aiModelInstance.getChatClient();
         String modelName = aiModelInstance.getModelNameInSupplier();
+        String userToEventStreamKey = eventStreamKeyBuilder.buildUserToEventStreamKey(userId);
+        String routingKey = redisTemplate.opsForValue().get(userToEventStreamKey);
         executorService.submit(() -> {
             try {
                 ChatClient.ChatClientRequestSpec chatClientRequestSpec = ChatClientRequestSpecBuilder
@@ -166,10 +175,10 @@ public class AIServiceImpl implements IAIService {
                 Object resultObject = chatClientRequestSpec
                         .call()
                         .entity(targetType.getType());
-                sendToQueue(resultObject, requestId, eventType, userId);
+                sendToQueue(resultObject, requestId, eventType, userId, routingKey);
             } catch (Exception e) {
                 log.error("结构化输出异常", e);
-                sendEndMessageToQueue("该AI模型暂时不可用，请切换模型或稍后再试", requestId, eventType, userId);
+                sendEndMessageToQueue("该AI模型暂时不可用，请切换模型或稍后再试", requestId, eventType, userId, routingKey);
                 throw new RuntimeException(e);
             }
         });
@@ -177,7 +186,7 @@ public class AIServiceImpl implements IAIService {
         return requestId;
     }
 
-    private void sendToQueue(Object data, String requestId, EventType eventType, String userId) {
+    private void sendToQueue(Object data, String requestId, EventType eventType, String userId, String routingKey) {
         EventMessage eventMessage = EventMessage.builder()
                 .userId(userId)
                 .eventType(eventType)
@@ -185,11 +194,13 @@ public class AIServiceImpl implements IAIService {
                 .data(data)
                 .build();
 
-        streamBridge.send("eventMessage-out-0", eventMessage);
+//        streamBridge.send("eventMessage-out-0", eventMessage);
+        rabbitTemplate.convertAndSend(EventStreamMessageConstant.EVENT_STREAM_EXCHANGE, routingKey, eventMessage);
+
     }
 
     private void sendToQueue(List<String> data, String requestId, EventType eventType, String userId,
-            Integer sequence) {
+                             Integer sequence, String routingKey) {
         StringBuilder sb = new StringBuilder();
         for (String str : data) {
             sb.append(str);
@@ -202,10 +213,11 @@ public class AIServiceImpl implements IAIService {
                 .data(result)
                 .sequence(sequence)
                 .build();
-        streamBridge.send("eventMessage-out-0", eventMessage);
+//        streamBridge.send("eventMessage-out-0", eventMessage);
+        rabbitTemplate.convertAndSend(EventStreamMessageConstant.EVENT_STREAM_EXCHANGE, routingKey, eventMessage);
     }
 
-    private void sendEndMessageToQueue(String endMessage, String requestId, EventType eventType, String userId) {
+    private void sendEndMessageToQueue(String endMessage, String requestId, EventType eventType, String userId, String routingKey) {
         EventMessage eventMessage = EventMessage.builder()
                 .userId(userId)
                 .data(endMessage)
@@ -213,7 +225,8 @@ public class AIServiceImpl implements IAIService {
                 .requestId(requestId)
                 .sequence(-1)
                 .build();
-        streamBridge.send("eventMessage-out-0", eventMessage);
+//        streamBridge.send("eventMessage-out-0", eventMessage);
+        rabbitTemplate.convertAndSend(EventStreamMessageConstant.EVENT_STREAM_EXCHANGE, routingKey, eventMessage);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.qiu.cardflow.event.stream.model;
+package com.qiu.codeflow.eventStream.dto;
 
 import lombok.Data;
 

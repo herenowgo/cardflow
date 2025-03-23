@@ -1,25 +1,33 @@
 package com.qiu.cardflow.event.stream.service;
 
+import com.qiu.cardflow.event.stream.message.EventStreamAMQPConfig;
+import com.qiu.cardflow.redis.starter.key.EventStreamKeyBuilder;
+import com.qiu.codeflow.eventStream.dto.EventMessage;
+import com.qiu.codeflow.eventStream.dto.EventMessageVO;
+import com.qiu.codeflow.eventStream.dto.EventType;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Sinks;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.springframework.stereotype.Service;
-
-import com.qiu.cardflow.event.stream.model.EventMessage;
-import com.qiu.cardflow.event.stream.model.EventMessageVO;
-import com.qiu.cardflow.event.stream.model.EventType;
-
-import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Sinks;
 
 @Slf4j
 @Service
 public class EventStreamService {
     // 修改为Map<String, Set<SinkInfo>>结构，为每个用户存储多个连接
     private final Map<String, Set<SinkInfo>> userSinks = new ConcurrentHashMap<>();
+
+    @Resource
+    private RedisTemplate redisTemplate;
+
+    @Resource
+    private EventStreamKeyBuilder keyBuilder;
 
     // 内部类，封装sink和连接ID
     private static class SinkInfo {
@@ -72,7 +80,8 @@ public class EventStreamService {
 
         // 立即发送连接成功消息
         sendInitialConnectionMessage(sink);
-
+        String key = keyBuilder.buildUserToEventStreamKey(userId);
+        redisTemplate.opsForValue().set(key, EventStreamAMQPConfig.EVENT_STREAM_QUEUE);
         return sink.asFlux()
                 .doFinally(signalType -> {
                     // 连接关闭时，移除对应的sink
@@ -85,6 +94,8 @@ public class EventStreamService {
                         // 如果用户没有更多连接，则移除用户条目
                         if (userConnections.isEmpty()) {
                             userSinks.remove(userId);
+
+                            redisTemplate.delete(key);
                             log.info("Removed user {} from sink map as all connections closed", userId);
                         }
                     }
@@ -93,7 +104,7 @@ public class EventStreamService {
 
     /**
      * 向新连接发送初始连接成功消息
-     * 
+     *
      * @param userId       用户ID
      * @param connectionId 连接ID
      * @param sink         Sink对象
