@@ -20,9 +20,9 @@ public class CodeSandBoxAMQPConfig {
     }
 
     @Bean
-    Binding codeSandBoxBinding(Queue codeSandBoxQueue, Exchange codeSandBoxToEventStreamQueue) {
-        return BindingBuilder.bind(codeSandBoxQueue)
-                .to(codeSandBoxToEventStreamQueue)
+    Binding codeSandBoxBinding(Queue codeSandBoxToEventStreamQueue, Exchange codeSandBoxExchange) {
+        return BindingBuilder.bind(codeSandBoxToEventStreamQueue)
+                .to(codeSandBoxExchange)
                 .with("toEventStream")
                 .noargs();
     }

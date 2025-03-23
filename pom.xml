@@ -30,6 +30,7 @@
         <module>cardflow-ai-interface</module>
         <module>cardflow-card-provider</module>
         <module>cardflow-card-interface</module>
+        <module>cardflow-judge-interface</module>
     </modules>
 
 

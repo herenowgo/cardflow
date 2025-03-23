@@ -52,7 +52,7 @@ public class JudgeServiceImpl implements JudgeService {
 
 
     @Override
-    public Boolean doJudge(String questionSubmitIdAndRequestId) {
+    public Boolean doJudge(String questionSubmitIdAndRequestId) throws IOException, InterruptedException {
         String[] split = questionSubmitIdAndRequestId.split(",");
         Long questionSubmitId = Long.parseLong(split[0]);
         String requestId = split[1];
@@ -77,11 +77,9 @@ public class JudgeServiceImpl implements JudgeService {
                 .inputList(inputList)
                 .build();
         ExecuteCodeResponse executeCodeResponse = null;
-        try {
-            executeCodeResponse = codeSandBoxService.executeCode(executeCodeRequest);
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+
+        executeCodeResponse = codeSandBoxService.executeCode(executeCodeRequest);
+
 
         // 判题
         List<String> outputList = executeCodeResponse.getRunOutput();

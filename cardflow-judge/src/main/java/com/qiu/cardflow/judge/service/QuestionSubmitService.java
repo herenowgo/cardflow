@@ -3,10 +3,10 @@ package com.qiu.cardflow.judge.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.qiu.cardflow.common.model.entity.User;
 import com.qiu.cardflow.judge.model.dto.questionsubmint.QuestionSubmitAddRequest;
 import com.qiu.cardflow.judge.model.dto.questionsubmint.QuestionSubmitQueryRequest;
 import com.qiu.cardflow.judge.model.entity.QuestionSubmit;
-import com.qiu.cardflow.common.model.entity.User;
 import com.qiu.cardflow.judge.model.vo.QuestionSubmitStateVO;
 import com.qiu.cardflow.judge.model.vo.QuestionSubmitVO;
 

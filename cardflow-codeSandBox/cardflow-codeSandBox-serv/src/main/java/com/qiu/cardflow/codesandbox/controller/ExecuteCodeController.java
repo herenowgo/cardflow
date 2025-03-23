@@ -1,6 +1,6 @@
 package com.qiu.cardflow.codesandbox.controller;
 
-import com.qiu.cardflow.codesandbox.model.ExecuteCodeRequest;
+import com.qiu.cardflow.codesandbox.dto.ExecuteCodeRequest;
 import com.qiu.cardflow.codesandbox.model.ExecuteCodeResponse;
 import com.qiu.cardflow.codesandbox.service.ExecuteCodeService;
 import jakarta.validation.Valid;

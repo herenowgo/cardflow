@@ -1,6 +1,6 @@
 package com.qiu.cardflow.codesandbox;
 
-import com.qiu.cardflow.codesandbox.model.ExecuteCodeRequest;
+import com.qiu.cardflow.codesandbox.dto.ExecuteCodeRequest;
 import com.qiu.cardflow.codesandbox.model.ExecuteCodeResponse;
 
 import java.io.IOException;

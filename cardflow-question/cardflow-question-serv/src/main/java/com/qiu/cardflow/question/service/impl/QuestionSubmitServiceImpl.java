@@ -7,6 +7,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import com.qiu.cardflow.codesandbox.message.CodeSandBoxToEventStreamMessage;
+import com.qiu.cardflow.judge.message.JudgeAMQPConfig;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -76,8 +78,8 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
-    @Resource
-    private CodeSandBoxService codeSandBoxService;
+//    @Resource
+//    private CodeSandBoxService codeSandBoxService;
 
     @Resource
     private RabbitTemplate rabbitTemplate;
@@ -121,8 +123,8 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         stringRedisTemplate.opsForZSet().incrementScore(key, String.valueOf(questionId), 1);
         Long questionSubmitId = questionSubmit.getId();
         // 异步执行判题服务
-        streamBridge.send(EventConstant.QUESTION_SUBMIT, questionSubmitId + "," + requestId);
-
+//        streamBridge.send(EventConstant.QUESTION_SUBMIT, questionSubmitId + "," + requestId);
+        rabbitTemplate.convertAndSend(JudgeAMQPConfig.JUDGE_EXCHANGE, "", questionSubmitId + "," + requestId);
         return new QuestionSubmitResponse(requestId, questionSubmitId);
     }
 
@@ -246,25 +248,32 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
             executeCodeRequest.setInputList(List.of(testCase));
             ExecuteCodeResponse executeCodeResponse = null;
 
-            rabbitTemplate.convertAndSend("codesandbox.exchange", "toEventStream", executeCodeRequest);
-            try {
-                executeCodeResponse = codeSandBoxService.executeCode(executeCodeRequest);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-
-            ExecuteCodeResponseVO executeCodeResponseVO = new ExecuteCodeResponseVO();
-            BeanUtil.copyProperties(executeCodeResponse, executeCodeResponseVO);
-
-//            executeCodeResponseVO.setTestCase(testCase);
-
-            EventMessage eventMessage = EventMessage.builder()
-                    .data(executeCodeResponseVO)
+            CodeSandBoxToEventStreamMessage codeSandBoxToEventStreamMessage = CodeSandBoxToEventStreamMessage.builder()
                     .userId(userId)
-                    .eventType(EventType.JUDGE_RESULT)
                     .requestId(requestId)
+                    .executeCodeRequest(executeCodeRequest)
+                    .eventType(EventType.JUDGE_RESULT)
                     .build();
-            streamBridge.send("eventMessage-out-0", eventMessage);
+
+            rabbitTemplate.convertAndSend("codesandbox.exchange", "toEventStream", codeSandBoxToEventStreamMessage);
+//            try {
+//                executeCodeResponse = codeSandBoxService.executeCode(executeCodeRequest);
+//            } catch (Exception e) {
+//                throw new RuntimeException(e);
+//            }
+
+//            ExecuteCodeResponseVO executeCodeResponseVO = new ExecuteCodeResponseVO();
+//            BeanUtil.copyProperties(executeCodeResponse, executeCodeResponseVO);
+//
+////            executeCodeResponseVO.setTestCase(testCase);
+//
+//            EventMessage eventMessage = EventMessage.builder()
+//                    .data(executeCodeResponseVO)
+//                    .userId(userId)
+//                    .eventType(EventType.JUDGE_RESULT)
+//                    .requestId(requestId)
+//                    .build();
+//            streamBridge.send("eventMessage-out-0", eventMessage);
         });
 
         return requestId;
