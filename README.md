@@ -5,9 +5,16 @@
 
 探索AI时代下更高效的编程学习与实战方式。平台提供多样的学习资源（在线评测的算法题、PDF、抽认卡等），高效的学习流程（思考、制卡、复习（采用FSRS算法）、致用）与智能的学习辅助（AI问答与自动制卡、自动构建用户个人知识图谱）
 
-## 项目架构
+## 技术栈
 
-![CardFlow架构图](https://github.com/user-attachments/assets/afc7ac87-a16a-4179-aa31-f640ff335711)
+### 后端
+Spring Cloud Alibaba+Dubbo+ Spring AI + RabbitMQ+MySQL+Redis+Neo4j+Docker+MongoDB
+
+### 前端
+在另一个项目中：https://github.com/herenowgo/cardflow-frontend
+
+## 项目架构
+![yuque_diagram](https://github.com/user-attachments/assets/25dd5931-f9c4-425b-b97a-28b9c604f59b)
 
 ## 核心功能模块
 
@@ -95,13 +102,7 @@ CardFlow 基于"思考、记录、复习、致用"的学习闭环，为用户打
 - 主题学习与查漏补缺
 - AI 辅助应用知识解决实际问题
 
-## 技术栈
 
-### 后端
-Spring Cloud Alibaba+Dubbo+ Spring AI + RabbitMQ+MySQL+Redis+Neo4j+Docker+MongoDB
-
-### 前端
-在另一个项目中：https://github.com/herenowgo/cardflow-frontend
 
 
 
